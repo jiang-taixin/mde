@@ -35,6 +35,7 @@ export default defineConfig(({ mode }) => {
           "src/utils",
           "src/components",
           "src/constants",
+          "src/language",
         ],
         dts: true,
       }),
@@ -73,7 +74,7 @@ export default defineConfig(({ mode }) => {
       proxy: {
         "/api": {
           // target: "http://127.0.0.1:8000",
-          target: "https://vmuat.pfizer.com.cn",
+          target: "http://localhost:8080",
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ""), // 路径重写
         },

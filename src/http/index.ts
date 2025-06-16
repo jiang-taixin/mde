@@ -1,9 +1,15 @@
 import axios, { AxiosError } from "axios";
 
-// 创建axios实例
+declare module "axios" {
+  interface AxiosRequestConfig {
+    showLoading?: boolean;
+  }
+}
+
 const request = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  timeout: 80000,
+  timeout: 180000,
+  withCredentials: false,
   headers: {
     post: {
       "Content-Type": "application/json; charset=UTF-8",
@@ -23,11 +29,12 @@ request.interceptors.request.use(
 
 // response 拦截器
 request.interceptors.response.use(
-  (response) => {
-    return response;
+  async (response) => {
+    return response.data;
   },
-  (error: AxiosError) => {
-    return Promise.reject(error.message);
+  async (error: AxiosError) => {
+    return Promise.reject(error);
   }
 );
+
 export default request;

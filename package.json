@@ -14,7 +14,6 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
-    "@ant-design/icons-vue": "^7.0.1",
     "@tailwindcss/vite": "^4.1.6",
     "ant-design-vue": "^4.2.6",
     "axios": "^1.9.0",
@@ -35,6 +34,7 @@
     "eslint": "^9.22.0",
     "eslint-plugin-vue": "~10.0.0",
     "jiti": "^2.4.2",
+    "less": "^4.3.0",
     "npm-run-all2": "^7.0.2",
     "postcss": "^8.5.3",
     "sass-embedded": "^1.88.0",

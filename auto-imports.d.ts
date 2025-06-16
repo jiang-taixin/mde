@@ -6,8 +6,13 @@
 // biome-ignore lint: disable
 export {}
 declare global {
+  const ComponentType: typeof import('./src/models/moduleConfig')['ComponentType']
   const EffectScope: typeof import('vue')['EffectScope']
+  const Language: typeof import('./src/language/index')['Language']
+  const LanguageNames: typeof import('./src/language/index')['LanguageNames']
+  const ModuleType: typeof import('./src/models/ModuleItem')['ModuleType']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
+  const alovaInstance: typeof import('./src/http/index')['alovaInstance']
   const computed: typeof import('vue')['computed']
   const createApp: typeof import('vue')['createApp']
   const createPinia: typeof import('pinia')['createPinia']
@@ -16,11 +21,19 @@ declare global {
   const defineComponent: typeof import('vue')['defineComponent']
   const defineStore: typeof import('pinia')['defineStore']
   const effectScope: typeof import('vue')['effectScope']
+  const en: typeof import('./src/language/en')['default']
   const getActivePinia: typeof import('pinia')['getActivePinia']
   const getCurrentInstance: typeof import('vue')['getCurrentInstance']
   const getCurrentScope: typeof import('vue')['getCurrentScope']
+  const getDateMessage: typeof import('./src/utils/datetime')['getDateMessage']
+  const getEnglishDate: typeof import('./src/utils/datetime')['getEnglishDate']
+  const getIcon: typeof import('./src/utils/icon-transfer')['getIcon']
+  const getModuleConfig: typeof import('./src/services/module-service')['getModuleConfig']
+  const getModulesList: typeof import('./src/services/module-service')['getModulesList']
+  const getWeekNo: typeof import('./src/utils/datetime')['getWeekNo']
   const h: typeof import('vue')['h']
   const http: typeof import('./src/http/index')['default']
+  const i18n: typeof import('./src/language/index')['i18n']
   const inject: typeof import('vue')['inject']
   const isProxy: typeof import('vue')['isProxy']
   const isReactive: typeof import('vue')['isReactive']
@@ -75,6 +88,7 @@ declare global {
   const useId: typeof import('vue')['useId']
   const useLink: typeof import('vue-router')['useLink']
   const useModel: typeof import('vue')['useModel']
+  const useModuleTabsStore: typeof import('./src/stores/moduleTabs')['useModuleTabsStore']
   const useRoute: typeof import('vue-router')['useRoute']
   const useRouter: typeof import('vue-router')['useRouter']
   const useSlots: typeof import('vue')['useSlots']
@@ -83,10 +97,20 @@ declare global {
   const watchEffect: typeof import('vue')['watchEffect']
   const watchPostEffect: typeof import('vue')['watchPostEffect']
   const watchSyncEffect: typeof import('vue')['watchSyncEffect']
+  const zh: typeof import('./src/language/zh')['default']
 }
 // for type re-export
 declare global {
   // @ts-ignore
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
+  // @ts-ignore
+  export type { ModuleType, ModuleTab, ModuleItem } from './src/models/ModuleItem'
+  import('./src/models/ModuleItem')
+  // @ts-ignore
+  export type { ComponentType, ComponentModel, SubConfig, ModuleConfig } from './src/models/moduleConfig'
+  import('./src/models/moduleConfig')
+  // @ts-ignore
+  export type { Language } from './src/language/index'
+  import('./src/language/index')
 }
