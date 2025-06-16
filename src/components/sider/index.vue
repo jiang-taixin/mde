@@ -4,36 +4,8 @@
             :class="[!props.collapsed && 'scale-100 opacity-100', props.collapsed && 'scale-0 opacity-0 h-0 overflow-hidden']">
             Navigate Explorer
         </div>
-        <a-menu v-model:selectedKeys="selectedKeys" v-model:openKeys="openKeys" theme="light" mode="inline"
-            @openChange="handleOpenChange">
-            <template v-for="rootModule in menuList" :key="rootModule.ID">
-                <!-- 一级菜单 -->
-                <a-sub-menu v-if="rootModule.SubModulesList" :key="rootModule.ID">
-                    <template #icon>
-                        <img :src="getIcon(rootModule.Icon)" />
-                    </template>
-                    <template #title>{{ rootModule.DisplayName }}</template>
-
-                    <!-- 二级菜单 -->
-                    <template v-for="moduleModule in rootModule.SubModulesList" :key="moduleModule.ID">
-                        <a-sub-menu v-if="moduleModule.SubModulesList" :key="moduleModule.ID">
-                            <template #icon>
-                                <img :src="getIcon(moduleModule.Icon)" />
-                            </template>
-                            <template #title>{{ moduleModule.DisplayName }}</template>
-
-                            <!-- 三级菜单 -->
-                            <a-menu-item v-for="pageModule in moduleModule.SubModulesList" :key="pageModule.ID"
-                                @click="itemClick(pageModule, rootModule.DisplayName, moduleModule.DisplayName)">
-                                <template #icon>
-                                    <img :src="getIcon(pageModule.Icon)" />
-                                </template>
-                                {{ pageModule.DisplayName }}
-                            </a-menu-item>
-                        </a-sub-menu>
-                    </template>
-                </a-sub-menu>
-            </template>
+        <a-menu mode="inline" class="bg-primary-200" :items="menuItems" @openChange="onOpenChange"
+            v-model:selectedKeys="selectedKeys" v-model:openKeys="openKeys">
         </a-menu>
     </div>
 </template>
@@ -44,22 +16,26 @@ import { getModulesList } from '@/services/module-service';
 import { useModuleTabsStore } from '@/stores/moduleTabs';
 import { storeToRefs } from 'pinia';
 import { ref, watch, onMounted } from 'vue';
+import { getIcon } from "@/utils/icon-transfer";
+import type { MenuProps } from 'ant-design-vue';
 import type { Key } from 'ant-design-vue/es/_util/type';
 
 const moduleTabsStore = useModuleTabsStore();
 const { activeModuleTab } = storeToRefs(moduleTabsStore);
 const menuList = ref<ModuleItem[]>([]);
-const selectedKeys = ref<string[]>([activeModuleTab.value as string]);
+const rootSubmenuKeys = ref<Key[]>([]);
 const openKeys = ref<Key[]>([]);
-
-import { getIcon } from "@/utils/icon-transfer";
-
+const selectedKeys = ref<string[]>([]);
+let lastOpenKeys: Key[] = [];
+const menuItems = computed(() => convertToMenuItems(menuList.value));
 onMounted(async () => {
     const res = await getModulesList("ssss");
     menuList.value = res;
+    // 提取所有一级菜单的 ID
+    rootSubmenuKeys.value = menuList.value.map(item => item.ID as string);
     // 默认展开第一个一级菜单
-    if (menuList.value.length > 0 && menuList.value[0].SubModulesList) {
-        openKeys.value = [menuList.value[0].ID];
+    if (menuList.value.length > 0) {
+        openKeys.value = [menuList.value[0].ID as string];
     }
 });
 
@@ -75,37 +51,8 @@ watch(activeModuleTab, (newVal) => {
     selectedKeys.value = [newVal];
 });
 
-// 处理菜单展开状态变化
-const handleOpenChange = (keys: Key[]) => {
-    // 找出最新变化的菜单项
-    const latestChangedKey = keys.length > openKeys.value.length
-        ? keys.find(key => !openKeys.value.includes(key))
-        : openKeys.value.find(key => !keys.includes(key));
-    console.log("---------------- handleOpenChange:" + latestChangedKey);
-    if (!latestChangedKey) return;
-
-    // 检查是否是二级或三级菜单
-    const isSubMenu = menuList.value.some(root =>
-        root.SubModulesList?.some(sub =>
-            sub.ID === latestChangedKey ||
-            sub.SubModulesList?.some(item => item.ID === latestChangedKey)
-        )
-    );
-
-    if (!isSubMenu) {
-        // 如果是一级菜单的点击，则切换其展开状态
-        openKeys.value = keys.includes(latestChangedKey)
-            ? [latestChangedKey]
-            : [];
-    } else {
-        // 如果是子菜单的点击，保持当前展开状态
-        openKeys.value = keys;
-    }
-};
 
 const itemClick = (moduleItem: ModuleItem, rootModuleName: string, moduleModuleName: string) => {
-    console.log("------ click item:" + JSON.stringify(moduleItem));
-
     const selectedModule: ModuleTab = {
         DisplayName: moduleItem.DisplayName,
         Url: moduleItem.ID as string,
@@ -129,6 +76,65 @@ const itemClick = (moduleItem: ModuleItem, rootModuleName: string, moduleModuleN
         moduleTabsStore.setActiveModuleTab(moduleTabsStore.moduleTabList[index].ID);
     }
 };
+
+const convertToMenuItems = (
+    items: ModuleItem[],
+    parentNames: string[] = []
+): MenuProps['items'] => {
+    return items.map(item => ({
+        key: item.ID,
+        label: item.DisplayName,
+        icon: () => h('img', { src: getIcon(item.Icon) }),
+        children: item.SubModulesList
+            ? convertToMenuItems(item.SubModulesList, [...parentNames, item.DisplayName])
+            : undefined,
+        // 如果是三级菜单（没有子菜单），添加点击事件
+        ...(!item.SubModulesList ? {
+            onClick: () => handleItemClick(item, parentNames)
+        } : {})
+    }));
+};
+
+const handleItemClick = (item: ModuleItem, parentNames: string[]) => {
+    console.log('点击的三级菜单:', item.DisplayName);
+    console.log('一级菜单名:', parentNames[0]);
+    console.log('二级菜单名:', parentNames[1]);
+
+    const selectedModule: ModuleTab = {
+        DisplayName: item.DisplayName,
+        Url: item.ID as string,
+        closable: true,
+        loading: true,
+        menuPath: [...parentNames, item.DisplayName],
+        ID: item.ID
+    };
+
+    const index = moduleTabsStore.moduleTabList.findIndex(
+        module => module.ID === item.ID
+    );
+
+    if (index === -1) {
+        moduleTabsStore.addModuleTab(selectedModule);
+    } else {
+        moduleTabsStore.setActiveModuleTab(moduleTabsStore.moduleTabList[index].ID);
+    }
+};
+
+const onOpenChange = (keys: Key[]) => {
+    // 找到新增的key（可能是最新点击的）
+    const latestOpenKey = keys.find(key => !lastOpenKeys.includes(key));
+    // 如果操作的是二级/三级菜单，不做限制
+    if (!latestOpenKey || !rootSubmenuKeys.value.includes(String(latestOpenKey))) {
+        lastOpenKeys = [...keys];
+        openKeys.value = keys;
+        return;
+    }
+    // 如果操作的是一级菜单，强制只展开当前项
+    openKeys.value = [latestOpenKey];
+    lastOpenKeys = [latestOpenKey];
+};
+
+
 </script>
 
 <style scoped></style>

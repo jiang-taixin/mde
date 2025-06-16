@@ -9,7 +9,7 @@
         <Header />
       </a-layout-header>
       <a-layout class="flex-1">
-        <a-layout-sider class="bg-white " v-model:collapsed="collapsed" collapsible>
+        <a-layout-sider class="bg-primary-300 " v-model:collapsed="collapsed" collapsible collapsedWidth="50">
           <Sider :collapsed="collapsed">
           </Sider>
           <template #trigger>
