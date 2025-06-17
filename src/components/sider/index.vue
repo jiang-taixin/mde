@@ -19,6 +19,7 @@ import { ref, watch, onMounted } from 'vue';
 import { getIcon } from "@/utils/icon-transfer";
 import type { MenuProps } from 'ant-design-vue';
 import type { Key } from 'ant-design-vue/es/_util/type';
+import banner from "@/assets/images/header/banner.png";
 
 const moduleTabsStore = useModuleTabsStore();
 const { activeModuleTab } = storeToRefs(moduleTabsStore);
@@ -36,6 +37,7 @@ onMounted(async () => {
     // 默认展开第一个一级菜单
     if (menuList.value.length > 0) {
         openKeys.value = [menuList.value[0].ID as string];
+        lastOpenKeys = [...openKeys.value]; // 同步初始化
     }
 });
 
@@ -50,32 +52,6 @@ const props = defineProps({
 watch(activeModuleTab, (newVal) => {
     selectedKeys.value = [newVal];
 });
-
-
-const itemClick = (moduleItem: ModuleItem, rootModuleName: string, moduleModuleName: string) => {
-    const selectedModule: ModuleTab = {
-        DisplayName: moduleItem.DisplayName,
-        Url: moduleItem.ID as string,
-        closable: true,
-        loading: true,
-        menuPath: [
-            rootModuleName,
-            moduleModuleName,
-            moduleItem.DisplayName
-        ],
-        ID: moduleItem.ID
-    };
-
-    const index = moduleTabsStore.moduleTabList.findIndex(
-        (module) => module.ID === moduleItem.ID
-    );
-
-    if (index === -1) {
-        moduleTabsStore.addModuleTab(selectedModule);
-    } else {
-        moduleTabsStore.setActiveModuleTab(moduleTabsStore.moduleTabList[index].ID);
-    }
-};
 
 const convertToMenuItems = (
     items: ModuleItem[],
@@ -130,8 +106,8 @@ const onOpenChange = (keys: Key[]) => {
         return;
     }
     // 如果操作的是一级菜单，强制只展开当前项
-    openKeys.value = [latestOpenKey];
-    lastOpenKeys = [latestOpenKey];
+    openKeys.value = latestOpenKey ? [latestOpenKey] : [];
+    lastOpenKeys = latestOpenKey ? [latestOpenKey] : [];
 };
 
 

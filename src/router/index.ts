@@ -29,13 +29,10 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: "/",
-      redirect: "/home",
-    },
-    {
       path: "/home",
       name: "home",
       component: Home,
+      alias: "/",
     },
     {
       path: "/demo",
