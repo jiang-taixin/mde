@@ -1,11 +1,7 @@
 <template>
-    <div class="w-full h-auto">
-        <div class="transition-all duration-300 ease-in-out transform origin-center flex items-center bg-primary-200 px-5 h-7"
-            :class="[!props.collapsed && 'scale-100 opacity-100', props.collapsed && 'scale-0 opacity-0 h-0 overflow-hidden']">
-            Navigate Explorer
-        </div>
-        <a-menu mode="inline" class="bg-primary-200" :items="menuItems" @openChange="onOpenChange"
-            v-model:selectedKeys="selectedKeys" v-model:openKeys="openKeys">
+    <div class="w-full h-full">
+        <a-menu mode="inline" class="overflow-y-auto h-full" :inlineIndent="13" :items="menuItems"
+            @openChange="onOpenChange" v-model:selectedKeys="selectedKeys" v-model:openKeys="openKeys">
         </a-menu>
     </div>
 </template>
@@ -19,7 +15,6 @@ import { ref, watch, onMounted } from 'vue';
 import { getIcon } from "@/utils/icon-transfer";
 import type { MenuProps } from 'ant-design-vue';
 import type { Key } from 'ant-design-vue/es/_util/type';
-import banner from "@/assets/images/header/banner.png";
 
 const moduleTabsStore = useModuleTabsStore();
 const { activeModuleTab } = storeToRefs(moduleTabsStore);
@@ -41,14 +36,6 @@ onMounted(async () => {
     }
 });
 
-const props = defineProps({
-    collapsed: {
-        type: Boolean,
-        required: true,
-        default: false
-    },
-});
-
 watch(activeModuleTab, (newVal) => {
     selectedKeys.value = [newVal];
 });
@@ -60,7 +47,7 @@ const convertToMenuItems = (
     return items.map(item => ({
         key: item.ID,
         label: item.DisplayName,
-        icon: () => h('img', { src: getIcon(item.Icon) }),
+        icon: () => h('img', { src: getIcon(item.Icon), style: "width: 16px" }),
         children: item.SubModulesList
             ? convertToMenuItems(item.SubModulesList, [...parentNames, item.DisplayName])
             : undefined,
@@ -78,7 +65,7 @@ const handleItemClick = (item: ModuleItem, parentNames: string[]) => {
 
     const selectedModule: ModuleTab = {
         DisplayName: item.DisplayName,
-        Url: item.ID as string,
+        Url: item.Url as string,
         closable: true,
         loading: true,
         menuPath: [...parentNames, item.DisplayName],

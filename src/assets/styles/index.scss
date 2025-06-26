@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url('./element/index.scss');
+@import url('./antdv/index.scss');
 body {
     min-height: 100vh;
     height: 100%;
@@ -35,6 +35,6 @@ body {
 
 @media (min-width: 768px) {
     body {
-        font-size: 14px;
+        font-size: 12px;
     }
 }

@@ -1,23 +1,23 @@
 <template>
-    <a-tabs v-model:active-key="activeModuleTab" type="editable-card" tab-position="bottom" :hide-add="true"
-        @edit="handleTabEdit" class="h-full">
-        <a-tab-pane v-for="pane in moduleTabsStore.moduleTabList" :key="(pane.Url as string)" :closable="pane.closable">
+    <a-tabs v-model:active-key="activeModuleTab" type="editable-card" :hide-add="true" @edit="handleTabEdit"
+        class="h-full" :tab-bar-style="{ marginBottom: '0px' }" size="small">
+        <a-tab-pane v-for="pane in moduleTabsStore.moduleTabList" :key="(pane.ID as string)" :closable="pane.closable">
             <template #tab>
-                <span>
+                <span class="flex flex-row items-center">
                     <template v-if="pane.Url === 'desktop'">
-                        <!-- <HomeOutlined /> -->
-                        <img :src="getIcon(null)"></img>
+                        <img :src="getIcon('home')" class="w-4 h-4 mr-2"></img>
                     </template>
                     <template v-else>
-                        <!-- <LoadingOutlined v-if="pane.loading" />
-                        <ProfileOutlined v-else /> -->
-                        <img :src="getIcon(null)"></img>
+                        <LoadingOutlined v-if="pane.loading" />
+                        <img v-else :src="getIcon('grid-header-icon')" class="w-4 h-5 mr-2"></img>
                     </template>
                     {{ pane.DisplayName }}
                 </span>
             </template>
             <template v-if="pane.Url !== 'desktop'">
-                <Content :moduleTab="pane" class="h-full" />
+                <div class="m-2 rounded-lg h-fill-available bg-white p-3">
+                    <Content :moduleTab="pane" />
+                </div>
             </template>
         </a-tab-pane>
     </a-tabs>
@@ -26,6 +26,7 @@
 import type { ModuleTab } from '@/models/ModuleItem';
 import { getIcon } from "@/utils/icon-transfer";
 import type { Key } from 'ant-design-vue/es/_util/type';
+import { LoadingOutlined } from '@ant-design/icons-vue';
 
 const { t } = useI18n();
 

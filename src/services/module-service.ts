@@ -8,6 +8,6 @@ export async function getModulesList(moduleId: string): Promise<[ModuleItem]> {
 }
 
 // 获取模块配置
-export async function getModuleConfig(configName: string): Promise<[ModuleItem]> {
+export async function getModuleConfig(configName: string): Promise<ModuleConfig> {
   return http.post("/moduleConfig", { configName });
 }

@@ -9,7 +9,7 @@ declare module "axios" {
 const request = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: 180000,
-  withCredentials: false,
+  withCredentials: true,
   headers: {
     post: {
       "Content-Type": "application/json; charset=UTF-8",

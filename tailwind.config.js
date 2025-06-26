@@ -11,6 +11,12 @@ export default {
           400: "#0095FF",
         },
       },
+      backgroundImage: {
+        header_bg: 'url("@assets/images/header/bg.png")',
+      },
+      height: {
+        "fill-available": "-webkit-fill-available",
+      },
     },
   },
   plugins: [],

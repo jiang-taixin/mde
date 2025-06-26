@@ -1,25 +1,15 @@
 <template>
-  <div class="h-auto flex flex-col">
-    <img :class="['w-full h-24', expand ? 'block' : 'hidden']" :src="banner" />
-    <div class="w-full h-9 px-3 flex items-center justify-between">
-      <div class="w-20 h-full flex items-center">
-        <a-button type="primary" @click="desktopClick" class="flex items-center justify-center">
-          <template #icon>
-            <img :src="getIcon(null)" class="w-3 h-3 mr-2" />
-          </template>
-          {{
-            $t("header.desktop")
-          }}
-        </a-button>
-      </div>
+  <div :class="['flex items-center bg-header_bg px-5 justify-between bg-cover', expand ? 'h-16' : 'h-9']">
+    <img :src="expand ? logo : logo_simple" :class="[expand ? 'h-[45%]' : 'h-1/2']" />
+    <div class="h-9 px-3 flex items-center justify-between">
       <div class="h-full flex flex-row items-center gap-2">
-        <a-dropdown-button class="flex items-center justify-center" type="primary" trigger="click">
-          <div class="flex items-center cursor-pointer">
-            <img :src="getIcon(null)" class="w-3 h-3 mr-2" />
+        <a-dropdown-button class="flex items-center justify-center " type="text" trigger="click">
+          <div class="flex items-center cursor-pointer text-white">
+            <img :src="avatar" class="w-5 mr-2" />
             <span>{{ loginUser }}</span>
           </div>
           <template #icon>
-            <img :src="getIcon(null)" class="w-3 h-3" />
+            <img :src="down_circle" class="w-6" />
           </template>
           <template #overlay>
             <a-menu>
@@ -53,9 +43,9 @@
         <a-select v-model:value="language" class="w-24" @change="changeLanguage">
           <a-select-option v-for="item in languageOptions" :value="item.value">{{ item.label }}</a-select-option>
         </a-select>
-        <a-button class="flex items-center justify-center" type="primary" shape="circle" @click="toggleExpand">
+        <a-button class="flex items-center justify-center" type="text" shape="circle" @click="toggleExpand">
           <template #icon>
-            <img :src="expand ? getIcon(null) : getIcon(null)" class="w-4 h-4" />
+            <img :src="expand ? down : up" class="w-6" />
           </template>
         </a-button>
       </div>
@@ -64,11 +54,15 @@
 </template>
 <script setup lang="ts">
 
-import banner from "@/assets/images/header/banner.png";
-import { getIcon } from "@/utils/icon-transfer";
 import { Language, LanguageNames } from "@/language";
 import { useI18n } from 'vue-i18n'
 import type { DefaultOptionType, SelectValue } from "ant-design-vue/es/select";
+import logo from "@/assets/images/header/logo.png";
+import logo_simple from "@/assets/images/header/logo-simple.png";
+import avatar from "@/assets/images/header/avatar.png";
+import down_circle from "@/assets/images/header/down-circle.png";
+import down from "@/assets/images/header/down.png";
+import up from "@/assets/images/header/up.png";
 const { locale } = useI18n()
 const checked = ref(false);
 const language = ref<Language>(Language.ZH_CN);
@@ -86,11 +80,6 @@ onMounted(() => {
   loginUser.value = "APAC\\JIANGT28[Development]";
 })
 
-
-const desktopClick = () => {
-  console.log("click desktop");
-  activeModuleTab.value = "desktop";
-}
 const switchAccount = () => {
   console.log("click switchAccount");
 }
