@@ -1,6 +1,8 @@
 export default {
   noAccess: "无相应操作权限",
   notFound: "页面不存在，请检查页面地址",
+  confirm:"确认",
+  cancel:"取消",
   app: {
     title: "辉瑞中国主数据管理系统",
   },
@@ -21,7 +23,9 @@ export default {
       Saturday: "星期六",
     },
   },
-  menu: {
-    title: "导航浏览器",
-  },
+  principal:{
+    title: '选择角色',
+    selectTips:'请选择角色',
+    signin:"确认"
+  }
 };

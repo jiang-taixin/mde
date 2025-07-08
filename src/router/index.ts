@@ -2,7 +2,8 @@ import { createRouter, createWebHistory } from "vue-router";
 import Demo from "@/views/demo/index.vue";
 import Home from "@/views/home/index.vue";
 
-import { i18n } from "@/language/index";
+import { i18n, Language } from "@/language/index";
+import { useUserProfileStore } from "@/stores/userProfile";
 const { t } = i18n.global;
 
 enum OperationType {
@@ -21,10 +22,6 @@ const getNode = (type: OperationType): VNode => {
   return h("div", commonClass, t(translationKey));
 };
 
-const hideHeader = () => {
-  return { hideHeader: true };
-};
-
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -33,6 +30,7 @@ const router = createRouter({
       name: "home",
       component: Home,
       alias: "/",
+      meta: {requireAuth: true},
     },
     {
       path: "/demo",
@@ -43,19 +41,37 @@ const router = createRouter({
       path: "/no-access",
       name: "no-access",
       component: getNode(OperationType.NoAccess),
-      meta: hideHeader(),
     },
     {
       path: "/:pathMatch(.*)*",
       name: "not-found",
       component: getNode(OperationType.NotFound),
-      meta: hideHeader(),
     },
   ],
 });
 
 router.beforeEach(async (to, from, next) => {
-  next();
+  if (to.meta.requireAuth) {
+    const userProfileStore = useUserProfileStore();
+    if (!userProfileStore.isAuthenticated) {
+      console.log("need login");
+      const userData = await login();
+      if (userData) {
+        // 登录成功保存用户信息并设置语言环境
+        userProfileStore.setUserProfile(userData);
+        i18n.global.locale.value = userData.Language as Language;
+        next();
+      } else {
+        next("/no-access");
+      }
+      next();
+    }
+    else{
+      next();
+    }
+  } else {
+    next();
+  }
 });
 
 export default router;

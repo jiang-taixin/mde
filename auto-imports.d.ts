@@ -6,15 +6,17 @@
 // biome-ignore lint: disable
 export {}
 declare global {
-  const ComponentType: typeof import('./src/models/moduleConfig')['ComponentType']
+  const ComponentType: typeof import('./src/models/moduleConfigModel')['ComponentType']
   const EffectScope: typeof import('vue')['EffectScope']
   const Language: typeof import('./src/language/index')['Language']
   const LanguageNames: typeof import('./src/language/index')['LanguageNames']
-  const ModuleType: typeof import('./src/models/ModuleItem')['ModuleType']
+  const ModuleType: typeof import('./src/models/moduleItemModel')['ModuleType']
+  const PrincipalType: typeof import('./src/models/userProfileModel')['PrincipalType']
   const Rules: typeof import('./src/utils/rules')['Rules']
   const Validator: typeof import('./src/utils/validator')['Validator']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const alovaInstance: typeof import('./src/http/index')['alovaInstance']
+  const clearDirtyData: typeof import('./src/utils/datacheck')['clearDirtyData']
   const computed: typeof import('vue')['computed']
   const createApp: typeof import('vue')['createApp']
   const createPinia: typeof import('pinia')['createPinia']
@@ -29,6 +31,7 @@ declare global {
   const getCurrentScope: typeof import('vue')['getCurrentScope']
   const getDateMessage: typeof import('./src/utils/datetime')['getDateMessage']
   const getEnglishDate: typeof import('./src/utils/datetime')['getEnglishDate']
+  const getGeoGraphyList: typeof import('./src/services/metaData-service')['getGeoGraphyList']
   const getIcon: typeof import('./src/utils/icon-transfer')['getIcon']
   const getModuleConfig: typeof import('./src/services/module-service')['getModuleConfig']
   const getModulesList: typeof import('./src/services/module-service')['getModulesList']
@@ -37,16 +40,24 @@ declare global {
   const http: typeof import('./src/http/index')['default']
   const i18n: typeof import('./src/language/index')['i18n']
   const inject: typeof import('vue')['inject']
+  const isElement: typeof import('./src/utils/datacheck')['isElement']
+  const isEmpty: typeof import('./src/utils/datacheck')['isEmpty']
+  const isNil: typeof import('./src/utils/datacheck')['isNil']
+  const isNull: typeof import('./src/utils/datacheck')['isNull']
   const isProxy: typeof import('vue')['isProxy']
   const isReactive: typeof import('vue')['isReactive']
   const isReadonly: typeof import('vue')['isReadonly']
   const isRef: typeof import('vue')['isRef']
+  const isUndefined: typeof import('./src/utils/datacheck')['isUndefined']
+  const isVoid: typeof import('./src/utils/datacheck')['isVoid']
+  const login: typeof import('./src/services/login-service')['login']
   const mapActions: typeof import('pinia')['mapActions']
   const mapGetters: typeof import('pinia')['mapGetters']
   const mapState: typeof import('pinia')['mapState']
   const mapStores: typeof import('pinia')['mapStores']
   const mapWritableState: typeof import('pinia')['mapWritableState']
   const markRaw: typeof import('vue')['markRaw']
+  const moduleId: typeof import('./src/constants/index')['moduleId']
   const nextTick: typeof import('vue')['nextTick']
   const onActivated: typeof import('vue')['onActivated']
   const onBeforeMount: typeof import('vue')['onBeforeMount']
@@ -64,6 +75,7 @@ declare global {
   const onUnmounted: typeof import('vue')['onUnmounted']
   const onUpdated: typeof import('vue')['onUpdated']
   const onWatcherCleanup: typeof import('vue')['onWatcherCleanup']
+  const parentId: typeof import('./src/constants/index')['parentId']
   const provide: typeof import('vue')['provide']
   const reactive: typeof import('vue')['reactive']
   const readonly: typeof import('vue')['readonly']
@@ -72,6 +84,7 @@ declare global {
   const router: typeof import('./src/router/index')['default']
   const setActivePinia: typeof import('pinia')['setActivePinia']
   const setMapStoreSuffix: typeof import('pinia')['setMapStoreSuffix']
+  const setupI18n: typeof import('./src/language/index')['setupI18n']
   const shallowReactive: typeof import('vue')['shallowReactive']
   const shallowReadonly: typeof import('vue')['shallowReadonly']
   const shallowRef: typeof import('vue')['shallowRef']
@@ -97,6 +110,7 @@ declare global {
   const useRouter: typeof import('vue-router')['useRouter']
   const useSlots: typeof import('vue')['useSlots']
   const useTemplateRef: typeof import('vue')['useTemplateRef']
+  const useUserProfileStore: typeof import('./src/stores/userProfile')['useUserProfileStore']
   const watch: typeof import('vue')['watch']
   const watchEffect: typeof import('vue')['watchEffect']
   const watchPostEffect: typeof import('vue')['watchPostEffect']
@@ -109,11 +123,17 @@ declare global {
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
   // @ts-ignore
-  export type { ModuleType, ModuleTab, ModuleItem } from './src/models/ModuleItem'
-  import('./src/models/ModuleItem')
+  export type { Geography } from './src/models/metaDataModel'
+  import('./src/models/metaDataModel')
   // @ts-ignore
-  export type { ComponentType, ComponentModel, SubConfig, ModuleConfig } from './src/models/moduleConfig'
-  import('./src/models/moduleConfig')
+  export type { ComponentType, ComponentModel, SubConfig, ModuleConfig } from './src/models/moduleConfigModel'
+  import('./src/models/moduleConfigModel')
+  // @ts-ignore
+  export type { ModuleType, ModuleTab, ModuleItem } from './src/models/moduleItemModel'
+  import('./src/models/moduleItemModel')
+  // @ts-ignore
+  export type { PrincipalType, Principal, UserProfile } from './src/models/userProfileModel'
+  import('./src/models/userProfileModel')
   // @ts-ignore
   export type { Language } from './src/language/index'
   import('./src/language/index')

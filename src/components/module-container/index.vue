@@ -1,0 +1,49 @@
+<template>
+    <a-tabs v-model:active-key="activeModuleTab" type="editable-card" :hide-add="true" @edit="handleTabEdit"
+        class="h-full" :tab-bar-style="{ marginBottom: '0px' }" size="small">
+        <a-tab-pane v-for="pane in moduleTabsStore.moduleTabList" :key="(pane.ID as string)" :closable="pane.closable">
+            <template #tab>
+                <span class="flex flex-row items-center">
+                    <template v-if="pane.Url === 'desktop'">
+                        <img :src="getIcon('home')" class="w-4 h-4 mr-2"></img>
+                    </template>
+                    <template v-else>
+                        <LoadingOutlined v-if="pane.loading" />
+                        <img v-else :src="getIcon('grid-header-icon')" class="w-4 h-5 mr-2"></img>
+                    </template>
+                    {{ pane.DisplayName }}
+                </span>
+            </template>
+            <template v-if="pane.Url !== 'desktop'">
+                <div class="m-2 rounded-lg h-fill-available bg-white p-3">
+                    <Content :moduleTab="pane" />
+                </div>
+            </template>
+        </a-tab-pane>
+    </a-tabs>
+</template>
+<script setup lang="ts">
+import type { ModuleTab } from '@/models/moduleItemModel';
+import { getIcon } from "@/utils/icon-transfer";
+import type { Key } from 'ant-design-vue/es/_util/type';
+import { LoadingOutlined } from '@ant-design/icons-vue';
+const { t } = useI18n();
+
+const moduleTabsStore = useModuleTabsStore();
+const desktopModeule: ModuleTab = { DisplayName: t("header.desktop"), Url: "desktop", closable: false, loading: false, menuPath: [t("header.desktop")], ID: "desktop" };
+moduleTabsStore.addModuleTab(desktopModeule);
+const { activeModuleTab } = storeToRefs(moduleTabsStore);
+console.log("---------- activeModuleTab:" + JSON.stringify(activeModuleTab));
+
+const remove = (targetKey: string) => {
+    moduleTabsStore.deleteModuleTab(targetKey);
+};
+
+const handleTabEdit = (e: Key | MouseEvent | KeyboardEvent, action: "add" | "remove") => {
+    console.log("handleTabEdit:" + e);
+    remove(e as string);
+}
+
+</script>
+<style lang="sass">
+</style>

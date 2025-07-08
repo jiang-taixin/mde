@@ -6,37 +6,47 @@
         <a-dropdown-button class="flex items-center justify-center " type="text" trigger="click">
           <div class="flex items-center cursor-pointer text-white">
             <img :src="avatar" class="w-5 mr-2" />
-            <span>{{ loginUser }}</span>
+            <span>{{ `${userProfile?.LogonName}[${activePrincipal?.Name}]` }}</span>
           </div>
           <template #icon>
             <img :src="down_circle" class="w-6" />
           </template>
           <template #overlay>
             <a-menu>
-              <a-menu-item key="1" class="w-36">
+              <a-menu-item key="switch" class="w-52">
                 <a-row>
-                  <a-col :span="5"></a-col>
-                  <a-col :span="19">
+                  <a-col :span="3"></a-col>
+                  <a-col :span="21">
                     <div @click="switchAccount">
                       {{ $t('header.switchAccount') }}
                     </div>
                   </a-col>
                 </a-row>
               </a-menu-item>
-              <a-menu-item key="1">
-                <a-row>
-                  <a-col :span="5">
-                    <a-checkbox v-model:checked="checked" @change="rememberMe"></a-checkbox>
-                  </a-col>
-                  <a-col :span="19">
-                    <div @click="rememberMe">
-                      {{ $t('header.rememberMe') }}
+              <template v-for="principal in userProfile?.Principals">
+              <a-menu-item v-if="principal.ID !== activePrincipal?.ID"  :key="principal.ID" >
+                <a-row >
+                  <a-col :span="3"></a-col>
+                  <a-col :span="21">
+                    <div @click="switchPrincipal(principal.ID)">
+                      {{ principal.Name }}
                     </div>
-
                   </a-col>
                 </a-row>
               </a-menu-item>
-
+              </template>
+              <a-menu-item key="remember">
+                <a-row>
+                  <a-col :span="3">
+                    <a-checkbox v-model:checked="rememberMe"></a-checkbox>
+                  </a-col>
+                  <a-col :span="21">
+                    <div>
+                      {{ $t('header.rememberMe') }}
+                    </div>
+                  </a-col>
+                </a-row>
+              </a-menu-item>
             </a-menu>
           </template>
         </a-dropdown-button>
@@ -55,7 +65,7 @@
 <script setup lang="ts">
 
 import { Language, LanguageNames } from "@/language";
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'vue-i18n';
 import type { DefaultOptionType, SelectValue } from "ant-design-vue/es/select";
 import logo from "@/assets/images/header/logo.png";
 import logo_simple from "@/assets/images/header/logo-simple.png";
@@ -63,32 +73,39 @@ import avatar from "@/assets/images/header/avatar.png";
 import down_circle from "@/assets/images/header/down-circle.png";
 import down from "@/assets/images/header/down.png";
 import up from "@/assets/images/header/up.png";
-const { locale } = useI18n()
-const checked = ref(false);
-const language = ref<Language>(Language.ZH_CN);
-const loginUser = ref<string>("");
-const moduleTabsStore = useModuleTabsStore();
-const { activeModuleTab } = storeToRefs(moduleTabsStore);
+const { locale } = useI18n();
+
+const userProfileStore = useUserProfileStore();
+const language = ref<Language>(userProfileStore.userProfile?.Language as Language);
+const {rememberMe, userProfile, activePrincipal } = storeToRefs(userProfileStore);
 const languageOptions = computed(() => {
   return Object.values(Language).map(lang => ({
     value: lang,
     label: LanguageNames[lang],
   }));
 });
-const expand = ref<boolean>(true);
-onMounted(() => {
-  loginUser.value = "APAC\\JIANGT28[Development]";
+
+const props = defineProps({
+  switchAccountCallback:{
+    type:Function,
+    require:true,
+  },
 })
+const expand = ref<boolean>(true);
 
 const switchAccount = () => {
-  console.log("click switchAccount");
+  props.switchAccountCallback!();
 }
-const rememberMe = () => {
-  console.log("click rememberMe:" + checked.value);
+
+const switchPrincipal = (principalID:string) => {
+  userProfileStore.setActivePrincipal(principalID);
 }
+
 const changeLanguage = (value: SelectValue, option: DefaultOptionType | DefaultOptionType[]) => {
-  console.log("click menu:" + value);
+  // 切换语言
   locale.value = value as string;
+  userProfileStore.setLanguage(value as string);
+  router.go(0);
 }
 const toggleExpand = () => {
   expand.value = !expand.value;

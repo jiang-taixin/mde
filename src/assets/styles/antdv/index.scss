@@ -8,11 +8,15 @@
   font-size: 12px !important;
 }
 
-// 一级菜单加粗 
+// 一级菜单加粗
 .ant-menu-root > .ant-menu-submenu > .ant-menu-submenu-title {
   font-weight: bold !important;
   font-size: 14px !important;
 }
 .ant-tabs .ant-tabs-content{
   height: 100%;
+}
+
+.ant-form-item{
+  margin-bottom: 5px;
 }

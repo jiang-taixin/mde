@@ -1,4 +1,4 @@
-import type { ModuleTab } from "@/models/ModuleItem";
+import type { ModuleTab } from "@/models/moduleItemModel";
 
 export const useModuleTabsStore = defineStore("moduleTabs", {
   state: () => ({

@@ -72,11 +72,10 @@ export default defineConfig(({ mode }) => {
       port: 8888,
       host: "0.0.0.0",
       proxy: {
-        "/api": {
-          // target: "http://127.0.0.1:8000",
-          target: "http://localhost:8080",
+        "/localty": {
+          target: "http://aspaewp00025355:8696",
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, ""), // 路径重写
+          rewrite: (path) => path.replace(/^\/localty/, ""), // 路径重写
         },
       },
     },

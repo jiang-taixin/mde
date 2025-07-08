@@ -1,4 +1,8 @@
 export default {
+  noAccess: "no access",
+  notFound: "no page",
+  confirm:"confirm",
+  cancel:"cancel",
   app: {
     title: "Pfizer China Master Data Enricher",
   },
@@ -19,7 +23,9 @@ export default {
       Saturday: "Saturday",
     },
   },
-  menu: {
-    title: "Navigate Explorer",
-  },
+  principal:{
+    title: 'Sign In',
+    selectTips:'select principal',
+    signin:"Sign In"
+  }
 };

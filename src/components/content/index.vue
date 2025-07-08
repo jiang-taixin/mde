@@ -124,8 +124,8 @@
     </div>
 </template>
 <script setup lang="ts">
-import type { ModuleTab } from '@/models/ModuleItem';
-import { ComponentType, type ModuleConfig } from '@/models/moduleConfig';
+import type { ModuleTab } from '@/models/moduleItemModel';
+import { ComponentType, type ModuleConfig } from '@/models/moduleConfigModel';
 import clock from "@/assets/images/others/clock.png";
 import { getWeekNo } from "@/utils/datetime";
 import { getIcon } from '@/utils/icon-transfer';

@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ModuleItem, ModuleTab } from '@/models/ModuleItem';
+import type { ModuleItem, ModuleTab } from '@/models/moduleItemModel';
 import { getModulesList } from '@/services/module-service';
 import { useModuleTabsStore } from '@/stores/moduleTabs';
 import { storeToRefs } from 'pinia';
@@ -15,23 +15,28 @@ import { ref, watch, onMounted } from 'vue';
 import { getIcon } from "@/utils/icon-transfer";
 import type { MenuProps } from 'ant-design-vue';
 import type { Key } from 'ant-design-vue/es/_util/type';
+import { moduleId } from '@/constants';
 
 const moduleTabsStore = useModuleTabsStore();
 const { activeModuleTab } = storeToRefs(moduleTabsStore);
-const menuList = ref<ModuleItem[]>([]);
 const rootSubmenuKeys = ref<Key[]>([]);
 const openKeys = ref<Key[]>([]);
 const selectedKeys = ref<string[]>([]);
 let lastOpenKeys: Key[] = [];
-const menuItems = computed(() => convertToMenuItems(menuList.value));
-onMounted(async () => {
-    const res = await getModulesList("ssss");
-    menuList.value = res;
+const props = defineProps({
+  menuList:{
+    type:Array<ModuleItem>,
+    require:true,
+    default:[]
+  }
+})
+const menuItems = computed(() => convertToMenuItems(props.menuList));
+onUpdated(() => {
     // 提取所有一级菜单的 ID
-    rootSubmenuKeys.value = menuList.value.map(item => item.ID as string);
+    rootSubmenuKeys.value = props.menuList.map(item => item.ID as string);
     // 默认展开第一个一级菜单
-    if (menuList.value.length > 0) {
-        openKeys.value = [menuList.value[0].ID as string];
+    if (props.menuList.length > 0) {
+        openKeys.value = [props.menuList[0].ID as string];
         lastOpenKeys = [...openKeys.value]; // 同步初始化
     }
 });
@@ -59,10 +64,6 @@ const convertToMenuItems = (
 };
 
 const handleItemClick = (item: ModuleItem, parentNames: string[]) => {
-    console.log('点击的三级菜单:', item.DisplayName);
-    console.log('一级菜单名:', parentNames[0]);
-    console.log('二级菜单名:', parentNames[1]);
-
     const selectedModule: ModuleTab = {
         DisplayName: item.DisplayName,
         Url: item.Url as string,
@@ -77,7 +78,8 @@ const handleItemClick = (item: ModuleItem, parentNames: string[]) => {
     );
 
     if (index === -1) {
-        moduleTabsStore.addModuleTab(selectedModule);
+      // 这里打开激活的菜单
+      moduleTabsStore.addModuleTab(selectedModule);
     } else {
         moduleTabsStore.setActiveModuleTab(moduleTabsStore.moduleTabList[index].ID);
     }
