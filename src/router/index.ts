@@ -4,6 +4,7 @@ import Home from "@/views/home/index.vue";
 
 import { i18n, Language } from "@/language/index";
 import { useUserProfileStore } from "@/stores/userProfile";
+import { message } from "ant-design-vue";
 const { t } = i18n.global;
 
 enum OperationType {
@@ -54,7 +55,6 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requireAuth) {
     const userProfileStore = useUserProfileStore();
     if (!userProfileStore.isAuthenticated) {
-      console.log("need login");
       const userData = await login();
       if (userData) {
         // 登录成功保存用户信息并设置语言环境
@@ -62,7 +62,8 @@ router.beforeEach(async (to, from, next) => {
         i18n.global.locale.value = userData.Language as Language;
         next();
       } else {
-        next("/no-access");
+        message.error(t("loginError"));
+        next(false);
       }
       next();
     }

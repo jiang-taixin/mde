@@ -4,7 +4,7 @@
   line-height: 32px !important;
   margin-top: 1px !important;
   margin-bottom: 1px !important;
-  margin-left: 5px !important;
+  margin-left: 3px !important;
   font-size: 12px !important;
 }
 
@@ -16,7 +16,18 @@
 .ant-tabs .ant-tabs-content{
   height: 100%;
 }
+.ant-menu-submenu-arrow{
+  margin-top: 2px;
+}
 
 .ant-form-item{
   margin-bottom: 5px;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* 隐藏滚动条 */
+}
+// 隐藏tabs的更多按钮
+.hide-more .ant-tabs-nav .ant-tabs-nav-operations{
+  display: none;
 }

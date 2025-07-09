@@ -11,7 +11,7 @@ export interface ComponentModel {
   Icon: string;
   Title: string;
   Disable: boolean;
-  key?: string;
+  Key?: string;
   props?: Record<string, any>;
   onClick?: (e: MouseEvent) => void;
 }

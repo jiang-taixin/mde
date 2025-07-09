@@ -7,19 +7,18 @@ export enum ModuleType {
   Page = "Page",
 }
 
-// 激活模块列表
+// 被选择的模块
 export interface ModuleTab {
-  DisplayName: string;
   Url: string;
-  closable: boolean;
-  loading: boolean;
-  menuPath: string[];
-  ID: string;
+  Closable: boolean;
+  MenuPath: string[];
+  Loading:boolean;
+  Id: string;
 }
 
 // 模块
 export interface ModuleItem {
-  ID: string; // 模块id
+  Id: string; // 模块id
   Description: string; // 描述
   DisplayName: string; // 显示名
   EntityConfigID: string; // 实体对应ID

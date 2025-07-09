@@ -41,7 +41,7 @@
                     <a-checkbox v-model:checked="rememberMe"></a-checkbox>
                   </a-col>
                   <a-col :span="21">
-                    <div>
+                    <div @click="switchRememberMe">
                       {{ $t('header.rememberMe') }}
                     </div>
                   </a-col>
@@ -110,5 +110,9 @@ const changeLanguage = (value: SelectValue, option: DefaultOptionType | DefaultO
 const toggleExpand = () => {
   expand.value = !expand.value;
 };
+
+const switchRememberMe = () =>{
+  rememberMe.value = !rememberMe.value;
+}
 </script>
 <style scoped></style>

@@ -1,8 +1,11 @@
 export default {
   noAccess: "no access",
   notFound: "no page",
+  loginError:"login error, please connect the administrator",
   confirm:"confirm",
   cancel:"cancel",
+  warning:"Warning",
+  loading:"loading...",
   app: {
     title: "Pfizer China Master Data Enricher",
   },
@@ -27,5 +30,9 @@ export default {
     title: 'Sign In',
     selectTips:'select principal',
     signin:"Sign In"
+  },
+  module:{
+    moreWarningTips:"The browser would be slowly if over 10 pages opened in TabExplorer, are you sure continue to open new page?",
+
   }
 };

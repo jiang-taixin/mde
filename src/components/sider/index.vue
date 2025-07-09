@@ -1,6 +1,6 @@
 <template>
     <div class="w-full h-full">
-        <a-menu mode="inline" class="overflow-y-auto h-full" :inlineIndent="13" :items="menuItems"
+        <a-menu mode="inline" class="overflow-y-auto h-full hide-scrollbar" :inlineIndent="8" :items="menuItems"
             @openChange="onOpenChange" v-model:selectedKeys="selectedKeys" v-model:openKeys="openKeys">
         </a-menu>
     </div>
@@ -8,14 +8,13 @@
 
 <script setup lang="ts">
 import type { ModuleItem, ModuleTab } from '@/models/moduleItemModel';
-import { getModulesList } from '@/services/module-service';
 import { useModuleTabsStore } from '@/stores/moduleTabs';
 import { storeToRefs } from 'pinia';
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch } from 'vue';
 import { getIcon } from "@/utils/icon-transfer";
-import type { MenuProps } from 'ant-design-vue';
+import { Modal, type MenuProps } from 'ant-design-vue';
 import type { Key } from 'ant-design-vue/es/_util/type';
-import { moduleId } from '@/constants';
+const { t } = useI18n();
 
 const moduleTabsStore = useModuleTabsStore();
 const { activeModuleTab } = storeToRefs(moduleTabsStore);
@@ -31,16 +30,14 @@ const props = defineProps({
   }
 })
 const menuItems = computed(() => convertToMenuItems(props.menuList));
-onUpdated(() => {
-    // 提取所有一级菜单的 ID
-    rootSubmenuKeys.value = props.menuList.map(item => item.ID as string);
-    // 默认展开第一个一级菜单
-    if (props.menuList.length > 0) {
-        openKeys.value = [props.menuList[0].ID as string];
-        lastOpenKeys = [...openKeys.value]; // 同步初始化
-    }
-});
-
+// 初始化菜单展开状态
+watch(() => props.menuList, (newList) => {
+  rootSubmenuKeys.value = newList.map(item => item.Id as string);
+  if (newList.length > 0 && openKeys.value.length === 0) {
+    openKeys.value = [newList[0].Id as string];
+    lastOpenKeys = [...openKeys.value]; // 同步初始化
+  }
+}, { immediate: true });
 watch(activeModuleTab, (newVal) => {
     selectedKeys.value = [newVal];
 });
@@ -50,14 +47,14 @@ const convertToMenuItems = (
     parentNames: string[] = []
 ): MenuProps['items'] => {
     return items.map(item => ({
-        key: item.ID,
+        key: item.Id,
         label: item.DisplayName,
         icon: () => h('img', { src: getIcon(item.Icon), style: "width: 16px" }),
-        children: item.SubModulesList
-            ? convertToMenuItems(item.SubModulesList, [...parentNames, item.DisplayName])
+        children: item.SubModulesList?.length !== 0
+            ? convertToMenuItems(item.SubModulesList as ModuleItem[], [...parentNames, item.DisplayName])
             : undefined,
         // 如果是三级菜单（没有子菜单），添加点击事件
-        ...(!item.SubModulesList ? {
+        ...(!item.SubModulesList || item.SubModulesList.length === 0 ? {
             onClick: () => handleItemClick(item, parentNames)
         } : {})
     }));
@@ -65,23 +62,36 @@ const convertToMenuItems = (
 
 const handleItemClick = (item: ModuleItem, parentNames: string[]) => {
     const selectedModule: ModuleTab = {
-        DisplayName: item.DisplayName,
         Url: item.Url as string,
-        closable: true,
-        loading: true,
-        menuPath: [...parentNames, item.DisplayName],
-        ID: item.ID
+        Closable: true,
+        MenuPath: [...parentNames, item.DisplayName],
+        Loading:true,
+        Id: item.Id
     };
 
     const index = moduleTabsStore.moduleTabList.findIndex(
-        module => module.ID === item.ID
+        module => module.Id === item.Id
     );
 
     if (index === -1) {
       // 这里打开激活的菜单
-      moduleTabsStore.addModuleTab(selectedModule);
+      if(moduleTabsStore.moduleTabList.length > 10){
+        Modal.warning({
+          title:t('warning'),
+          content:t('module.moreWarningTips'),
+          okText:t('confirm'),
+          cancelText:t('cancel'),
+          onOk:()=>{
+            moduleTabsStore.addModuleTab(selectedModule);
+          }
+        })
+      }
+      else{
+        moduleTabsStore.addModuleTab(selectedModule);
+      }
+
     } else {
-        moduleTabsStore.setActiveModuleTab(moduleTabsStore.moduleTabList[index].ID);
+        moduleTabsStore.setActiveModuleTab(moduleTabsStore.moduleTabList[index].Id);
     }
 };
 
@@ -102,4 +112,5 @@ const onOpenChange = (keys: Key[]) => {
 
 </script>
 
-<style scoped></style>
+<style scoped>
+</style>

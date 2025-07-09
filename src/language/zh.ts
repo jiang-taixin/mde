@@ -1,8 +1,11 @@
 export default {
   noAccess: "无相应操作权限",
   notFound: "页面不存在，请检查页面地址",
+  loginError:"登录故障，请联系管理员",
   confirm:"确认",
   cancel:"取消",
+  warning:"警告",
+  loading:"加载中...",
   app: {
     title: "辉瑞中国主数据管理系统",
   },
@@ -27,5 +30,9 @@ export default {
     title: '选择角色',
     selectTips:'请选择角色',
     signin:"确认"
+  },
+  module:{
+    moreWarningTips:"Tab浏览器超过10个页面会变慢，确定继续打开新的页面吗？",
+
   }
 };

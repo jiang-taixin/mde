@@ -3,7 +3,7 @@ import {message as AntMessage} from 'ant-design-vue';
 
 declare module "axios" {
   interface AxiosRequestConfig {
-    showLoading?: boolean;
+    loading?: boolean;
     skipAuth?: boolean; // 是否跳过身份验证
   }
 }
@@ -20,7 +20,11 @@ const request = axios.create({
 // 请求拦截器
 request.interceptors.request.use(
   (config) => {
+    console.log("-----------config:"+config.loading);
     // 添加认证令牌
+    if(config.loading){
+      showLoading();
+    }
     if (!config.skipAuth) {
       const userProfileStore = useUserProfileStore();
       const token = userProfileStore.userProfile?.Token;
@@ -31,6 +35,9 @@ request.interceptors.request.use(
     return config;
   },
   (error: AxiosError) => {
+    if(error.config?.loading){
+      hideLoading();
+    }
     return Promise.reject(error);
   }
 );
@@ -38,6 +45,9 @@ request.interceptors.request.use(
 
 request.interceptors.response.use(
   (response: AxiosResponse) => {
+    if(response.config.loading){
+      hideLoading();
+    }
     if(response.status === 200){
       const res = response.data;
       const {StatusCode , Message, Data} = res;
@@ -53,6 +63,9 @@ request.interceptors.response.use(
     return response;
   },
   (err: AxiosError) => {
+    if(err.config?.loading){
+      hideLoading();
+    }
     const {code, message, status} = err;
 
     AntMessage.error(message, 1);

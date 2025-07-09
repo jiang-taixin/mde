@@ -8,14 +8,14 @@ export const useModuleTabsStore = defineStore("moduleTabs", {
   actions: {
     addModuleTab(moduleTab: ModuleTab) {
       this.moduleTabList.push(moduleTab);
-      this.activeModuleTab = moduleTab.ID as string;
+      this.activeModuleTab = moduleTab.Id as string;
     },
     deleteModuleTab(moduleID: string) {
-      const index = this.moduleTabList.findIndex((module) => module.ID === moduleID);
+      const index = this.moduleTabList.findIndex((module) => module.Id === moduleID);
       if (index !== -1) {
         this.moduleTabList.splice(index, 1);
         if (this.activeModuleTab === moduleID) {
-          this.activeModuleTab = this.moduleTabList[this.moduleTabList.length - 1].ID as string;
+          this.activeModuleTab = this.moduleTabList[this.moduleTabList.length - 1].Id as string;
         }
       }
     },

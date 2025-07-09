@@ -10,7 +10,7 @@
       </a-layout-header>
       <a-layout class="flex-1">
         <a-layout-sider v-model:collapsed="collapsed" collapsible
-          collapsedWidth="40" width="240" :class="['bg-white']">
+          collapsedWidth="40" width="250" :class="['bg-white']">
           <Sider :menuList="menuList" >
           </Sider>
           <template #trigger>
@@ -91,7 +91,6 @@ const signInClick = () =>{
 }
 
 const switchAccount = ()=>{
-  console.log("------switch account");
   userProfileStore.clearUserProfile();
   userProfileStore.clearActivePrincipal();
   userProfileStore.setRememberMe(false);
