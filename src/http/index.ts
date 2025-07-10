@@ -3,7 +3,7 @@ import {message as AntMessage} from 'ant-design-vue';
 
 declare module "axios" {
   interface AxiosRequestConfig {
-    loading?: boolean;
+    loading?: boolean;   // 是否显示loading框
     skipAuth?: boolean; // 是否跳过身份验证
   }
 }
@@ -20,7 +20,6 @@ const request = axios.create({
 // 请求拦截器
 request.interceptors.request.use(
   (config) => {
-    console.log("-----------config:"+config.loading);
     // 添加认证令牌
     if(config.loading){
       showLoading();
