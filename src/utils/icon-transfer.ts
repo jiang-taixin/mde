@@ -19,6 +19,14 @@ const iconMap: Record<string, string> = {
   "delete-icon": Delete,
   "search-icon": Search,
   "save-icon": Save,
+  "query-icon":Add,
+  "query-Advanced-icon":Search,
+  "history-icon":Add,
+  "detail-icon":Add,
+  "export-icon":Add,
+  "savesetting-icon":Save,
+  "resetsetting-icon":Add,
+  "remove-icon":Delete
 };
 
 export function getIcon(iconName: string | null): string {

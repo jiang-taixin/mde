@@ -6,9 +6,7 @@
 // biome-ignore lint: disable
 export {}
 declare global {
-  const ComponentType: typeof import('./src/models/moduleConfigModel')['ComponentType']
   const EffectScope: typeof import('vue')['EffectScope']
-  const FeatureType: typeof import('./src/models/moduleConfigModel')['FeatureType']
   const Language: typeof import('./src/language/index')['Language']
   const LanguageNames: typeof import('./src/language/index')['LanguageNames']
   const ModuleType: typeof import('./src/models/moduleItemModel')['ModuleType']

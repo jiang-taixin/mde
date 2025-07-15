@@ -33,6 +33,7 @@ declare module 'vue' {
     ATable: typeof import('ant-design-vue/es')['Table']
     ATabPane: typeof import('ant-design-vue/es')['TabPane']
     ATabs: typeof import('ant-design-vue/es')['Tabs']
+    ATooltip: typeof import('ant-design-vue/es')['Tooltip']
     HeaderComponent: typeof import('./src/components/header/HeaderComponent.vue')['default']
     ModuleContainer: typeof import('./src/components/module-container/ModuleContainer.vue')['default']
     ModuleContent: typeof import('./src/components/module-content/ModuleContent.vue')['default']

@@ -7,7 +7,7 @@
           {{ index !== props.moduleTab.MenuPath.length - 1 ? menuName : '' }}
         </a-breadcrumb-item>
       </a-breadcrumb>
-      <div class="flex flex-row">
+      <div class="flex flex-row items-center">
         <img :src="clock" class="w-5 h-5 mr-2" />
         {{ $t('footer.dateMessage', { week: getWeekNo(), date: dateMessage }) }}
       </div>
@@ -19,14 +19,15 @@
     <!-- 内容 -->
     <div class="flex-1">
       <!-- 主表 -->
-      <div :class="['flex flex-col w-full', (moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0 ? 'h-1/2' : 'h-full']" ref="mainTableRef">
-        <ModuleTable />
+      <div :class="['flex-1 flex-col w-full', (moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0 ? 'h-1/2' : 'h-full']" ref="mainTableRef">
+        <ModuleTable :module-config="moduleConfig"/>
       </div>
       <!-- 从表 -->
-      <div class="max-h-1/2 " v-if="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0">
-        <a-tabs class="max-h-full" :tab-bar-style="{ marginBottom: '4px' }" size="small">
+      <div class="h-1/2 " v-if="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0">
+        <a-tabs class="h-full" :tab-bar-style="{ marginBottom: '4px' }" size="small">
           <a-tab-pane v-for="subConfig in moduleConfig?.ChildEntityConfigs" :key="subConfig.ID" :tab="subConfig.DisplayName">
-            <ModuleTable />
+
+            <ModuleTable :module-config="subConfig"/>
 
           </a-tab-pane>
         </a-tabs>
@@ -41,7 +42,6 @@ import type { ModuleTab } from '@/models/moduleItemModel';
 
 import clock from "@/assets/images/others/clock.png";
 import { getWeekNo } from "@/utils/datetime";
-import { getIcon } from '@/utils/icon-transfer';
 import type { Key } from 'ant-design-vue/es/_util/type';
 import type { ModuleConfig } from '@/models/moduleConfigModel';
 const { locale } = useI18n();

@@ -6,6 +6,7 @@ export default {
   cancel:"取消",
   warning:"警告",
   loading:"加载中...",
+  searchPlaceholder:"搜索",
   app: {
     title: "辉瑞中国主数据管理系统",
   },

@@ -6,6 +6,7 @@ export default {
   cancel:"cancel",
   warning:"Warning",
   loading:"loading...",
+  searchPlaceholder:"Search...",
   app: {
     title: "Pfizer China Master Data Enricher",
   },
