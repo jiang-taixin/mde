@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <a-config-provider :theme="{
     token: {
@@ -7,13 +6,13 @@
   }">
     <a-layout class="h-full flex">
       <a-layout-header :class="['px-0 h-auto']">
-        <Header :switchAccountCallback="switchAccount"></Header>
+        <HeaderComponent :switchAccountCallback="switchAccount"></HeaderComponent>
       </a-layout-header>
       <a-layout class="flex-1">
         <a-layout-sider v-model:collapsed="collapsed" collapsible
           collapsedWidth="40" width="250" :class="['bg-white']">
-          <Sider :menuList="menuList" >
-          </Sider>
+          <SiderComponent :menuList="menuList" >
+          </SiderComponent>
           <template #trigger>
             <div class="w-full flex items-center justify-center bg-white h-12 border-t-2">
               <img class="w-5" :src="open" v-if="collapsed" />
@@ -46,7 +45,7 @@ import { isVoid } from '../../utils/datacheck';
 import { useI18n } from 'vue-i18n';
 import open from "@/assets/images/menu/open.png";
 import close from "@/assets/images/menu/collapsed.png";
-import SelectPrincipal from '@/components/select-principal/index.vue'
+import SelectPrincipal from '@/components/select-principal/SelectPrincial.vue'
 import { message } from 'ant-design-vue';
 const { t } = useI18n();
 const collapsed = ref<boolean>(false);
@@ -74,8 +73,7 @@ onMounted(async () => {
 })
 
 const loadModules = async () =>{
-  console.log("-------------------load modules:"+userProfileStore.activePrincipal?.ID);
-  const res = await getModulesList(moduleId,userProfileStore.activePrincipal?.ID as string);
+  const res = await getModulesList(moduleId);
   if(res){
     menuList.value = res;
   }

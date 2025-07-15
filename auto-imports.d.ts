@@ -8,15 +8,12 @@ export {}
 declare global {
   const ComponentType: typeof import('./src/models/moduleConfigModel')['ComponentType']
   const EffectScope: typeof import('vue')['EffectScope']
+  const FeatureType: typeof import('./src/models/moduleConfigModel')['FeatureType']
   const Language: typeof import('./src/language/index')['Language']
   const LanguageNames: typeof import('./src/language/index')['LanguageNames']
   const ModuleType: typeof import('./src/models/moduleItemModel')['ModuleType']
   const PrincipalType: typeof import('./src/models/userProfileModel')['PrincipalType']
-  const Rules: typeof import('./src/utils/rules')['Rules']
-  const Validator: typeof import('./src/utils/validator')['Validator']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
-  const alovaInstance: typeof import('./src/http/index')['alovaInstance']
-  const clearDirtyData: typeof import('./src/utils/datacheck')['clearDirtyData']
   const computed: typeof import('vue')['computed']
   const createApp: typeof import('vue')['createApp']
   const createPinia: typeof import('pinia')['createPinia']
@@ -42,7 +39,6 @@ declare global {
   const i18n: typeof import('./src/language/index')['i18n']
   const inject: typeof import('vue')['inject']
   const isElement: typeof import('./src/utils/datacheck')['isElement']
-  const isEmpty: typeof import('./src/utils/datacheck')['isEmpty']
   const isNil: typeof import('./src/utils/datacheck')['isNil']
   const isNull: typeof import('./src/utils/datacheck')['isNull']
   const isProxy: typeof import('vue')['isProxy']
@@ -99,14 +95,11 @@ declare global {
   const triggerRef: typeof import('vue')['triggerRef']
   const unref: typeof import('vue')['unref']
   const useAttrs: typeof import('vue')['useAttrs']
-  const useCounterStore: typeof import('./src/stores/counter')['useCounterStore']
   const useCssModule: typeof import('vue')['useCssModule']
   const useCssVars: typeof import('vue')['useCssVars']
-  const useDynamicForm: typeof import('./src/hooks/useDynamicForm')['useDynamicForm']
   const useI18n: typeof import('vue-i18n')['useI18n']
   const useId: typeof import('vue')['useId']
   const useLink: typeof import('vue-router')['useLink']
-  const useLoading: typeof import('./src/utils/loading')['useLoading']
   const useModel: typeof import('vue')['useModel']
   const useModuleTabsStore: typeof import('./src/stores/moduleTabs')['useModuleTabsStore']
   const useRoute: typeof import('vue-router')['useRoute']
@@ -129,7 +122,7 @@ declare global {
   export type { Geography } from './src/models/metaDataModel'
   import('./src/models/metaDataModel')
   // @ts-ignore
-  export type { ComponentType, ComponentModel, SubConfig, ModuleConfig } from './src/models/moduleConfigModel'
+  export type { Attribute, Feature, ModuleConfig } from './src/models/moduleConfigModel'
   import('./src/models/moduleConfigModel')
   // @ts-ignore
   export type { ModuleType, ModuleTab, ModuleItem } from './src/models/moduleItemModel'

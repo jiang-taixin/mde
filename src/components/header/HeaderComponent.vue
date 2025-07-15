@@ -13,7 +13,7 @@
           </template>
           <template #overlay>
             <a-menu>
-              <a-menu-item key="switch" class="w-52">
+              <a-menu-item key="switch" class="w-[200px]">
                 <a-row>
                   <a-col :span="3"></a-col>
                   <a-col :span="21">
@@ -50,7 +50,7 @@
             </a-menu>
           </template>
         </a-dropdown-button>
-        <a-select v-model:value="language" class="w-24" @change="changeLanguage">
+        <a-select v-model:value="language" class="w-28" size="small" @change="changeLanguage">
           <a-select-option v-for="item in languageOptions" :value="item.value">{{ item.label }}</a-select-option>
         </a-select>
         <a-button class="flex items-center justify-center" type="text" shape="circle" @click="toggleExpand">

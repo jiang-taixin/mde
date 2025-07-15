@@ -16,7 +16,7 @@ export interface ModuleTab {
   Id: string;
 }
 
-// 模块
+// 模块（菜单）
 export interface ModuleItem {
   Id: string; // 模块id
   Description: string; // 描述

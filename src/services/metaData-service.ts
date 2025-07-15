@@ -3,5 +3,5 @@ import type { Geography } from "@/models/metaDataModel";
 
 // 获取省份
 export async function getGeoGraphyList(parentId: string): Promise<[Geography]> {
-  return http.get("/API/api/entity/GetGeographyItem",{params:{parentId}});
+  return http.get("/API/entity/GetGeographyItem",{params:{parentId}});
 }

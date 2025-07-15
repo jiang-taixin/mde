@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Demo from "@/views/demo/index.vue";
-import Home from "@/views/home/index.vue";
+import Demo from "@/views/demo/DemoPage.vue";
+import Home from "@/views/home/HomePage.vue";
 
 import { i18n, Language } from "@/language/index";
 import { useUserProfileStore } from "@/stores/userProfile";

@@ -31,7 +31,14 @@ const { t } = useI18n();
 
 const moduleTabsStore = useModuleTabsStore();
 const desktopModeule: ModuleTab = { Url: "desktop", Closable: false, MenuPath: [t("header.desktop")],Loading: false, Id: "desktop" };
-moduleTabsStore.addModuleTab(desktopModeule);
+
+onMounted(() => {
+  if(!moduleTabsStore.moduleTabList.find(item => item.Id === 'desktop')){
+    moduleTabsStore.addModuleTab(desktopModeule);
+  }
+
+})
+
 const { activeModuleTab } = storeToRefs(moduleTabsStore);
 
 const remove = (targetKey: string) => {
