@@ -17,18 +17,16 @@
       <span class="font-bold text-lg">{{ props.moduleTab.MenuPath[props.moduleTab.MenuPath.length - 1] }}</span>
     </div>
     <!-- 内容 -->
-    <div class="flex-1">
+    <div class="">
       <!-- 主表 -->
-      <div :class="['flex-1 flex-col w-full', (moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0 ? 'h-1/2' : 'h-full']" ref="mainTableRef">
+      <div :class="[' flex-col w-full', (moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0 ? 'h-1/2' : 'h-full']" ref="mainTableRef">
         <ModuleTable :module-config="moduleConfig"/>
       </div>
       <!-- 从表 -->
       <div class="h-1/2 " v-if="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0">
         <a-tabs class="h-full" :tab-bar-style="{ marginBottom: '4px' }" size="small">
           <a-tab-pane v-for="subConfig in moduleConfig?.ChildEntityConfigs" :key="subConfig.ID" :tab="subConfig.DisplayName">
-
             <ModuleTable :module-config="subConfig"/>
-
           </a-tab-pane>
         </a-tabs>
       </div>

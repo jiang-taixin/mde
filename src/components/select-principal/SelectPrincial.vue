@@ -25,7 +25,10 @@ const formState = reactive({
 });
 
 watch(() => formState.principalID, (newVal) => {
-  principalID.value = newVal;
+  setPrincipal(newVal).then(() => {
+    principalID.value = newVal;
+  });
+
 });
 const rules: Record<string, Rule[]> = {
   principalID: [{ required: true, message: t('principal.selectTips'), trigger: 'change' }],

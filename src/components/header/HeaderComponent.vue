@@ -98,14 +98,20 @@ const switchAccount = () => {
 }
 
 const switchPrincipal = (principalID:string) => {
-  userProfileStore.setActivePrincipal(principalID);
+  setPrincipal(principalID).then(() => {
+    userProfileStore.setActivePrincipal(principalID);
+  });
+
 }
 
-const changeLanguage = (value: SelectValue, option: DefaultOptionType | DefaultOptionType[]) => {
+const changeLanguage = async (value: SelectValue, option: DefaultOptionType | DefaultOptionType[]) => {
   // 切换语言
-  locale.value = value as string;
-  userProfileStore.setLanguage(value as string);
-  router.go(0);
+  await setLanuguage(value as string).then(() =>{
+    locale.value = value as string;
+    userProfileStore.setLanguage(value as string);
+    router.go(0);
+  }).catch(()=>{
+  });
 }
 const toggleExpand = () => {
   expand.value = !expand.value;

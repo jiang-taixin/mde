@@ -9,5 +9,12 @@ export async function login(): Promise<UserProfile> {
   return http.get("/API/auth/login",{skipAuth: true, withCredentials:true});
 
 }
+// 设置语言
+export async function setLanuguage(LanguageCode:string):Promise<any> {
+  return http.post("/API/culture/language",{LanguageCode});
+}
 
-
+// 切换角色
+export async function setPrincipal(activePrincipalId:string):Promise<any> {
+  return http.post("/API/auth/SignAs",{activePrincipalId});
+}

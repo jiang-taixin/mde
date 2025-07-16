@@ -1,7 +1,7 @@
 <template>
   <div class="w-full h-full flex flex-col">
     <!--操作栏-->
-    <div class="w-full flex flex-row">
+    <div class="w-full flex flex-row py-1">
       <a-input-search v-model:value="searchWord" size="small" :placeholder="t('searchPlaceholder')" style="width: 200px"
         @search="onSearch" v-if="props.moduleConfig.Features.find(item => item.Name === 'FuzzySearch')"/>
       <div ref="container" class="flex flex-row w-full overflow-hidden" @wheel="handleWheel">
@@ -10,9 +10,9 @@
           <a-tooltip v-for="button in props.moduleConfig.Features" :title="button.Description">
             <a-button v-if="!button.IsColumnButton && button.Name !== 'FuzzySearch'" size="small"
             class="flex-shrink-0 whitespace-nowrap ml-2 flex items-center" @click="handleClick(button.CommandName)">
-              {{ button.IconCss }}
+              {{ button.DisplayName }}
               <template #icon>
-                <img :src="getIcon(button.IconCss)" v-if="button.Name !== 'SwitchVersion'" class="w-4 h-4 mr-1 mt-1" />
+                <img :src="getIcon(button.IconCss)" v-if="button.Name !== 'SwitchVersion'" class="w-4 h-4 mr-1" />
               </template>
             </a-button>
           </a-tooltip>
@@ -21,9 +21,9 @@
       </div>
     </div>
 
-    <!--主表-->
-    <div class="flex-1">
-      <vxe-table :data="tableData" size="small" border round
+    <!--表格-->
+    <div>
+      <vxe-table :data="tableData" size="small" round
             :column-config="{ resizable: true, drag: true }" :column-drag-config="columnDragConfig"
             :cell-config="{ height: 32 }" :custom-config="customConfig" ref="tableRef"
             @column-dragstart="columnDragstartEvent" @column-dragend="columnDragendEvent"
@@ -45,7 +45,7 @@
         </vxe-table>
     </div>
     <!--分页-->
-    <div class="flex justify-end">
+    <div class="flex justify-end pb-2">
       <a-pagination size="small" v-model:current="current1" show-quick-jumper :total="500" @change="onChange" :show-total="total => `Total ${total} items`"/>
     </div>
   </div>
@@ -179,7 +179,8 @@ const tableData = ref<RowVO[]>([
     { id: 10004, name: 'Test4', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
     { id: 10005, name: 'Test5', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
     { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-    { id: 10007, name: 'Test7', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' }
+    { id: 10007, name: 'Test7', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
+    { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },{ id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },{ id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },{ id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
 ])
 
 

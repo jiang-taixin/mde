@@ -15,7 +15,7 @@
                 </span>
             </template>
             <template v-if="pane.Url !== 'desktop'">
-                <div class="m-2 rounded-lg h-full bg-white p-3">
+                <div class="m-2 rounded-lg h-full bg-white p-3 overflow-y-auto">
                     <ModuleContent :moduleTab="pane" />
                 </div>
             </template>
