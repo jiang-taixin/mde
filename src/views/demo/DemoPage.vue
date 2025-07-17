@@ -1,12 +1,12 @@
 <template>
     <div class="w-full h-[250px]">
-        <vxe-table :data="tableData" size="small" border round height="100%"
+        <vxe-table :data="tableData" size="small" round height="100%"
             :column-config="{ resizable: true, drag: true }" :column-drag-config="columnDragConfig"
             :cell-config="{ height: 32 }" :custom-config="customConfig" ref="tableRef"
             @column-dragstart="columnDragstartEvent" @column-dragend="columnDragendEvent"
             @column-resizable-change="columnResizableChange">
             <vxe-column v-for="column in columnData" :type="column.type" :field="column.field" :title="column.title"
-                :width="column.width" :fixed="column.fixed" show-overflow="ellipsis"
+                :width="column.width" :fixed="column.fixed" show-overflow show-header-overflow
                 :sortable="column.field !== 'action'">
 
                 <template #header="{ column }" v-if="column.field !== 'action' && column.type !== 'seq'">
@@ -180,7 +180,7 @@ const columnData = ref<VxeColumnProps[]>([{
     width: 70,
     fixed: 'left'
 }, {
-    title: '姓名',
+    title: 'skskkdjdhdhdhhshshhssh',
     field: 'name',
     width: 150,
 }, {

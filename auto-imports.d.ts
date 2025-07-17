@@ -6,7 +6,9 @@
 // biome-ignore lint: disable
 export {}
 declare global {
+  const CommandName: typeof import('./src/models/moduleConfigModel')['CommandName']
   const EffectScope: typeof import('vue')['EffectScope']
+  const FeatureName: typeof import('./src/models/moduleConfigModel')['FeatureName']
   const Language: typeof import('./src/language/index')['Language']
   const LanguageNames: typeof import('./src/language/index')['LanguageNames']
   const ModuleType: typeof import('./src/models/moduleItemModel')['ModuleType']
@@ -122,7 +124,7 @@ declare global {
   export type { Geography } from './src/models/metaDataModel'
   import('./src/models/metaDataModel')
   // @ts-ignore
-  export type { Attribute, Feature, ModuleConfig } from './src/models/moduleConfigModel'
+  export type { FeatureName, Attribute, Feature, ModuleConfig } from './src/models/moduleConfigModel'
   import('./src/models/moduleConfigModel')
   // @ts-ignore
   export type { ModuleType, ModuleTab, ModuleItem } from './src/models/moduleItemModel'

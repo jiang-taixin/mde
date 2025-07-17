@@ -1,6 +1,6 @@
 <template>
   <div class="w-full flex flex-col h-full">
-    <!--路径-->
+    <!--页面菜单路径-->
     <div class="h-6 flex items-center flex-row justify-between">
       <a-breadcrumb separator=">">
         <a-breadcrumb-item v-for="(menuName, index) in props.moduleTab.MenuPath">
@@ -17,16 +17,18 @@
       <span class="font-bold text-lg">{{ props.moduleTab.MenuPath[props.moduleTab.MenuPath.length - 1] }}</span>
     </div>
     <!-- 内容 -->
-    <div class="">
+    <div class="flex-1">
       <!-- 主表 -->
-      <div :class="[' flex-col w-full', (moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0 ? 'h-1/2' : 'h-full']" ref="mainTableRef">
-        <ModuleTable :module-config="moduleConfig"/>
+      <div :class="['flex-col w-full', (moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0 ? 'h-1/2' : 'h-full']" ref="mainTableRef">
+        <ModuleTable :module-config="moduleConfig" :has-sub-module-config="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0"/>
       </div>
       <!-- 从表 -->
-      <div class="h-1/2 " v-if="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0">
+      <div class="h-1/2 border-t-2" v-if="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0">
         <a-tabs class="h-full" :tab-bar-style="{ marginBottom: '4px' }" size="small">
           <a-tab-pane v-for="subConfig in moduleConfig?.ChildEntityConfigs" :key="subConfig.ID" :tab="subConfig.DisplayName">
-            <ModuleTable :module-config="subConfig"/>
+             <div class="h-full">
+              <ModuleTable :module-config="subConfig" :has-sub-module-config="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0"/>
+             </div>
           </a-tab-pane>
         </a-tabs>
       </div>
@@ -40,14 +42,10 @@ import type { ModuleTab } from '@/models/moduleItemModel';
 
 import clock from "@/assets/images/others/clock.png";
 import { getWeekNo } from "@/utils/datetime";
-import type { Key } from 'ant-design-vue/es/_util/type';
 import type { ModuleConfig } from '@/models/moduleConfigModel';
 const { locale } = useI18n();
 const dateMessage = ref<string>();
 const mainTableRef = ref<HTMLElement | null>(null);
-const subTableRef = ref<HTMLElement | null>(null);
-const mainSelectedRowKeys = ref<Key[]>([]);
-const subSelectedRowKeys = ref<Key[]>([]);
 const moduleConfig = ref<ModuleConfig>({
   AllowEdit: false,
   Attributes: [],
@@ -104,32 +102,16 @@ const props = defineProps({
   },
 });
 
-const searchArguments = reactive({
-  searchValue: '',
-})
-
-console.log(props.moduleTab.Url)
-
 
 onMounted(async () => {
+  loadConfig();
+});
+
+const loadConfig = async () =>{
   const res = await getModuleConfig(props.moduleTab.Url.split('entity=')[1]);
-  console.log(JSON.stringify(res));
+  console.log(JSON.stringify(res.Attributes))
   moduleConfig.value = res;
   props.moduleTab.Loading = false;
-})
-
-
-const onMainSelectChange = (selectedRowKeys: Key[]) => {
-  console.log('selectedRowKeys changed: ', selectedRowKeys);
-  mainSelectedRowKeys.value = selectedRowKeys;
-};
-const onSubSelectChange = (selectedRowKeys: Key[]) => {
-  console.log('selectedRowKeys changed: ', selectedRowKeys);
-  subSelectedRowKeys.value = selectedRowKeys;
-};
-function handleResizeColumn(w: number, col: any) {
-  console.log("-----------handleResizeColumn" + w);
-  col.width = w;
 }
 
 </script>

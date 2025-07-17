@@ -1,5 +1,23 @@
 import type { Language } from "@/language";
 
+// 按钮点击事件
+export enum FeatureName{
+  FuzzySearch="FuzzySearch",           // 搜索，这个按钮会被替换成搜索框
+  AdvancedSearch="AdvancedSearch",     // 高级搜索
+  Delete="Delete",                     // 删除单条记录
+  Add="Add",                           // 添加
+  Remove="Remove",                     // 批量移除
+  History="History",                   // 查看历史
+  Detail="Detail",                     // 查看详情
+  Upload="Upload",                     // 上传
+  Export="Export",                     // 导出
+  Download="Download",                 // 下载
+  SaveSetting="SaveSetting",           // 保存设置
+  ResetSetting="ResetSetting",         // 重置设置
+  SwitchVersion="SwitchVersion",       // 切换版本
+  Choose="Choose",                     // 选择
+}
+
 
 // 表头参数
 export interface Attribute{
@@ -44,7 +62,7 @@ export interface Attribute{
   Sequence:number,
   SortDirection:string|null,
   SortExpression:string|null,
-  SortOrder:number,
+  SortOrder:number|null,
   TargetDisplayMemberID:string,
   TargetDisplayMemberName:string|null,
   TargetEntityID:string,
@@ -52,7 +70,9 @@ export interface Attribute{
   TargetLovID:string,
   TargetLovName:string|null,
   TargetValueMemberID:string,
-  TargetValueMemberName:string|null
+  TargetValueMemberName:string|null,
+  IsActionColumn?:boolean,
+  IconCss?:string,
 }
 
 // 操作栏那妞参数
@@ -69,7 +89,7 @@ export interface Feature{
   IsColumnButton:boolean,
   Language:Language,
   MaskFlag:number,
-  Name:string,
+  Name:FeatureName,
   Sequence:number
 }
 
