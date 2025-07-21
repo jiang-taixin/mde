@@ -1,12 +1,29 @@
-import axios, { type AxiosResponse, type AxiosError } from "axios";
-import {message as AntMessage} from 'ant-design-vue';
-
+import axios, { type AxiosResponse, type AxiosError, type AxiosRequestConfig } from "axios";
+import { message as AntMessage } from 'ant-design-vue';
+import { useUserProfileStore } from '@/stores/userProfile';
 declare module "axios" {
   interface AxiosRequestConfig {
     loading?: boolean;   // 是否显示loading框
     skipAuth?: boolean; // 是否跳过身份验证
   }
 }
+
+// 不需要认证的API路径
+const SKIP_AUTH_PATHS = ['/API/auth/LoginTest', '/API/auth/login'];
+// 加载状态管理
+const loading = {
+  show: () => { showLoading() },
+  hide: () => { hideLoading() }
+};
+
+// 处理认证过期的逻辑
+const handleAuthExpired = () => {
+  const userProfileStore = useUserProfileStore();
+  userProfileStore.clearUserProfile();
+  userProfileStore.clearActivePrincipal();
+  userProfileStore.setRememberMe(false);
+  router.push("/home").then(() => {router.go(0)});
+};
 
 // 创建 axios 实例
 const request = axios.create({
@@ -17,58 +34,82 @@ const request = axios.create({
   },
 });
 
-// 请求拦截器
 request.interceptors.request.use(
   (config) => {
-    // 添加认证令牌
-    if(config.loading){
-      showLoading();
+    // 显示loading
+    if (config.loading) {
+      loading.show();
     }
-    if (!config.skipAuth) {
+    // 添加认证令牌
+    if (!config.skipAuth && !SKIP_AUTH_PATHS.includes(config.url || '')) {
       const userProfileStore = useUserProfileStore();
       const token = userProfileStore.userProfile?.Token;
       if (token) {
+        config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
     return config;
   },
+
   (error: AxiosError) => {
-    if(error.config?.loading){
-      hideLoading();
+    // 请求错误时隐藏loading
+    if (error.config?.loading) {
+      loading.hide();
     }
     return Promise.reject(error);
   }
 );
-// 响应拦截器
+
 
 request.interceptors.response.use(
   (response: AxiosResponse) => {
-    if(response.config.loading){
-      hideLoading();
+    // 响应成功时隐藏loading
+    if (response.config.loading) {
+      loading.hide();
     }
-    if(response.status === 200){
-      const res = response.data;
-      const {StatusCode , Message, Data} = res;
-      if(StatusCode === 200){
+    const { data, status } = response;
+    if (status === 200) {
+      const { StatusCode, Message, Data } = data;
+      // 业务状态码处理
+      if (StatusCode === 200) {
         return Data;
       }
-      else{
-        AntMessage.error(Message);
-        return Promise.reject(res);
+      // 认证过期处理
+      if (StatusCode === 401 && !SKIP_AUTH_PATHS.includes(response.config.url as string)) {
+        AntMessage.error(Message || '认证已过期，请重新登录');
+        handleAuthExpired();
+        return Promise.reject(data);
       }
-
+      // 其他业务错误
+      AntMessage.error(Message || '请求失败');
+      return Promise.reject(data);
     }
     return response;
   },
-  (err: AxiosError) => {
-    if(err.config?.loading){
-      hideLoading();
-    }
-    const {code, message, status} = err;
 
-    AntMessage.error(message, 1);
-    return Promise.reject(err);
+  (error: AxiosError) => {
+    // 响应错误时隐藏loading
+    if (error.config?.loading) {
+      loading.hide();
+    }
+    // 网络错误处理
+    if (!error.response) {
+      AntMessage.error('网络错误，请检查网络连接');
+      return Promise.reject(error);
+    }
+
+    // HTTP状态码处理
+    const { status, config } = error.response;
+    // 认证过期处理
+    if (status === 401 && !SKIP_AUTH_PATHS.includes(config.url as string)) {
+      handleAuthExpired();
+      return Promise.reject(error);
+    }
+    // 其他HTTP错误
+    const message = error.message || `请求失败，状态码: ${status}`;
+    AntMessage.error(message);
+    return Promise.reject(error);
   }
 );
 

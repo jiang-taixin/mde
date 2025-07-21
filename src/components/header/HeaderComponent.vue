@@ -76,6 +76,7 @@ import up from "@/assets/images/header/up.png";
 const { locale } = useI18n();
 
 const userProfileStore = useUserProfileStore();
+const moduleTabsStore = useModuleTabsStore();
 const language = ref<Language>(userProfileStore.userProfile?.Language as Language);
 const {rememberMe, userProfile, activePrincipal } = storeToRefs(userProfileStore);
 const languageOptions = computed(() => {
@@ -99,6 +100,8 @@ const switchAccount = () => {
 
 const switchPrincipal = (principalID:string) => {
   setPrincipal(principalID).then(() => {
+    moduleTabsStore.clearActiveModuleTab();
+    moduleTabsStore.setActiveModuleTab("");
     userProfileStore.setActivePrincipal(principalID);
   });
 

@@ -7,6 +7,8 @@ export default {
   warning:"警告",
   loading:"加载中...",
   searchPlaceholder:"搜索",
+  total:"总计:{total}",
+  empty:"暂无数据",
   app: {
     title: "辉瑞中国主数据管理系统",
   },

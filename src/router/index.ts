@@ -65,7 +65,6 @@ router.beforeEach(async (to, from, next) => {
         message.error(t("loginError"));
         next(false);
       }
-      next();
     }
     else{
       next();

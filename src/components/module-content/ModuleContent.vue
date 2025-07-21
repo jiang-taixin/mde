@@ -17,22 +17,23 @@
       <span class="font-bold text-lg">{{ props.moduleTab.MenuPath[props.moduleTab.MenuPath.length - 1] }}</span>
     </div>
     <!-- 内容 -->
-    <div class="flex-1">
+    <div class="flex-1" v-if="moduleConfig">
       <!-- 主表 -->
       <div :class="['flex-col w-full', (moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0 ? 'h-1/2' : 'h-full']" ref="mainTableRef">
-        <ModuleTable :module-config="moduleConfig" :has-sub-module-config="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0"/>
+        <ModuleTable :module-config="moduleConfig" :has-sub-module-config="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0"
+          :table-level="TableLevel.MainTable" :row-click="parentIDChange"/>
       </div>
       <!-- 从表 -->
       <div class="h-1/2 border-t-2" v-if="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0">
         <a-tabs class="h-full" :tab-bar-style="{ marginBottom: '4px' }" size="small">
           <a-tab-pane v-for="subConfig in moduleConfig?.ChildEntityConfigs" :key="subConfig.ID" :tab="subConfig.DisplayName">
              <div class="h-full">
-              <ModuleTable :module-config="subConfig" :has-sub-module-config="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0"/>
+              <ModuleTable :module-config="subConfig" :has-sub-module-config="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0"
+                :table-level="TableLevel.SubTable" :parentID="parentID"/>
              </div>
           </a-tab-pane>
         </a-tabs>
       </div>
-
     </div>
 
   </div>
@@ -43,52 +44,22 @@ import type { ModuleTab } from '@/models/moduleItemModel';
 import clock from "@/assets/images/others/clock.png";
 import { getWeekNo } from "@/utils/datetime";
 import type { ModuleConfig } from '@/models/moduleConfigModel';
+import { TableLevel } from '@/models/gridDataModel';
 const { locale } = useI18n();
 const dateMessage = ref<string>();
 const mainTableRef = ref<HTMLElement | null>(null);
-const moduleConfig = ref<ModuleConfig>({
-  AllowEdit: false,
-  Attributes: [],
-  ChildEntityConfigs: [],
-  Description: null,
-  DetailTemplateName: '',
-  DialogHeight: 0,
-  DialogWidth: 0,
-  DisplayName: '',
-  EntityAttributes: null,
-  EntityID: '',
-  EntityName: '',
-  ExcelRuntimeVersion: undefined,
-  Features: [],
-  ForeignKeyID: '',
-  ForeignKeyPhysicalViewAlias: undefined,
-  GroupingPhysicalViewAlias: undefined,
-  ID: '',
-  ImportTypeEnum: 0,
-  IsSystem: false,
-  Language: null,
-  Name: '',
-  PageSize: 0,
-  ParentEntityConfigName: null,
-  ParentID: '',
-  PhysicalView: '',
-  PrimaryConfigID: '',
-  PrimaryConfigName: null,
-  PrimaryKey: '',
-  ServiceDeleteMethod: undefined,
-  ServiceGetMethod: undefined,
-  ServiceInsertMethod: undefined,
-  ServiceUpdateMethod: undefined,
-  UniqueScope: 0,
-  UniqueScopeError: undefined
-});
+const moduleConfig = ref<ModuleConfig>();
+const parentID = ref<string>('');
+const parentIDChange = (newID: string) => {
+  parentID.value = newID;
+  console.log("--------------------parent id changed:"+newID);
+}
 // 监听语言切换
 watch(locale, () => {
   if (locale.value === Language.ZH_CN) {
     dateMessage.value = getDateMessage();
   } else {
     dateMessage.value = getEnglishDate();
-
   }
 }, { immediate: true });
 
@@ -109,10 +80,15 @@ onMounted(async () => {
 
 const loadConfig = async () =>{
   const res = await getModuleConfig(props.moduleTab.Url.split('entity=')[1]);
-  console.log(JSON.stringify(res.Attributes))
   moduleConfig.value = res;
   props.moduleTab.Loading = false;
 }
+
+const showLoading = (loading: boolean) =>{
+  props.moduleTab.Loading = loading;
+}
+
+provide("showLoading",showLoading);
 
 </script>
 <style scoped></style>

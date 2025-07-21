@@ -13,7 +13,7 @@ const iconMap: Record<string, string> = {
   "mdm-icon": DB,
   "config-icon": Settings,
   null: Folder,
-  home: Home,
+  "home": Home,
   "grid-header-icon": Documents,
   "add-icon": Add,
   "delete-icon": Delete,

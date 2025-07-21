@@ -22,6 +22,9 @@ export const useModuleTabsStore = defineStore("moduleTabs", {
     setActiveModuleTab(activeModuleTab: string) {
       this.activeModuleTab = activeModuleTab;
     },
+    clearActiveModuleTab(){
+      this.moduleTabList = [];
+    }
   },
   getters: {},
 });

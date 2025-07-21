@@ -1,5 +1,7 @@
 <template>
+<a-spin :tip="t('loading')" :spinning="loading">
   <div class="flex flex-col h-full">
+
     <!--操作栏-->
     <div class="w-full flex flex-row py-1">
       <a-input-search v-model:value="searchWord" size="small" :placeholder="t('searchPlaceholder')" style="width: 200px"
@@ -20,43 +22,64 @@
 
         </div>
       </div>
-      <a-button type="link" size="small" @click="openCustomEvent" :icon="h('img', { src: getIcon(null), style: 'width: 16px' })"></a-button>
+      <a-button type="link" size="small" @click="openCustomEvent"
+        :icon="h('img', { src: getIcon(null), style: 'width: 16px' })"></a-button>
     </div>
 
     <!--表格-->
     <div class="flex-1">
-      <vxe-table ref="tableRef" :data="tableData" :max-height="props.hasSubModuleConfig?'300px':'98%'" min-height="300px" size="mini" round :border="true" :column-config="{ resizable: true, drag: true }"
-        :column-drag-config="columnDragConfig" :cell-config="{ height: 25 }" :custom-config="customConfig"
-        show-overflow="ellipsis" @cell-dblclick="cellDblclickEvent">
+      <vxe-table ref="tableRef" :data="gridData.JsonData" :max-height="props.hasSubModuleConfig ? '300px' : '400px'"
+        :min-height="props.hasSubModuleConfig ? '300px' : '400px'" size="mini" round :border="true" :column-config="{ resizable: true, drag: true }"
+        :column-drag-config="columnDragConfig"
+        :checkbox-config="{highlight:true}"
+        :cell-config="{ height: 25 }"
+        :custom-config="customConfig"
+        :row-config="{isHover: true, isCurrent: true,keyField:'ID'}"
+        :empty-text="t('empty')"
+        show-overflow="ellipsis" @cell-dblclick="cellDblclickEvent" @cell-click="cellClickEvent">
         <!--选择列-->
         <vxe-column type="checkbox" width="30" fixed="left" field="check"></vxe-column>
-        <!-- :type="column.type" -->
-        <vxe-column v-for="column in props.moduleConfig.Attributes" :field="column.Name" :title="column.DisplayName"
-          :width="`${column.DisplayWidth>0?column.DisplayWidth:80}px`"
-          show-header-overflow :sortable="column.SortOrder !== null"
-          :visible="!column.Hidden">
-        </vxe-column>
-        <template v-for="feature in props.moduleConfig.Features">
-          <vxe-column  v-if="feature.IsColumnButton" :field="feature.Name" :title="feature.DisplayName" width="80px" :resizable="false" align="center">
-            <a-button type="link" size="small" :icon="h('img', { src: getIcon(null), style: 'width: 16px' })"></a-button>
-          </vxe-column>
+        <!--Attribute中的有效列-->
+        <template v-for="column in props.moduleConfig.Attributes">
+          <template v-if="!column.Hidden">
+            <vxe-column :field="column.Name" :title="column.DisplayName"
+              :width="`${column.DisplayWidth > 0 ? column.DisplayWidth : 80}px`" show-header-overflow
+              :sortable="column.SortOrder !== null" :visible="column.DisplayByDefault">
+            </vxe-column>
           </template>
+        </template>
+        <!--Feature中包含的列-->
+        <template v-for="feature in props.moduleConfig.Features">
+          <vxe-column v-if="feature.IsColumnButton" :field="feature.Name" :title="feature.DisplayName" width="80px"
+            :resizable="false" align="center">
+            <a-button type="link" size="small" @click="handleClick(feature.Name)"
+              :icon="h('img', { src: getIcon(feature.IconCss), style: 'width: 16px' })"></a-button>
+          </vxe-column>
+        </template>
       </vxe-table>
     </div>
     <!--分页-->
     <div class="flex justify-end py-2">
-      <a-pagination size="small" v-model:current="current1" show-quick-jumper :total="500" @change="onChange"
-        :show-total="total => `Total ${total} items`" />
+      <a-pagination size="small" v-model:current="pagination.current"
+      v-model:page-size="pagination.pageSize"
+      show-quick-jumper
+      :total="pagination.total"
+       @change="onPageChange"
+      :page-size-options="pagination.pageSizeOptions"
+        :show-total="(total: any) => t('total',{total:total})" />
     </div>
   </div>
+</a-spin>
 </template>
 <script setup lang="ts">
-import { ref, h } from 'vue';
+import { ref, h, type PropType } from 'vue';
 import { FeatureName, type Attribute, type ModuleConfig } from '@/models/moduleConfigModel';
 import { getIcon } from '@/utils/icon-transfer';
 import { message } from 'ant-design-vue';
 import type { VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table/types/all';
 import { debounce } from 'lodash';
+import { TableLevel, type GridData, type RequestGridParams } from '@/models/gridDataModel';
+import { getGridData } from '@/services/gridData-service';
 const { t } = useI18n();
 const container = ref<HTMLElement | null>(null);
 const content = ref<HTMLElement | null>(null);
@@ -66,23 +89,60 @@ const searchWord = ref<string>('');
 const tableRef = ref<VxeTableInstance<any>>();
 const resizeObserver = ref<ResizeObserver>();
 
+const showLoading = inject<(loading: boolean) => void>('showLoading');
+const loading = ref<boolean>(false);
+
 const props = defineProps({
   moduleConfig: {
     type: Object as PropType<ModuleConfig>,
     require: true,
     default: null
   },
-  hasSubModuleConfig:{
+  hasSubModuleConfig: {
     type: Boolean,
     require: true,
     default: false
+  },
+  tableLevel:{
+    type: Number as PropType<TableLevel>,
+    require:true,
+    default: TableLevel.MainTable
+  },
+  rowClick:{
+    type: Function,
+    require: false,
+  },
+  parentID:{
+    type: String,
+    require: false
   }
 });
 
-const current1 = ref<number>(1);
-const onChange = (pageNumber: number) => {
-  console.log('Page: ', pageNumber);
+watch(() => props.parentID,(parentId) =>{
+  if(!isVoid(parentId)){
+    // 子表在主表被选中某行时才加载数据
+    loadGridData();
+  }
+})
+
+interface Pagination{
+  current:number,
+  pageSize:number,
+  pageSizeOptions:number[]|string[],
+  total?:number
+}
+
+const pagination = reactive<Pagination>({
+  current: 1,
+  pageSize: props.moduleConfig.PageSize,
+  pageSizeOptions: ['5','10','25','50','100','200'],
+  total:0
+});
+const onPageChange = () => {
+  console.log('Page change: ',pagination);
+  loadGridData();
 };
+
 onMounted(() => {
   // 使用ResizeObserver监听尺寸变化
   resizeObserver.value = new ResizeObserver(calculateMaxScroll);
@@ -94,7 +154,44 @@ onMounted(() => {
     calculateMaxScroll();
     setTimeout(calculateMaxScroll, 100);
   }, 50);
+  if(props.tableLevel === TableLevel.MainTable||props.parentID){
+    // 只有主表在页面加载时就加载数据
+    loadGridData();
+  }
+
 });
+
+const gridData = reactive<GridData>({
+  TotalRecords: 0,
+  EntityConfigName: '',
+  JsonData: undefined
+});
+const loadGridData = async () =>{
+  showLoading && showLoading(true);
+  loading.value = true;
+  const params:RequestGridParams = {
+    PageSize: pagination.pageSize,
+    PageIndex: pagination.current,
+    SortAttributeConfigName: null,
+    EntityConfigName: props.moduleConfig.Name,
+    IsAscending: false,
+    SearchCondition: null,
+    MasterCondition: props.tableLevel === TableLevel.MainTable?null:[{Name:'ParentID',Value:props.parentID}]
+  }
+  const res = await getGridData(params);
+  if(res){
+    gridData.JsonData = JSON.parse(res.JsonData);
+    console.log("-------grid:"+JSON.stringify(gridData.JsonData[0]))
+    pagination.total = res.TotalRecords;
+    showLoading && showLoading(false);
+    loading.value = false;
+
+    tableRef.value?.setCheckboxRow(gridData.JsonData[0], true);
+    if(props.tableLevel === TableLevel.MainTable){
+      props.rowClick!(gridData.JsonData[0].ID);
+    }
+  }
+}
 // 按钮组超过最大宽度横向滚动
 const calculateMaxScroll = debounce(() => {
   if (container.value && content.value) {
@@ -138,41 +235,7 @@ const columnDragConfig = reactive<VxeTablePropTypes.ColumnDragConfig<any>>({
   trigger: 'cell'
 })
 
-const tableData = ref<any[]>([
-  { Code: 10001, EnglishName: 'Test1', role: 'Develop', sex: 'Man', age: 28, address: 'test abc' },
-  { id: 10002, name: 'Test2', role: 'Test', sex: 'Women', age: 22, address: 'Guangzhou' },
-  { id: 10003, name: 'Test3', role: 'PM', sex: 'Man', age: 32, address: 'Shanghai' },
-  { id: 10004, name: 'Test4', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10005, name: 'Test5', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10007, name: 'Test7', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-  { id: 10006, name: 'Test6', role: 'Designer', sex: 'Women', age: 24, address: 'Shanghai' },
-])
 
-
-
-const columnDragstartEvent: VxeTableEvents.ColumnDragstart = ({ column }) => {
-  console.log(`拖拽开始 ${column.field}`)
-}
-
-const columnDragendEvent: VxeTableEvents.ColumnDragend = ({ newColumn, oldColumn, dragColumn, dragPos }) => {
-  console.log(`拖拽完成，旧列 ${oldColumn.field} 新列 ${newColumn.field}`)
-}
 
 const openCustomEvent = () => {
   const $table = tableRef.value
@@ -180,7 +243,15 @@ const openCustomEvent = () => {
     $table.openCustom()
   }
 }
-
+const cellDblclickEvent: VxeTableEvents.CellDblclick = ({ row,$event }) => {
+  console.log(`double click row: ${JSON.stringify(row)}, event:${JSON.stringify($event)}`);
+}
+const cellClickEvent: VxeTableEvents.CellClick<any> = ({ row, $event }) => {
+  console.log(`click row: ${JSON.stringify(row)}, event:${JSON.stringify($event)}`);
+  if(props.tableLevel === TableLevel.MainTable){
+    props.rowClick!(row.ID);
+  }
+}
 onUnmounted(() => {
   if (resizeObserver.value) {
     resizeObserver.value.disconnect();
@@ -188,9 +259,7 @@ onUnmounted(() => {
   window.removeEventListener('resize', calculateMaxScroll);
 });
 
-const cellDblclickEvent: VxeTableEvents.CellClick<any> = ({ row, column }) => {
-  console.log(`双击行：${JSON.stringify(row)} 双击列：${column.title}`)
-}
+
 </script>
 <style lang="sass">
 </style>

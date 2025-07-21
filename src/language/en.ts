@@ -7,6 +7,8 @@ export default {
   warning:"Warning",
   loading:"loading...",
   searchPlaceholder:"Search...",
+  total:"Count:{total}",
+  empty:"No Records",
   app: {
     title: "Pfizer China Master Data Enricher",
   },
