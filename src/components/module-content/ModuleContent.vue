@@ -52,9 +52,7 @@ const moduleConfig = ref<ModuleConfig>();
 const parentID = ref<string>('');
 const parentIDChange = (newID: string) => {
   parentID.value = newID;
-  console.log("--------------------parent id changed:"+newID);
 }
-// 监听语言切换
 watch(locale, () => {
   if (locale.value === Language.ZH_CN) {
     dateMessage.value = getDateMessage();
@@ -62,8 +60,6 @@ watch(locale, () => {
     dateMessage.value = getEnglishDate();
   }
 }, { immediate: true });
-
-
 
 const props = defineProps({
   moduleTab: {
@@ -84,11 +80,6 @@ const loadConfig = async () =>{
   props.moduleTab.Loading = false;
 }
 
-const showLoading = (loading: boolean) =>{
-  props.moduleTab.Loading = loading;
-}
-
-provide("showLoading",showLoading);
 
 </script>
 <style scoped></style>

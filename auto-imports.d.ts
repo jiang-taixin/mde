@@ -13,6 +13,7 @@ declare global {
   const LanguageNames: typeof import('./src/language/index')['LanguageNames']
   const ModuleType: typeof import('./src/models/moduleItemModel')['ModuleType']
   const PrincipalType: typeof import('./src/models/userProfileModel')['PrincipalType']
+  const TableLevel: typeof import('./src/models/gridDataModel')['TableLevel']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const computed: typeof import('vue')['computed']
   const createApp: typeof import('vue')['createApp']
@@ -29,6 +30,7 @@ declare global {
   const getDateMessage: typeof import('./src/utils/datetime')['getDateMessage']
   const getEnglishDate: typeof import('./src/utils/datetime')['getEnglishDate']
   const getGeoGraphyList: typeof import('./src/services/metaData-service')['getGeoGraphyList']
+  const getGridData: typeof import('./src/services/gridData-service')['getGridData']
   const getIcon: typeof import('./src/utils/icon-transfer')['getIcon']
   const getModuleConfig: typeof import('./src/services/module-service')['getModuleConfig']
   const getModulesList: typeof import('./src/services/module-service')['getModulesList']
@@ -77,8 +79,10 @@ declare global {
   const reactive: typeof import('vue')['reactive']
   const readonly: typeof import('vue')['readonly']
   const ref: typeof import('vue')['ref']
+  const resetUserSetting: typeof import('./src/services/module-service')['resetUserSetting']
   const resolveComponent: typeof import('vue')['resolveComponent']
   const router: typeof import('./src/router/index')['default']
+  const saveUserSetting: typeof import('./src/services/module-service')['saveUserSetting']
   const setActivePinia: typeof import('pinia')['setActivePinia']
   const setLanuguage: typeof import('./src/services/login-service')['setLanuguage']
   const setMapStoreSuffix: typeof import('pinia')['setMapStoreSuffix']
@@ -120,6 +124,9 @@ declare global {
   // @ts-ignore
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
+  // @ts-ignore
+  export type { TableLevel, RequestGridParams, GridData } from './src/models/gridDataModel'
+  import('./src/models/gridDataModel')
   // @ts-ignore
   export type { Geography } from './src/models/metaDataModel'
   import('./src/models/metaDataModel')

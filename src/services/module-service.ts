@@ -11,3 +11,12 @@ export async function getModulesList(moduleId: string): Promise<[ModuleItem]> {
 export async function getModuleConfig(entityConfigName: string): Promise<ModuleConfig> {
   return http.get("/API/application/GetEntityByUser", { params:{entityConfigName} });
 }
+
+// 重置配置
+export async function resetUserSetting(entityConfigID:string):Promise<ModuleConfig> {
+  return http.post(`/API/application/ResetUserSetting?entityConfigID=${entityConfigID}`,{entityConfigID});
+}
+// 保存配置
+export async function saveUserSetting(params:ModuleConfig):Promise<any> {
+  return http.post(`/API/application/SaveUserEntityConfig`,params);
+}
