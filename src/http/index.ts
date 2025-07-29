@@ -22,7 +22,7 @@ const handleAuthExpired = () => {
   userProfileStore.clearUserProfile();
   userProfileStore.clearActivePrincipal();
   userProfileStore.setRememberMe(false);
-  router.push("/home").then(() => {router.go(0)});
+  //router.push("/home").then(() => {router.go(0)});
 };
 
 // 创建 axios 实例

@@ -7,6 +7,7 @@ export default {
   warning:"Warning",
   loading:"loading...",
   searchPlaceholder:"Search...",
+  selectPlaceholder:"--Please Select--",
   searchButtonTitle:"Search",
   typeKeywords:"Please Type Keywords",
   advancedSearchTips:"Advanced Search Filters",

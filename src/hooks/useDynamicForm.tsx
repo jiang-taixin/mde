@@ -1,4 +1,6 @@
+import type { LovItem } from "@/models/metaDataModel";
 import type { Attribute } from "@/models/moduleConfigModel";
+const { t } = i18n.global;
 
 const LABEL_WIDTH = 130;
 const COMMON_DECORATOR_PROPS = {
@@ -9,55 +11,126 @@ const COMMON_DECORATOR_PROPS = {
   },
 };
 const COMMON_COMPONENT_PROPS = {
-  style:{width:'100%'},
+  style: { width: '100%' },
   size: "small" as const,
 };
 
-export const useDynamicForm = (attribute: Attribute) => {
-  const baseConfig = {
-    type: 'string' as const,
-    title: attribute.DisplayName,
-    'x-decorator': 'FormItem' as const,
-    'x-decorator-props': COMMON_DECORATOR_PROPS,
-  };
 
-  switch (attribute.ExtControlType) {
-    case 'entitydatafield':
-    case 'boolvaluecombox':
-    case 'lovfield':
-      return {
-        ...baseConfig,
-        'x-component': 'Select' as const,
-        'x-component-props': {
-          ...COMMON_COMPONENT_PROPS,
-          placeholder:attribute.PromptMessage?attribute.PromptMessage:''
-        },
-      };
-    case 'textfield':
-      return {
-        ...baseConfig,
-        'x-component': 'Input' as const,
-        'x-component-props': {
-          ...COMMON_COMPONENT_PROPS,
-          placeholder:attribute.PromptMessage?attribute.PromptMessage:''
-        },
-      };
-    case 'datefield':
-      return {
-        ...baseConfig,
-        'x-component': 'DatePicker' as const,
-        'x-component-props': COMMON_COMPONENT_PROPS,
-      };
-    case 'inputcheckfield':
-      return {
-        ...baseConfig,
-        'x-component': 'InputSearch' as const,
-        'x-component-props': {
-          ...COMMON_COMPONENT_PROPS,
-          placeholder:attribute.PromptMessage?attribute.PromptMessage:''
-        },
-      };
-    default:
-      break;
+
+export const useDynamicForm = () => {
+  const CLEAR_OPTION = {
+    label: t('selectPlaceholder'),
+    value: '__CLEAR__',
+};
+
+  // 定义异步获取LOV列表的函数
+  async function getLovList(field: any, lovId: string) {
+    if (!lovId) {
+      field.dataSource = [];
+      return;
+    }
+    try {
+      const response = await getLovItems(lovId);
+      field.dataSource = [
+        CLEAR_OPTION,
+        ...response.map((item: LovItem) => ({
+        label: item.Name,
+        value: item.ID
+      }))];
+    } catch (error) {
+      field.dataSource = [];
+    } finally {
+    }
   }
+  // 定义异步获取LOV列表的函数
+  async function getEntityDataList(field: any, entityConfigName: string) {
+    if (!entityConfigName) {
+      field.dataSource = [];
+      return;
+    }
+    try {
+      const params: RequestGridParams = {
+        PageSize: -1,
+        PageIndex: 1,
+        EntityConfigName: entityConfigName,
+      }
+      await getGridData(params).then((res) => {
+        if (res) {
+          const data = JSON.parse(res.JsonData);
+          field.dataSource = [
+            CLEAR_OPTION,
+            ...data.map((item: any) => ({
+            label: item.Name,
+            value: item.ID
+          }))
+          ];
+        }
+      }).catch(() => {
+      });
+    } catch (error) {
+      field.dataSource = [];
+    } finally {
+    }
+  }
+
+  // boolvaluecombox    是 1 否 0       entitydatafield   下拉
+  const generateFieldSchema = (attribute: Attribute) => {
+    const baseConfig = {
+      type: 'string' as const,
+      title: attribute.DisplayName,
+      'x-decorator': 'FormItem' as const,
+      'x-decorator-props': COMMON_DECORATOR_PROPS,
+    };
+    switch (attribute.ExtControlType) {
+      case 'entitydatafield':
+        return {
+          ...baseConfig,
+          'x-component': 'Select' as const,
+          'x-component-props': {
+            ...COMMON_COMPONENT_PROPS,
+            placeholder: attribute.PromptMessage ? attribute.PromptMessage : '',
+          },
+          'x-reactions': `{{(field) => getEntityDataList(field, '${attribute.TargetEntityName}')}}`
+        };
+      case 'boolvaluecombox':
+      case 'lovfield':
+        return {
+          ...baseConfig,
+          'x-component': 'Select' as const,
+          'x-component-props': {
+            ...COMMON_COMPONENT_PROPS,
+            placeholder: attribute.PromptMessage ? attribute.PromptMessage : '',
+          },
+          'x-reactions': `{{(field) => getLovList(field, '${attribute.TargetLovID}')}}`
+        };
+      case 'textfield':
+        return {
+          ...baseConfig,
+          'x-component': 'Input' as const,
+          'x-component-props': {
+            ...COMMON_COMPONENT_PROPS,
+            placeholder: attribute.PromptMessage ? attribute.PromptMessage : ''
+          },
+        };
+      case 'datefield':
+        return {
+          ...baseConfig,
+          'x-component': 'DatePicker' as const,
+          'x-component-props': COMMON_COMPONENT_PROPS,
+        };
+      case 'inputcheckfield':
+        return {
+          ...baseConfig,
+          'x-component': 'InputSearch' as const,
+          'x-component-props': {
+            ...COMMON_COMPONENT_PROPS,
+            placeholder: attribute.PromptMessage ? attribute.PromptMessage : ''
+          },
+        };
+      default:
+        return baseConfig;
+    }
+  }
+
+  return { generateFieldSchema, scope: { getLovList,getEntityDataList } }
 };

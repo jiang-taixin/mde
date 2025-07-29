@@ -8,6 +8,6 @@ export async function getGeoGraphyList(parentId: string): Promise<[Geography]> {
 
 
 // 获取lov信息
-export async function getLovList(lovId:string):Promise<[LovItem]>{
+export async function getLovItems(lovId:string):Promise<[LovItem]>{
   return http.get("/API/entity/GetLovItems",{params:{lovId}});
 }

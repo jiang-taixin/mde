@@ -17,11 +17,11 @@ export interface SearchConditionValue{
 export interface RequestGridParams{
   PageSize:number,
   PageIndex:number,
-  SortAttributeConfigName:string|null,
+  SortAttributeConfigName?:string|null,
   EntityConfigName:string,
-  IsAscending:boolean,
-  SearchCondition:SearchConditionValue | null,
-  MasterCondition:Record<string, any>|null,
+  IsAscending?:boolean,
+  SearchCondition?:SearchConditionValue | null,
+  MasterCondition?:Record<string, any>|null,
 }
 
 

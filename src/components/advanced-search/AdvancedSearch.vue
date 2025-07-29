@@ -4,28 +4,27 @@
       <img class="w-4 h-4" :src="searchIcon" />
       {{ t('advancedSearchTips') }}
     </div>
-    <!--检索组件-->
     <div class="my-2">
       <FormProvider :form="form">
-        <SchemaField :schema="schema" />
+        <SchemaField :schema="schema" :scope="scope" />
       </FormProvider>
     </div>
-    <a-button class="w-24 flex items-center" size="small" :icon="h('img', { src: searchIcon, style: 'width: 14px' })" @click="advancedSearch">
+    <a-button class="w-24 flex items-center" size="small" :icon="h('img', { src: searchIcon, style: 'width: 14px' })"
+      @click="advancedSearch">
       <span class="text-base ml-1">{{ t('searchButtonTitle') }}</span>
     </a-button>
   </div>
 </template>
 
 <script lang="ts" setup>
-const { t } = useI18n();
-import searchIcon from "@/assets/images/button/advanced-search.png";
-import { h, watch } from 'vue';
+import { h, ref, watch } from 'vue';
 import { createForm } from "@formily/core";
 import { FormProvider, createSchemaField } from "@formily/vue";
 import { FormGrid, FormItem, Input, Select, DatePicker } from "@formily/antdv";
-import type { ModuleConfig } from "@/models/moduleConfigModel";
 import InputSearch from "../input-search/InputSearch.vue";
-
+import searchIcon from "@/assets/images/button/advanced-search.png";
+import type { ModuleConfig } from "@/models/moduleConfigModel";
+const { t } = useI18n();
 const props = defineProps({
   moduleConfig: {
     type: Object as PropType<ModuleConfig>,
@@ -34,61 +33,54 @@ const props = defineProps({
   },
 });
 
-const emits = defineEmits(['searchCallback'])
+const emits = defineEmits(['searchCallback']);
+// 初始化Formily
+const form = createForm();
+const { SchemaField } = createSchemaField({
+  components: {
+    Input, DatePicker, Select,
+    InputSearch, FormGrid, FormItem
+  }
+});
 
-// 先定义schema结构
-const schema = reactive({
+// 使用自定义Hook
+const { generateFieldSchema, scope } = useDynamicForm();
+// 响应式schema
+const schema = ref({
   type: "object",
   properties: {
     grid: {
       type: "void",
       "x-component": "FormGrid",
-      "x-component-props": {
-        minColumns: 3,
-        maxColumns: 3,
-      },
-      properties: {} // 初始化为空对象
+      "x-component-props": { minColumns: 3, maxColumns: 3 },
+      properties: {}
     },
   }
 });
-
+// 更新schema
 const setupSchema = (config: ModuleConfig) => {
   if (!config?.Attributes) return;
-  // 使用新对象替换properties确保响应式更新
-  const newProperties = {} as Record<string, any>;
+  const newProperties: Record<string, any> = {};
   config.Attributes.forEach(item => {
-    console.log("-----------------------");
     if (item.IsAdvancedFilter) {
-      newProperties[item.Name] = useDynamicForm(item);
+      newProperties[item.Name] = generateFieldSchema(item);
     }
   });
-
-  // 整体替换grid.properties
-  schema.properties.grid.properties = newProperties;
-  schema.type = "object";
+  schema.value = {
+    ...schema.value,
+    properties: {
+      grid: {
+        ...schema.value.properties.grid,
+        properties: newProperties
+      }
+    }
+  };
 };
-
-const form = createForm();
-const { SchemaField } = createSchemaField({
-  components: {
-    Input,
-    DatePicker,
-    Select,
-    InputSearch,
-    FormGrid,
-    FormItem
-  }
-});
-
-const advancedSearch = () =>{
-  //console.log("------search :"+typeof(form.values));
+// 监听配置变化
+watch(() => props.moduleConfig, setupSchema, { immediate: true, deep: true });
+const advancedSearch = () => {
   emits('searchCallback', form.values);
-}
-
-watch(() => props.moduleConfig, (newConfig) => {
-  setupSchema(newConfig);
-}, { immediate: true, deep: true });
-
+};
 </script>
 
 <style scoped></style>

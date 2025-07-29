@@ -7,6 +7,7 @@ export default {
   warning:"警告",
   loading:"加载中...",
   searchPlaceholder:"搜索...",
+  selectPlaceholder:"--请选择--",
   searchButtonTitle:"搜索",
   typeKeywords:"请输入关键字",
   advancedSearchTips:"高级查询筛选",

@@ -33,6 +33,7 @@ declare global {
   const getGeoGraphyList: typeof import('./src/services/metaData-service')['getGeoGraphyList']
   const getGridData: typeof import('./src/services/gridData-service')['getGridData']
   const getIcon: typeof import('./src/utils/icon-transfer')['getIcon']
+  const getLovItems: typeof import('./src/services/metaData-service')['getLovItems']
   const getLovList: typeof import('./src/services/metaData-service')['getLovList']
   const getModuleConfig: typeof import('./src/services/module-service')['getModuleConfig']
   const getModulesList: typeof import('./src/services/module-service')['getModulesList']

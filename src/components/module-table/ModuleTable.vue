@@ -196,8 +196,11 @@ const loadGridData = async (isAdvancedSearch: boolean = false, searchParams: any
   if (isAdvancedSearch) {
     searchCondition = { AndOr: ANDOR.AND, Conditions: [] };
     Object.entries(searchParams).forEach(([key, value]) => {
-      const param = {Name:key, Value:value};
-      searchCondition.Conditions.push(param);
+      if(value !== '__CLEAR__'){
+        const param = {Name:key, Value:value};
+        searchCondition.Conditions.push(param);
+      }
+
     });
   }
   else {
