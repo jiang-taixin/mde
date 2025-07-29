@@ -1,3 +1,4 @@
+// 省市
 export interface Geography{
   ID:string,
   PYCode:string,                      // 省份编码
@@ -7,4 +8,18 @@ export interface Geography{
   TypeLovItemValue:number,            // ？
   Name:string|null,                   // ？
   CategoryLOVItemName:string|null     // ？
+}
+
+
+// LOV
+export interface LovItem{
+  LOVID:string,
+  LOVName: string,
+  LovDisplayName:string|null,
+  Name:string,
+  value:number,
+  Squeue:number,
+  IsDefault:boolean,
+  Language:Language|null,
+  ID:string
 }

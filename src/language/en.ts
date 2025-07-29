@@ -7,6 +7,9 @@ export default {
   warning:"Warning",
   loading:"loading...",
   searchPlaceholder:"Search...",
+  searchButtonTitle:"Search",
+  typeKeywords:"Please Type Keywords",
+  advancedSearchTips:"Advanced Search Filters",
   total:"Count:{total}",
   empty:"No Records",
   app: {

@@ -99,11 +99,16 @@ const signInClick = () => {
   showPrincipalModal.value = false;
 }
 
-const switchAccount = () => {
+const switchAccount = async () => {
   userProfileStore.clearUserProfile();
   userProfileStore.clearActivePrincipal();
   userProfileStore.setRememberMe(false);
-  router.go(0);
+  const res = await login(true);
+  if(res){
+    userProfileStore.setUserProfile(res);
+    i18n.global.locale.value = res.Language as Language;
+    router.go(0);
+  }
 }
 
 </script>

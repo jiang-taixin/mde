@@ -6,7 +6,7 @@
 // biome-ignore lint: disable
 export {}
 declare global {
-  const CommandName: typeof import('./src/models/moduleConfigModel')['CommandName']
+  const ANDOR: typeof import('./src/models/gridDataModel')['ANDOR']
   const EffectScope: typeof import('vue')['EffectScope']
   const FeatureName: typeof import('./src/models/moduleConfigModel')['FeatureName']
   const Language: typeof import('./src/language/index')['Language']
@@ -22,6 +22,7 @@ declare global {
   const defineAsyncComponent: typeof import('vue')['defineAsyncComponent']
   const defineComponent: typeof import('vue')['defineComponent']
   const defineStore: typeof import('pinia')['defineStore']
+  const downloadFile: typeof import('./src/services/download-file')['downloadFile']
   const effectScope: typeof import('vue')['effectScope']
   const en: typeof import('./src/language/en')['default']
   const getActivePinia: typeof import('pinia')['getActivePinia']
@@ -32,6 +33,7 @@ declare global {
   const getGeoGraphyList: typeof import('./src/services/metaData-service')['getGeoGraphyList']
   const getGridData: typeof import('./src/services/gridData-service')['getGridData']
   const getIcon: typeof import('./src/utils/icon-transfer')['getIcon']
+  const getLovList: typeof import('./src/services/metaData-service')['getLovList']
   const getModuleConfig: typeof import('./src/services/module-service')['getModuleConfig']
   const getModulesList: typeof import('./src/services/module-service')['getModulesList']
   const getWeekNo: typeof import('./src/utils/datetime')['getWeekNo']
@@ -103,6 +105,7 @@ declare global {
   const useAttrs: typeof import('vue')['useAttrs']
   const useCssModule: typeof import('vue')['useCssModule']
   const useCssVars: typeof import('vue')['useCssVars']
+  const useDynamicForm: typeof import('./src/hooks/useDynamicForm')['useDynamicForm']
   const useI18n: typeof import('vue-i18n')['useI18n']
   const useId: typeof import('vue')['useId']
   const useLink: typeof import('vue-router')['useLink']
@@ -125,10 +128,10 @@ declare global {
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
   // @ts-ignore
-  export type { TableLevel, RequestGridParams, GridData } from './src/models/gridDataModel'
+  export type { TableLevel, ANDOR, SearchConditionValue, RequestGridParams, GridData } from './src/models/gridDataModel'
   import('./src/models/gridDataModel')
   // @ts-ignore
-  export type { Geography } from './src/models/metaDataModel'
+  export type { Geography, LovItem } from './src/models/metaDataModel'
   import('./src/models/metaDataModel')
   // @ts-ignore
   export type { FeatureName, Attribute, Feature, ModuleConfig } from './src/models/moduleConfigModel'

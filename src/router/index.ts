@@ -55,7 +55,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requireAuth) {
     const userProfileStore = useUserProfileStore();
     if (!userProfileStore.isAuthenticated) {
-      const userData = await login();
+      const userData = await login(false);
       if (userData) {
         // 登录成功保存用户信息并设置语言环境
         userProfileStore.setUserProfile(userData);

@@ -4,13 +4,24 @@
 
       <!--操作栏-->
       <div class="w-full flex flex-row py-1">
-        <a-input-search v-model:value="searchWord" size="small" :placeholder="t('searchPlaceholder')"
-          style="width: 200px" @search="onSearch"
-          v-if="moduleConfig.Features?.find(item => item.Name === FeatureName.FuzzySearch)" />
+        <a-popover trigger="focus" color="#CCEAFF" placement="bottomLeft" :arrow="false"
+          :overlay-inner-style="{ padding: '4px' }">
+          <template #title>
+            <p class="mb-1 text-base">{{ t('typeKeywords') }}</p>
+          </template>
+          <template #content>
+            <template v-for="item in moduleConfig.Attributes">
+              <p class="mb-1 text-sm" v-if="item.IsFuzzyFilter">{{ item.DisplayName }}</p>
+            </template>
+          </template>
+          <a-input-search v-model:value="searchWord" size="small" :placeholder="t('searchPlaceholder')"
+            style="width: 200px" @search="onSearch"
+            v-if="moduleConfig.Features?.find(item => item.Name === FeatureName.FuzzySearch)" />
+        </a-popover>
         <div ref="container" class="flex flex-row w-full overflow-hidden" @wheel="handleWheel">
           <!-- 按钮组 超出边界横向滚动-->
           <div ref="content" class="flex" :style="{ transform: `translateX(${scrollOffset}px)` }">
-            <a-tooltip v-for="button in moduleConfig.Features" :title="button.Description">
+            <a-tooltip :arrow="false" v-for="button in moduleConfig.Features" :title="button.Description">
               <a-button :disabled="button.Name === FeatureName.Remove && !hasSelection"
                 v-if="!button.IsColumnButton && button.Name !== FeatureName.FuzzySearch" size="small"
                 class="flex-shrink-0 whitespace-nowrap ml-2 flex items-center" @click="handleClick(button.Name)">
@@ -28,15 +39,19 @@
           :icon="h('img', { src: getIcon('filter'), style: 'width: 16px' })"></a-button>
       </div>
 
+      <div v-show="showAdvancedSearch">
+        <AdvancedSearch :module-config="moduleConfig" @searchCallback="onAdvancedSearch"/>
+      </div>
+
       <!--表格-->
       <div class="flex-1">
         <vxe-table ref="tableRef" :data="gridData.JsonData" :max-height="props.hasSubModuleConfig ? '300px' : '400px'"
           :min-height="props.hasSubModuleConfig ? '300px' : '400px'" size="mini" round :border="true"
           :column-config="{ resizable: true, drag: true }" :column-drag-config="columnDragConfig"
           :checkbox-config="{ highlight: true }" :cell-config="{ height: 25 }" :custom-config="customConfig"
-          :row-config="{ isHover: true, isCurrent: true, keyField: 'ID' }" :empty-text="t('empty')" show-overflow="ellipsis"
-          @cell-dblclick="cellDblclickEvent" @cell-click="cellClickEvent" @checkbox-change="checkboxChange"
-          @checkbox-all="checkAll" @column-resizable-change="columnResizeChange"
+          :row-config="{ isHover: true, isCurrent: true, keyField: 'ID' }" :empty-text="t('empty')"
+          show-overflow="ellipsis" @cell-dblclick="cellDblclickEvent" @cell-click="cellClickEvent"
+          @checkbox-change="checkboxChange" @checkbox-all="checkAll" @column-resizable-change="columnResizeChange"
           @custom-visible-change="columnVisibleChange" @column-dragend="columnDragend">
           <!--选择列-->
           <vxe-column type="checkbox" width="30" fixed="left" field="check"></vxe-column>
@@ -60,7 +75,7 @@
         </vxe-table>
       </div>
       <!--分页-->
-      <div class="flex justify-end py-2">
+      <div class="flex justify-end py-2 mb-2">
         <a-pagination size="small" v-model:current="pagination.current" v-model:page-size="pagination.pageSize"
           show-quick-jumper :total="pagination.total" @change="onPageChange"
           :page-size-options="pagination.pageSizeOptions" :show-total="(total: any) => t('total', { total: total })" />
@@ -75,7 +90,7 @@ import { getIcon } from '@/utils/icon-transfer';
 import { message } from 'ant-design-vue';
 import type { VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table/types/all';
 import { debounce } from 'lodash';
-import { TableLevel, type GridData, type RequestGridParams } from '@/models/gridDataModel';
+import { ANDOR, TableLevel, type GridData, type RequestGridParams, type SearchConditionValue } from '@/models/gridDataModel';
 import { getGridData } from '@/services/gridData-service';
 const { t } = useI18n();
 const container = ref<HTMLElement | null>(null);
@@ -87,6 +102,8 @@ const tableRef = ref<VxeTableInstance<any>>();
 const resizeObserver = ref<ResizeObserver>();
 const selectedRows = ref<any[]>([]);
 const hasSelection = computed(() => selectedRows.value.length > 0);
+
+const showAdvancedSearch = ref<boolean>(false);
 
 const loading = ref<boolean>(false);
 
@@ -173,42 +190,61 @@ const gridData = reactive<GridData>({
   EntityConfigName: '',
   JsonData: undefined
 });
-const loadGridData = async () => {
+const loadGridData = async (isAdvancedSearch: boolean = false, searchParams: any = null) => {
   loading.value = true;
+  let searchCondition: SearchConditionValue = {} as SearchConditionValue;
+  if (isAdvancedSearch) {
+    searchCondition = { AndOr: ANDOR.AND, Conditions: [] };
+    Object.entries(searchParams).forEach(([key, value]) => {
+      const param = {Name:key, Value:value};
+      searchCondition.Conditions.push(param);
+    });
+  }
+  else {
+    searchCondition = isVoid(searchWord.value) ? null as any : { AndOr: ANDOR.OR, Conditions: [{ Name: '', Value: searchWord.value }] };
+  }
+
   const params: RequestGridParams = {
     PageSize: pagination.pageSize,
     PageIndex: pagination.current,
     SortAttributeConfigName: null,
     EntityConfigName: moduleConfig.value.Name,
     IsAscending: false,
-    SearchCondition: null,
+    SearchCondition: searchCondition,
     MasterCondition: props.tableLevel === TableLevel.MainTable ? null : [{ Name: moduleConfig.value.ForeignKeyPhysicalViewAlias, Value: props.parentID }]
   }
-  const res = await getGridData(params);
-  loading.value = false;
-  if (res) {
-    gridData.JsonData = JSON.parse(res.JsonData);
-    pagination.total = res.TotalRecords;
-    if (gridData.JsonData.length !== 0) {
-      tableRef.value?.setCheckboxRow(gridData.JsonData[0], true);
-      nextTick(() => {
-        selectedRows.value = tableRef.value?.getCheckboxRecords() as any;
-      })
-      if (props.tableLevel === TableLevel.MainTable) {
-        props.rowClick!(gridData.JsonData[0].ID);
+  await getGridData(params).then((res) => {
+    loading.value = false;
+    if (res) {
+      gridData.JsonData = JSON.parse(res.JsonData);
+      pagination.total = res.TotalRecords;
+      if (gridData.JsonData.length !== 0) {
+        tableRef.value?.setCheckboxRow(gridData.JsonData[0], true);
+        nextTick(() => {
+          selectedRows.value = tableRef.value?.getCheckboxRecords() as any;
+        })
+        if (props.tableLevel === TableLevel.MainTable) {
+          props.rowClick!(gridData.JsonData[0].ID);
+        }
       }
     }
+  }).catch(() => {
+    loading.value = false;
+  });
 
-  }
 }
 
 const onSearch = () => {
-  console.log('or use this.value', searchWord.value);
-
+  pagination.current = 1;
+  loadGridData();
 };
 
+const onAdvancedSearch = (params: any) => {
+  loadGridData(true, params);
+}
+
 // 按钮点击事件
-const handleClick = async (featureName: FeatureName) => {
+const handleClick = async (featureName: FeatureName, ) => {
   message.success(featureName);
   switch (featureName) {
     case FeatureName.ResetSetting:
@@ -226,6 +262,9 @@ const handleClick = async (featureName: FeatureName) => {
       loading.value = true;
       await saveUserSetting(moduleConfig.value);
       loading.value = false;
+      break;
+    case FeatureName.AdvancedSearch:
+      showAdvancedSearch.value = !showAdvancedSearch.value
       break;
     default:
 
@@ -311,6 +350,7 @@ const handleWheel = (e: WheelEvent) => {
 };
 
 const customConfig = reactive<VxeTablePropTypes.CustomConfig<Attribute>>({
+  immediate: true,
   checkMethod({ column }) {
     return !['check'].includes(column.field) && !moduleConfig.value.Features.find(item => item.Name === column.field)
   }

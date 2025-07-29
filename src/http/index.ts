@@ -1,4 +1,4 @@
-import axios, { type AxiosResponse, type AxiosError, type AxiosRequestConfig } from "axios";
+import axios, { type AxiosResponse, type AxiosError } from "axios";
 import { message as AntMessage } from 'ant-design-vue';
 import { useUserProfileStore } from '@/stores/userProfile';
 declare module "axios" {
@@ -68,6 +68,9 @@ request.interceptors.response.use(
     if (response.config.loading) {
       loading.hide();
     }
+    if(response.config.responseType === 'blob'){
+      return response;
+    }
     const { data, status } = response;
     if (status === 200) {
       const { StatusCode, Message, Data } = data;
@@ -75,14 +78,14 @@ request.interceptors.response.use(
       if (StatusCode === 200) {
         return Data;
       }
-      // 认证过期处理
-      if (StatusCode === 401 && !SKIP_AUTH_PATHS.includes(response.config.url as string)) {
-        AntMessage.error(Message || '认证已过期，请重新登录');
-        handleAuthExpired();
-        return Promise.reject(data);
-      }
+      // // 认证过期处理
+      // if ((StatusCode === 401 || 403) && !SKIP_AUTH_PATHS.includes(response.config.url as string)) {
+      //   AntMessage.error(Message);
+      //   handleAuthExpired();
+      //   return Promise.reject(data);
+      // }
       // 其他业务错误
-      AntMessage.error(Message || '请求失败');
+      AntMessage.error(Message);
       return Promise.reject(data);
     }
     return response;
@@ -95,19 +98,19 @@ request.interceptors.response.use(
     }
     // 网络错误处理
     if (!error.response) {
-      AntMessage.error('网络错误，请检查网络连接');
+      AntMessage.error(error.message);
       return Promise.reject(error);
     }
 
     // HTTP状态码处理
     const { status, config } = error.response;
     // 认证过期处理
-    if (status === 401 && !SKIP_AUTH_PATHS.includes(config.url as string)) {
+    if ((status === 401 || 403) && !SKIP_AUTH_PATHS.includes(config.url as string)) {
       handleAuthExpired();
       return Promise.reject(error);
     }
     // 其他HTTP错误
-    const message = error.message || `请求失败，状态码: ${status}`;
+    const message = error.message;
     AntMessage.error(message);
     return Promise.reject(error);
   }

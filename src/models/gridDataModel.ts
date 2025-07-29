@@ -3,14 +3,25 @@ export enum TableLevel{
   SubTable = 2
 }
 
+export enum ANDOR{
+  AND = '0',
+  OR = '1',
+  ANDOR = '2'
+}
+
+export interface SearchConditionValue{
+  AndOr: ANDOR,
+  Conditions:Record<string, any>
+}
+
 export interface RequestGridParams{
   PageSize:number,
   PageIndex:number,
   SortAttributeConfigName:string|null,
   EntityConfigName:string,
   IsAscending:boolean,
-  SearchCondition:unknown,
-  MasterCondition:unknown
+  SearchCondition:SearchConditionValue | null,
+  MasterCondition:Record<string, any>|null,
 }
 
 

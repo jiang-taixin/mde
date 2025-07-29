@@ -24,7 +24,7 @@ export interface Attribute{
   AllowOverwriteNull:boolean,       //
   AttributeID:string,               //
   AttributeName:string,             // 表头显示的名称
-  AutoGenerateCode:boolean,         //
+  AutoGenerateCode:boolean,         // 这个是true   添加和编辑时都不允许编辑
   DataType:string|null,             // 数据类型
   DefaultValue:string|null,
   Description:string|null,
@@ -43,12 +43,12 @@ export interface Attribute{
   Hidden:boolean,
   ID:string,
   IsAdvancedFilter:boolean,
-  IsBusinessPrimaryKey:boolean,
+  IsBusinessPrimaryKey:boolean,         // true时字段不能编辑
   IsDerivedFromOtherEntity:boolean,
   IsExcelMandatory:boolean,
   IsFuzzyFilter:boolean,
   IsNullable:boolean,
-  IsPrimaryKey:boolean,
+  IsPrimaryKey:boolean,                 // true时字段不能编辑
   IsSystem:boolean,
   Language:Language,
   Length:number,
@@ -95,7 +95,7 @@ export interface Feature{
 
 // 模块配置信息
 export interface ModuleConfig {
-  AllowEdit: boolean;
+  AllowEdit: boolean;                       // false全部字段不允许编辑
   Attributes: Attribute[];
   ChildEntityConfigs: ModuleConfig[];
   Description: string|null;

@@ -22,10 +22,12 @@
         </vxe-table>
 
         <OperationTool :buttons="buttons" />
+        <a-button type="link" size="small"   @click="download">下载</a-button>
     </div>
 </template>
 
 <script lang="ts" setup>
+import { downloadFile } from '@/services/download-file'
 import type { VxeColumnProps, VxeColumnPropTypes, VxePagerEvents, VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table'
 
 const buttons = ref([
@@ -237,7 +239,32 @@ const columnResizableChange = ({ column, columnIndex }) => {
     console.log('列宽变化 column:' + column.renderWidth + ", columnIndex:" + columnIndex);
 }
 
+const download = async ()=>{
+  try {
+                const res = await downloadFile("SfePosition");
+                if (res.status === 200) {
+                    const contentDisposition = (res as any).headers['content-disposition'];
+                    let filename = 'report.xlsx';
+                    if (contentDisposition) {
+                        const matches = contentDisposition.match(/filename=(.*)/);
+                        if (matches !== null && matches.length > 1) {
+                            filename = matches[1].replace(/"/g, '');
+                        }
+                    }
+                    const blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = decodeURIComponent(filename);
+                    a.click();
+                    URL.revokeObjectURL(url);
+                }
+            }
+            catch {
 
+            }
+
+}
 
 const moduleConfig = ref<ModuleConfig>();
 

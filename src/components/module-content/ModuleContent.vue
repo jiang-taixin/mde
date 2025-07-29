@@ -19,12 +19,12 @@
     <!-- 内容 -->
     <div class="flex-1" v-if="moduleConfig">
       <!-- 主表 -->
-      <div :class="['flex-col w-full', (moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0 ? 'h-1/2' : 'h-full']" ref="mainTableRef">
+      <div :class="['flex-col w-full', (moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0 ? 'h-auto' : 'h-full']" ref="mainTableRef">
         <ModuleTable :module-config="moduleConfig" :has-sub-module-config="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0"
           :table-level="TableLevel.MainTable" :row-click="parentIDChange"/>
       </div>
       <!-- 从表 -->
-      <div class="h-1/2 border-t-2" v-if="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0">
+      <div class="border-t-2" v-if="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0">
         <a-tabs class="h-full" :tab-bar-style="{ marginBottom: '4px' }" size="small">
           <a-tab-pane v-for="subConfig in moduleConfig?.ChildEntityConfigs" :key="subConfig.ID" :tab="subConfig.DisplayName">
              <div class="h-full">

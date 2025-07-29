@@ -6,7 +6,10 @@ export default {
   cancel:"取消",
   warning:"警告",
   loading:"加载中...",
-  searchPlaceholder:"搜索",
+  searchPlaceholder:"搜索...",
+  searchButtonTitle:"搜索",
+  typeKeywords:"请输入关键字",
+  advancedSearchTips:"高级查询筛选",
   total:"总计:{total}",
   empty:"暂无数据",
   app: {
