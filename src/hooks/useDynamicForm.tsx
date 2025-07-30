@@ -51,7 +51,35 @@ export const useDynamicForm = () => {
     } finally {
     }
   }
-  // 定义异步获取LOV列表的函数
+
+  // 定义异步获取下拉信息
+  async function getComboxList(field: any, attributeName: string) {
+    console.log(field)
+    if (!attributeName) {
+      field.dataSource = [];
+      return;
+    }
+    try {
+      const response = await getComboxItems(attributeName);
+      field.dataSource = [
+        CLEAR_OPTION,
+        ...response.map((item: LovItem) => ({
+          label: item.Name,
+          value: item.Value
+        }))];
+
+      field.componentProps = {
+        ...field.componentProps,
+        showSearch: true,
+        filterOption: (input: string, option: any) => filterOption(input, option),
+      };
+    } catch (error) {
+      field.dataSource = [];
+    } finally {
+    }
+  }
+
+  // 定义异步获取实体数据列表的函数
   async function getEntityDataList(field: any, entityConfigName: string) {
     if (!entityConfigName) {
       field.dataSource = [];
@@ -87,7 +115,6 @@ export const useDynamicForm = () => {
     }
   }
 
-  // boolvaluecombox    是 1 否 0       entitydatafield   下拉
   const generateFieldSchema = (attribute: Attribute) => {
     const baseConfig = {
       type: 'string' as const,
@@ -109,6 +136,16 @@ export const useDynamicForm = () => {
           'x-reactions': `{{(field) => getEntityDataList(field, '${attribute.TargetEntityName}')}}`
         };
       case 'boolvaluecombox':
+        return {
+          ...baseConfig,
+          'x-component': 'Select' as const,
+          'x-component-props': {
+            ...COMMON_COMPONENT_PROPS,
+            placeholder: attribute.PromptMessage ? attribute.PromptMessage : '',
+
+          },
+          'x-reactions': `{{(field) => getComboxList(field, '${attribute.AttributeName}')}}`
+        };
       case 'lovfield':
         return {
           ...baseConfig,
@@ -142,5 +179,5 @@ export const useDynamicForm = () => {
     }
   }
 
-  return { generateFieldSchema, scope: { getLovList, getEntityDataList } }
+  return { generateFieldSchema, scope: { getLovList, getEntityDataList,getComboxList } }
 };

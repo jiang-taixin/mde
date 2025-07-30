@@ -27,6 +27,7 @@ declare global {
   const effectScope: typeof import('vue')['effectScope']
   const en: typeof import('./src/language/en')['default']
   const getActivePinia: typeof import('pinia')['getActivePinia']
+  const getComboxItems: typeof import('./src/services/metaData-service')['getComboxItems']
   const getCurrentInstance: typeof import('vue')['getCurrentInstance']
   const getCurrentScope: typeof import('vue')['getCurrentScope']
   const getDateMessage: typeof import('./src/utils/datetime')['getDateMessage']
