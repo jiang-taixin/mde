@@ -1,3 +1,4 @@
+import { CLEAR_KEY } from "@/constants";
 import type { LovItem } from "@/models/metaDataModel";
 import type { Attribute } from "@/models/moduleConfigModel";
 const { t } = i18n.global;
@@ -15,13 +16,15 @@ const COMMON_COMPONENT_PROPS = {
   size: "small" as const,
 };
 
-
-
 export const useDynamicForm = () => {
   const CLEAR_OPTION = {
     label: t('selectPlaceholder'),
-    value: '__CLEAR__',
-};
+    value: CLEAR_KEY,
+  };
+  const filterOption = (input: string, option: any) => {
+    if (option.value === CLEAR_KEY) return true;
+    return option.label.toLowerCase().includes(input.toLowerCase());
+  };
 
   // 定义异步获取LOV列表的函数
   async function getLovList(field: any, lovId: string) {
@@ -34,9 +37,15 @@ export const useDynamicForm = () => {
       field.dataSource = [
         CLEAR_OPTION,
         ...response.map((item: LovItem) => ({
-        label: item.Name,
-        value: item.ID
-      }))];
+          label: item.Name,
+          value: item.ID
+        }))];
+
+      field.componentProps = {
+        ...field.componentProps,
+        showSearch: true,
+        filterOption: (input: string, option: any) => filterOption(input, option),
+      };
     } catch (error) {
       field.dataSource = [];
     } finally {
@@ -60,10 +69,15 @@ export const useDynamicForm = () => {
           field.dataSource = [
             CLEAR_OPTION,
             ...data.map((item: any) => ({
-            label: item.Name,
-            value: item.ID
-          }))
+              label: item.Name,
+              value: item.ID
+            }))
           ];
+          field.componentProps = {
+            ...field.componentProps,
+            showSearch: true,
+            filterOption: (input: string, option: any) => filterOption(input, option),
+          };
         }
       }).catch(() => {
       });
@@ -88,6 +102,8 @@ export const useDynamicForm = () => {
           'x-component': 'Select' as const,
           'x-component-props': {
             ...COMMON_COMPONENT_PROPS,
+            showSearch: true,
+            filterOption: false,
             placeholder: attribute.PromptMessage ? attribute.PromptMessage : '',
           },
           'x-reactions': `{{(field) => getEntityDataList(field, '${attribute.TargetEntityName}')}}`
@@ -112,12 +128,6 @@ export const useDynamicForm = () => {
             placeholder: attribute.PromptMessage ? attribute.PromptMessage : ''
           },
         };
-      case 'datefield':
-        return {
-          ...baseConfig,
-          'x-component': 'DatePicker' as const,
-          'x-component-props': COMMON_COMPONENT_PROPS,
-        };
       case 'inputcheckfield':
         return {
           ...baseConfig,
@@ -132,5 +142,5 @@ export const useDynamicForm = () => {
     }
   }
 
-  return { generateFieldSchema, scope: { getLovList,getEntityDataList } }
+  return { generateFieldSchema, scope: { getLovList, getEntityDataList } }
 };

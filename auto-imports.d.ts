@@ -7,6 +7,7 @@
 export {}
 declare global {
   const ANDOR: typeof import('./src/models/gridDataModel')['ANDOR']
+  const CLEAR_KEY: typeof import('./src/constants/index')['CLEAR_KEY']
   const EffectScope: typeof import('vue')['EffectScope']
   const FeatureName: typeof import('./src/models/moduleConfigModel')['FeatureName']
   const Language: typeof import('./src/language/index')['Language']
