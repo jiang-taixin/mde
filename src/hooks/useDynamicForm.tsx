@@ -7,6 +7,7 @@ const LABEL_WIDTH = 130;
 const COMMON_DECORATOR_PROPS = {
   labelAlign: "left" as const,
   labelWidth: LABEL_WIDTH,
+  colon:false,
   labelStyle: {
     fontSize: '12px'
   },
@@ -16,168 +17,167 @@ const COMMON_COMPONENT_PROPS = {
   size: "small" as const,
 };
 
-export const useDynamicForm = () => {
-  const CLEAR_OPTION = {
-    label: t('selectPlaceholder'),
-    value: CLEAR_KEY,
-  };
-  const filterOption = (input: string, option: any) => {
-    if (option.value === CLEAR_KEY) return true;
-    return option.label.toLowerCase().includes(input.toLowerCase());
-  };
+const createDataSourceOptions = <T extends Record<string, any>>(
+  items: T[],
+  labelKey: keyof T,
+  valueKey: keyof T
+) => [
+  CLEAR_OPTION,
+  ...items.map(item => ({
+    label: item[labelKey],
+    value: item[valueKey]
+  }))
+];
 
-  // 定义异步获取LOV列表的函数
-  async function getLovList(field: any, lovId: string) {
-    if (!lovId) {
-      field.dataSource = [];
-      return;
-    }
-    try {
-      const response = await getLovItems(lovId);
-      field.dataSource = [
-        CLEAR_OPTION,
-        ...response.map((item: LovItem) => ({
-          label: item.Name,
-          value: item.ID
-        }))];
+const updateFieldProps = (field: any, dataSource: any[]) => {
+  field.dataSource = dataSource;
+  field.componentProps = {
+    ...field.componentProps,
+    options: dataSource,
+    showSearch: true,
+    loading: false,
+    filterOption: filterOption,
+  };
+};
 
-      field.componentProps = {
-        ...field.componentProps,
-        showSearch: true,
-        filterOption: (input: string, option: any) => filterOption(input, option),
-      };
-    } catch (error) {
-      field.dataSource = [];
-    } finally {
-    }
+const handleLoadingState = (field: any, isLoading: boolean) => {
+  field.loading = isLoading;
+  field.componentProps.loading = isLoading;
+};
+
+const CLEAR_OPTION = {
+  label: t('selectPlaceholder'),
+  value: CLEAR_KEY,
+};
+
+const filterOption = (input: string, option: any) => {
+  if (option.value === CLEAR_KEY) return true;
+  return option.label.toLowerCase().includes(input.toLowerCase());
+};
+
+const fetchData = async (
+  field: any,
+  fetchFn: (params: any) => Promise<any>,
+  params: any,
+  labelKey: string,
+  valueKey: string
+) => {
+  try {
+    handleLoadingState(field, true);
+    const response = await fetchFn(params);
+    const dataSource = createDataSourceOptions(response, labelKey, valueKey);
+    updateFieldProps(field, dataSource);
+  } catch (error) {
+    field.dataSource = [];
+  } finally {
+    handleLoadingState(field, false);
   }
+};
+
+export const useDynamicForm = () => {
+  // 定义异步获取LOV列表的函数
+  const getLovList = async (field: any, lovId: string, open: boolean) => {
+    if (!open || field.dataSource?.length > 0) return;
+    await fetchData(field, getLovItems, lovId, 'Name', 'ID');
+  };
 
   // 定义异步获取下拉信息
-  async function getComboxList(field: any, attributeName: string) {
-    console.log(field)
-    if (!attributeName) {
-      field.dataSource = [];
-      return;
-    }
-    try {
-      const response = await getComboxItems(attributeName);
-      field.dataSource = [
-        CLEAR_OPTION,
-        ...response.map((item: LovItem) => ({
-          label: item.Name,
-          value: item.Value
-        }))];
-
-      field.componentProps = {
-        ...field.componentProps,
-        showSearch: true,
-        filterOption: (input: string, option: any) => filterOption(input, option),
-      };
-    } catch (error) {
-      field.dataSource = [];
-    } finally {
-    }
-  }
+  const getComboxList = async (field: any, attributeName: string, open: boolean) => {
+    if (!open || field.dataSource?.length > 0) return;
+    await fetchData(field, getComboxItems, attributeName, 'Name', 'Value');
+  };
 
   // 定义异步获取实体数据列表的函数
-  async function getEntityDataList(field: any, entityConfigName: string) {
-    if (!entityConfigName) {
-      field.dataSource = [];
-      return;
-    }
+  const getEntityDataList = async (field: any, entityConfigName: string, open: boolean) => {
+    if (!open || field.dataSource?.length > 0) return;
     try {
+      handleLoadingState(field, true);
       const params: RequestGridParams = {
         PageSize: -1,
         PageIndex: 1,
         EntityConfigName: entityConfigName,
+      };
+      const res = await getGridData(params);
+      if (res) {
+        const data = JSON.parse(res.JsonData);
+        const dataSource = createDataSourceOptions(data, 'Name', 'ID');
+        updateFieldProps(field, dataSource);
       }
-      await getGridData(params).then((res) => {
-        if (res) {
-          const data = JSON.parse(res.JsonData);
-          field.dataSource = [
-            CLEAR_OPTION,
-            ...data.map((item: any) => ({
-              label: item.Name,
-              value: item.ID
-            }))
-          ];
-          field.componentProps = {
-            ...field.componentProps,
-            showSearch: true,
-            filterOption: (input: string, option: any) => filterOption(input, option),
-          };
-        }
-      }).catch(() => {
-      });
     } catch (error) {
       field.dataSource = [];
     } finally {
+      handleLoadingState(field, false);
     }
-  }
+  };
+
+  const createBaseFieldConfig = (attribute: Attribute) => ({
+    type: 'string' as const,
+    title: attribute.DisplayName,
+    'x-decorator': 'FormItem' as const,
+    'x-decorator-props': COMMON_DECORATOR_PROPS,
+    'x-component-props': {
+      ...COMMON_COMPONENT_PROPS,
+      placeholder: attribute.PromptMessage || '',
+    }
+  });
+
+  const createSelectorFieldConfig = (
+    attribute: Attribute,
+    fetchFn: (field: any, param: string, open: boolean) => Promise<void>,
+    fetchParam: string
+  ) => ({
+    ...createBaseFieldConfig(attribute),
+    'x-component': 'MySelect' as const,
+    'x-component-props': {
+      ...COMMON_COMPONENT_PROPS,
+      showSearch: true,
+      filterOption: false,
+      placeholder: attribute.PromptMessage || '',
+    },
+    'x-reactions': (field: any) => {
+      field.componentProps.onDropdownVisibleChange = async (open: boolean) => {
+        await fetchFn(field, fetchParam, open);
+      };
+    },
+  });
 
   const generateFieldSchema = (attribute: Attribute) => {
-    const baseConfig = {
-      type: 'string' as const,
-      title: attribute.DisplayName,
-      'x-decorator': 'FormItem' as const,
-      'x-decorator-props': COMMON_DECORATOR_PROPS,
-    };
     switch (attribute.ExtControlType) {
       case 'entitydatafield':
-        return {
-          ...baseConfig,
-          'x-component': 'Select' as const,
-          'x-component-props': {
-            ...COMMON_COMPONENT_PROPS,
-            showSearch: true,
-            filterOption: false,
-            placeholder: attribute.PromptMessage ? attribute.PromptMessage : '',
-          },
-          'x-reactions': `{{(field) => getEntityDataList(field, '${attribute.TargetEntityName}')}}`
-        };
+        return createSelectorFieldConfig(
+          attribute,
+          getEntityDataList,
+          attribute.TargetEntityName as string
+        );
       case 'boolvaluecombox':
-        return {
-          ...baseConfig,
-          'x-component': 'Select' as const,
-          'x-component-props': {
-            ...COMMON_COMPONENT_PROPS,
-            placeholder: attribute.PromptMessage ? attribute.PromptMessage : '',
-
-          },
-          'x-reactions': `{{(field) => getComboxList(field, '${attribute.AttributeName}')}}`
-        };
+        return createSelectorFieldConfig(
+          attribute,
+          getComboxList,
+          attribute.AttributeName as string
+        );
       case 'lovfield':
-        return {
-          ...baseConfig,
-          'x-component': 'Select' as const,
-          'x-component-props': {
-            ...COMMON_COMPONENT_PROPS,
-            placeholder: attribute.PromptMessage ? attribute.PromptMessage : '',
-          },
-          'x-reactions': `{{(field) => getLovList(field, '${attribute.TargetLovID}')}}`
-        };
+        return createSelectorFieldConfig(
+          attribute,
+          getLovList,
+          attribute.TargetLovID as string
+        );
       case 'textfield':
         return {
-          ...baseConfig,
+          ...createBaseFieldConfig(attribute),
           'x-component': 'Input' as const,
-          'x-component-props': {
-            ...COMMON_COMPONENT_PROPS,
-            placeholder: attribute.PromptMessage ? attribute.PromptMessage : ''
-          },
         };
       case 'inputcheckfield':
         return {
-          ...baseConfig,
+          ...createBaseFieldConfig(attribute),
           'x-component': 'InputSearch' as const,
-          'x-component-props': {
-            ...COMMON_COMPONENT_PROPS,
-            placeholder: attribute.PromptMessage ? attribute.PromptMessage : ''
-          },
         };
       default:
-        return baseConfig;
+        return createBaseFieldConfig(attribute);
     }
-  }
+  };
 
-  return { generateFieldSchema, scope: { getLovList, getEntityDataList,getComboxList } }
+  return {
+    generateFieldSchema,
+    scope: { getLovList, getEntityDataList, getComboxList }
+  };
 };
