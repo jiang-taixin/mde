@@ -1,5 +1,5 @@
 <template>
-  <a-input-search v-model:value="keyword" :placeholder="props.placeholder" style="width: 100%;" :enter-button="true">
+  <a-input-search v-model:value="keyword" :placeholder="props.placeholder" style="width: 100%;" >
   </a-input-search>
 </template>
 

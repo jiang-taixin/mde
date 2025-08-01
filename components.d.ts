@@ -41,6 +41,7 @@ declare module 'vue' {
     ModuleContent: typeof import('./src/components/module-content/ModuleContent.vue')['default']
     ModuleTable: typeof import('./src/components/module-table/ModuleTable.vue')['default']
     MySelect: typeof import('./src/components/my-select/MySelect.vue')['default']
+    ProvinceCity: typeof import('./src/components/province-city/ProvinceCity.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SelectPrincial: typeof import('./src/components/select-principal/SelectPrincial.vue')['default']

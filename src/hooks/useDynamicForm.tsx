@@ -1,5 +1,4 @@
 import { CLEAR_KEY } from "@/constants";
-import type { LovItem } from "@/models/metaDataModel";
 import type { Attribute } from "@/models/moduleConfigModel";
 const { t } = i18n.global;
 
@@ -171,6 +170,18 @@ export const useDynamicForm = () => {
           ...createBaseFieldConfig(attribute),
           'x-component': 'InputSearch' as const,
         };
+      case 'datefield':
+         return {
+          ...createBaseFieldConfig(attribute),
+          'x-component': 'DatePicker' as const,
+        };
+
+      case 'provincecityfield':
+          // 所在城市    省市联动
+          return {
+            ...createBaseFieldConfig(attribute),
+            'x-component': 'ProvinceCity' as const,
+          };
       default:
         return createBaseFieldConfig(attribute);
     }

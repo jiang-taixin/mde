@@ -105,7 +105,7 @@ request.interceptors.response.use(
     // HTTP状态码处理
     const { status, config } = error.response;
     // 认证过期处理
-    if ((status === 401 || 403) && !SKIP_AUTH_PATHS.includes(config.url as string)) {
+    if ((status === 401 || status === 403) && !SKIP_AUTH_PATHS.includes(config.url as string)) {
       handleAuthExpired();
       return Promise.reject(error);
     }

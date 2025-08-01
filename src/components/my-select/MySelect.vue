@@ -9,8 +9,8 @@
 
     <!-- 显示正常选项 -->
     <template v-else>
-      <a-select-option v-for="option in options" :key="option.value" :value="option.value" :disabled="option.disabled">
-        {{ option.label }}
+      <a-select-option v-for="option in options" :key="(option as any).value" :value="(option as any).value" :disabled="(option as any).disabled">
+        {{ (option as any).label }}
       </a-select-option>
     </template>
 
@@ -18,7 +18,7 @@
   </a-select>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, useAttrs } from 'vue';
 
 const emit = defineEmits(['dropdownVisibleChange']);
@@ -32,7 +32,7 @@ const selectProps = computed(() => {
   }
 })
 
-function handleDropdown(open) {
+function handleDropdown(open:boolean) {
   emit('dropdownVisibleChange', open);
 }
 </script>

@@ -6,15 +6,6 @@
     </div>
     <div class="my-2">
       <FormProvider :form="form">
-        <!-- <div class="grid grid-cols-3">
-          <template v-for="item in moduleConfig.Attributes">
-            <a-form-item v-if="item.IsAdvancedFilter" :colon="false" :label="item.DisplayName"
-            label-align="left" :label-col="{style:{fontSize:'12px'}}">
-
-            </a-form-item>
-          </template>
-        </div> -->
-
         <SchemaField :schema="schema" :scope="scope" />
       </FormProvider>
     </div>
@@ -32,6 +23,7 @@ import { FormProvider, createSchemaField } from "@formily/vue";
 import { FormGrid, FormItem, Input, DatePicker } from "@formily/antdv";
 import MySelect from '../my-select/MySelect.vue';
 import InputSearch from "../input-search/InputSearch.vue";
+import ProvinceCity from '../province-city/ProvinceCity.vue';
 import searchIcon from "@/assets/images/button/advanced-search.png";
 import type { ModuleConfig } from "@/models/moduleConfigModel";
 const { t } = useI18n();
@@ -48,7 +40,7 @@ const emits = defineEmits(['searchCallback']);
 const form = createForm();
 const { SchemaField } = createSchemaField({
   components: {
-    Input, DatePicker, MySelect,
+    Input, DatePicker, MySelect,ProvinceCity,
     InputSearch, FormGrid, FormItem
   }
 });
