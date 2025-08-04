@@ -1,5 +1,5 @@
 import { CLEAR_KEY } from "@/constants";
-import type { Attribute } from "@/models/moduleConfigModel";
+import type { Attribute, ModuleConfig } from "@/models/moduleConfigModel";
 const { t } = i18n.global;
 
 const LABEL_WIDTH = 130;
@@ -120,6 +120,19 @@ export const useDynamicForm = () => {
     }
   });
 
+  const createInputSearchFieldConfig = (attribute: Attribute, config: ModuleConfig) => ({
+    type: 'string' as const,
+    title: attribute.DisplayName,
+    'x-decorator': 'FormItem' as const,
+    'x-decorator-props': COMMON_DECORATOR_PROPS,
+    'x-component-props': {
+      ...COMMON_COMPONENT_PROPS,
+      placeholder: attribute.PromptMessage || '',
+      entityConfigName:attribute.EntityConfigName,
+      moduleConfig:config
+    }
+  });
+
   const createSelectorFieldConfig = (
     attribute: Attribute,
     fetchFn: (field: any, param: string, open: boolean) => Promise<void>,
@@ -140,7 +153,7 @@ export const useDynamicForm = () => {
     },
   });
 
-  const generateFieldSchema = (attribute: Attribute) => {
+  const generateFieldSchema = (attribute: Attribute, config:ModuleConfig) => {
     switch (attribute.ExtControlType) {
       case 'entitydatafield':
         return createSelectorFieldConfig(
@@ -167,7 +180,7 @@ export const useDynamicForm = () => {
         };
       case 'inputcheckfield':
         return {
-          ...createBaseFieldConfig(attribute),
+          ...createInputSearchFieldConfig(attribute,config),
           'x-component': 'InputSearch' as const,
         };
       case 'datefield':

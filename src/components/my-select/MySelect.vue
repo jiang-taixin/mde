@@ -1,13 +1,10 @@
 <template>
   <a-select v-bind="selectProps" @dropdownVisibleChange="handleDropdown">
-    <!-- 显示 loading 占位项 -->
     <template v-if="loading">
       <a-select-option :value="null" disabled>
         <a-spin size="small" />
       </a-select-option>
     </template>
-
-    <!-- 显示正常选项 -->
     <template v-else>
       <a-select-option v-for="option in options" :key="(option as any).value" :value="(option as any).value" :disabled="(option as any).disabled">
         {{ (option as any).label }}

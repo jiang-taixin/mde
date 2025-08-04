@@ -44,6 +44,7 @@ declare module 'vue' {
     ProvinceCity: typeof import('./src/components/province-city/ProvinceCity.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SearchResult: typeof import('./src/components/search-result/SearchResult.vue')['default']
     SelectPrincial: typeof import('./src/components/select-principal/SelectPrincial.vue')['default']
     SiderComponent: typeof import('./src/components/sider/SiderComponent.vue')['default']
   }
