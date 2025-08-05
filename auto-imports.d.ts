@@ -23,6 +23,7 @@ declare global {
   const defineAsyncComponent: typeof import('vue')['defineAsyncComponent']
   const defineComponent: typeof import('vue')['defineComponent']
   const defineStore: typeof import('pinia')['defineStore']
+  const deleteRecords: typeof import('./src/services/module-service')['deleteRecords']
   const downloadFile: typeof import('./src/services/download-file')['downloadFile']
   const effectScope: typeof import('vue')['effectScope']
   const en: typeof import('./src/language/en')['default']

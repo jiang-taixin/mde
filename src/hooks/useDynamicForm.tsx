@@ -1,4 +1,4 @@
-import { CLEAR_KEY } from "@/constants";
+import { CLEAR_KEY, Month_Regex } from "@/constants";
 import type { Attribute, ModuleConfig } from "@/models/moduleConfigModel";
 const { t } = i18n.global;
 
@@ -6,7 +6,7 @@ const LABEL_WIDTH = 130;
 const COMMON_DECORATOR_PROPS = {
   labelAlign: "left" as const,
   labelWidth: LABEL_WIDTH,
-  colon:false,
+  colon: false,
   labelStyle: {
     fontSize: '12px'
   },
@@ -21,12 +21,12 @@ const createDataSourceOptions = <T extends Record<string, any>>(
   labelKey: keyof T,
   valueKey: keyof T
 ) => [
-  CLEAR_OPTION,
-  ...items.map(item => ({
-    label: item[labelKey],
-    value: item[valueKey]
-  }))
-];
+    CLEAR_OPTION,
+    ...items.map(item => ({
+      label: item[labelKey],
+      value: item[valueKey]
+    }))
+  ];
 
 const updateFieldProps = (field: any, dataSource: any[]) => {
   field.dataSource = dataSource;
@@ -128,8 +128,8 @@ export const useDynamicForm = () => {
     'x-component-props': {
       ...COMMON_COMPONENT_PROPS,
       placeholder: attribute.PromptMessage || '',
-      entityConfigName:attribute.EntityConfigName,
-      moduleConfig:config
+      entityConfigName: attribute.EntityConfigName,
+      moduleConfig: config
     }
   });
 
@@ -153,7 +153,7 @@ export const useDynamicForm = () => {
     },
   });
 
-  const generateFieldSchema = (attribute: Attribute, config:ModuleConfig) => {
+  const generateFieldSchema = (attribute: Attribute, config: ModuleConfig) => {
     switch (attribute.ExtControlType) {
       case 'entitydatafield':
         return createSelectorFieldConfig(
@@ -180,21 +180,37 @@ export const useDynamicForm = () => {
         };
       case 'inputcheckfield':
         return {
-          ...createInputSearchFieldConfig(attribute,config),
+          ...createInputSearchFieldConfig(attribute, config),
           'x-component': 'InputSearch' as const,
         };
       case 'datefield':
-         return {
+        return {
           ...createBaseFieldConfig(attribute),
           'x-component': 'DatePicker' as const,
         };
 
       case 'provincecityfield':
-          // 所在城市    省市联动
-          return {
-            ...createBaseFieldConfig(attribute),
-            'x-component': 'ProvinceCity' as const,
-          };
+        // 所在城市    省市联动
+        return {
+          ...createBaseFieldConfig(attribute),
+          'x-component': 'ProvinceCity' as const,
+        };
+
+      case 'numberfield':
+        return {
+          ...createBaseFieldConfig(attribute),
+          'x-component': 'Input' as const,
+          'x-validator': [
+            {
+              validator: (value: string) => {
+                if (!value) return true; // 非必填
+                if (!Month_Regex.test(value)) return t('monthNotNumber', { month: value });
+                if (Number(value) >= 999999) return t('monthMaxError');
+                return true;
+              }
+            }
+          ]
+        }
       default:
         return createBaseFieldConfig(attribute);
     }

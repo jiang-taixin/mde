@@ -76,7 +76,7 @@ const handleItemClick = (item: ModuleItem, parentNames: string[]) => {
     if (index === -1) {
       // 这里打开激活的菜单
       if(moduleTabsStore.moduleTabList.length > 10){
-        Modal.warning({
+        Modal.confirm({
           title:t('warning'),
           content:t('module.moreWarningTips'),
           okText:t('confirm'),

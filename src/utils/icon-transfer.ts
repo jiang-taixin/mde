@@ -17,6 +17,11 @@ import Temp from "@/assets/images/button/temp.png";
 import ToUp from "@/assets/images/button/toup.png";
 import ToDown from "@/assets/images/button/todown.png";
 import Upload from "@/assets/images/button/upload.png";
+import Choose from "@/assets/images/button/choose.png";
+import Active from "@/assets/images/button/active.png";
+import Copy from "@/assets/images/button/copy.png";
+import Publish from "@/assets/images/button/publish.png";
+
 
 // icon 映射列表
 const iconMap: Record<string, string> = {
@@ -39,7 +44,11 @@ const iconMap: Record<string, string> = {
   "remove-icon":Delete,
   "filter":Filter,
   "upload-icon":Upload,
-  "download-icon":Temp
+  "download-icon":Temp,
+  "choose-icon":Choose,
+  "settoactive-icon":Active,
+  "copytoadd-icon":Copy,
+  "publish-icon":Publish
 };
 
 export function getIcon(iconName: string | null): string {

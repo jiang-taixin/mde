@@ -20,7 +20,7 @@
 import { h, ref, watch } from 'vue';
 import { createForm } from "@formily/core";
 import { FormProvider, createSchemaField } from "@formily/vue";
-import { FormGrid, FormItem, Input, DatePicker } from "@formily/antdv";
+import { FormGrid, FormItem, Input, DatePicker,InputNumber } from "@formily/antdv";
 import MySelect from '../my-select/MySelect.vue';
 import InputSearch from "../input-search/InputSearch.vue";
 import ProvinceCity from '../province-city/ProvinceCity.vue';
@@ -40,7 +40,7 @@ const emits = defineEmits(['searchCallback']);
 const form = createForm();
 const { SchemaField } = createSchemaField({
   components: {
-    Input, DatePicker, MySelect,ProvinceCity,
+    Input, DatePicker, MySelect,ProvinceCity,InputNumber,
     InputSearch, FormGrid, FormItem
   }
 });

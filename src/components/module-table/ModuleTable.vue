@@ -68,8 +68,11 @@
           <template v-for="feature in moduleConfig.Features">
             <vxe-column v-if="feature.IsColumnButton" :field="feature.Name" :title="feature.DisplayName" width="80px"
               :resizable="false" align="center">
-              <a-button type="link" size="small" @click="handleClick(feature.Name)"
-                :icon="h('img', { src: getIcon(feature.IconCss), style: 'width: 16px' })"></a-button>
+              <template  #default="{row}">
+              <a-button type="link" size="small" @click="handleClick(feature.Name, row)"
+                :icon="h('img', { src: getIcon(feature.IconCss), style: 'width: 16px' })">
+              </a-button>
+              </template>
             </vxe-column>
           </template>
         </vxe-table>
@@ -87,7 +90,7 @@
 import { ref, h, type PropType } from 'vue';
 import { FeatureName, type Attribute, type ModuleConfig } from '@/models/moduleConfigModel';
 import { getIcon } from '@/utils/icon-transfer';
-import { message } from 'ant-design-vue';
+import { message, Modal } from 'ant-design-vue';
 import type { VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table/types/all';
 import { debounce } from 'lodash';
 import { ANDOR, TableLevel, type GridData, type RequestGridParams, type SearchConditionValue } from '@/models/gridDataModel';
@@ -247,7 +250,7 @@ const onAdvancedSearch = (params: any) => {
 }
 
 // 按钮点击事件
-const handleClick = async (featureName: FeatureName, ) => {
+const handleClick = async (featureName: FeatureName, row?:any) => {
   message.success(featureName);
   switch (featureName) {
     case FeatureName.ResetSetting:
@@ -269,8 +272,42 @@ const handleClick = async (featureName: FeatureName, ) => {
     case FeatureName.AdvancedSearch:
       showAdvancedSearch.value = !showAdvancedSearch.value
       break;
+    case FeatureName.Delete:
+      Modal.confirm({
+        title:t('warning'),
+        content:t('deleteTips'),
+        okText:t('confirm'),
+        cancelText:t('cancel'),
+        onOk:async ()=>{
+          const delRes = await deleteRecords(moduleConfig.value.EntityName,[row.ID]);
+          if(delRes.IsSuccess){
+            message.success(t('success'));
+            loadGridData();
+          }
+        }
+      });
+      break;
+    case FeatureName.Remove:
+      if(selectedRows.value.length < 1){
+        message.error(t('deleteListNull'));
+        return;
+      }
+      Modal.confirm({
+        title:t('warning'),
+        content:t('deleteTips'),
+        okText:t('confirm'),
+        cancelText:t('cancel'),
+        onOk:async ()=>{
+          const ids = selectedRows.value.map((item) => item.ID);
+          const removeRes = await deleteRecords(moduleConfig.value.EntityName,ids);
+          if(removeRes.IsSuccess){
+            message.success(t('success'));
+            loadGridData();
+          }
+        }
+      })
+      break;
     default:
-
   }
 }
 
