@@ -241,7 +241,7 @@ const columnResizableChange = ({ column, columnIndex }) => {
 
 const download = async ()=>{
   try {
-                const res = await downloadFile("SfePosition");
+                const res = await ExportExcelTemplate("SfePosition");
                 if (res.status === 200) {
                     const contentDisposition = (res as any).headers['content-disposition'];
                     let filename = 'report.xlsx';

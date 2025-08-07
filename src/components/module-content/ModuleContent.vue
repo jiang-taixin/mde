@@ -29,7 +29,7 @@
           <a-tab-pane v-for="subConfig in moduleConfig?.ChildEntityConfigs" :key="subConfig.ID" :tab="subConfig.DisplayName">
              <div class="h-full">
               <ModuleTable :module-config="subConfig" :has-sub-module-config="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0"
-                :table-level="TableLevel.SubTable" :parentID="parentID"/>
+                :table-level="TableLevel.SubTable" :parentID="parentID" :parent-title="props.moduleTab.MenuPath[props.moduleTab.MenuPath.length - 1]"/>
              </div>
           </a-tab-pane>
         </a-tabs>

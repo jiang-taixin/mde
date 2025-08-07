@@ -9,10 +9,14 @@ declare global {
   const ANDOR: typeof import('./src/models/gridDataModel')['ANDOR']
   const CLEAR_KEY: typeof import('./src/constants/index')['CLEAR_KEY']
   const EffectScope: typeof import('vue')['EffectScope']
+  const ExportExcelData: typeof import('./src/services/download-file')['ExportExcelData']
+  const ExportExcelTemplate: typeof import('./src/services/download-file')['ExportExcelTemplate']
+  const ExportType: typeof import('./src/models/gridDataModel')['ExportType']
   const FeatureName: typeof import('./src/models/moduleConfigModel')['FeatureName']
   const Language: typeof import('./src/language/index')['Language']
   const LanguageNames: typeof import('./src/language/index')['LanguageNames']
   const ModuleType: typeof import('./src/models/moduleItemModel')['ModuleType']
+  const Month_Regex: typeof import('./src/constants/index')['Month_Regex']
   const PrincipalType: typeof import('./src/models/userProfileModel')['PrincipalType']
   const TableLevel: typeof import('./src/models/gridDataModel')['TableLevel']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
@@ -108,6 +112,7 @@ declare global {
   const useCssModule: typeof import('vue')['useCssModule']
   const useCssVars: typeof import('vue')['useCssVars']
   const useDynamicForm: typeof import('./src/hooks/useDynamicForm')['useDynamicForm']
+  const useExportFile: typeof import('./src/hooks/useExportFile')['useExportFile']
   const useI18n: typeof import('vue-i18n')['useI18n']
   const useId: typeof import('vue')['useId']
   const useLink: typeof import('vue-router')['useLink']
@@ -130,7 +135,7 @@ declare global {
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
   // @ts-ignore
-  export type { TableLevel, ANDOR, SearchConditionValue, RequestGridParams, GridData } from './src/models/gridDataModel'
+  export type { TableLevel, ANDOR, ExportType, SearchConditionValue, RequestGridParams, ExportParams, GridData } from './src/models/gridDataModel'
   import('./src/models/gridDataModel')
   // @ts-ignore
   export type { Geography, LovItem } from './src/models/metaDataModel'

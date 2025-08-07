@@ -1,7 +1,6 @@
 <template>
   <a-spin :tip="t('loading')" :spinning="loading">
     <div class="flex flex-col h-full">
-
       <!--操作栏-->
       <div class="w-full flex flex-row py-1">
         <a-popover trigger="focus" color="#CCEAFF" placement="bottomLeft" :arrow="false"
@@ -40,7 +39,8 @@
       </div>
 
       <div v-show="showAdvancedSearch">
-        <AdvancedSearch :module-config="moduleConfig" @searchCallback="onAdvancedSearch"/>
+        <AdvancedSearch :module-config="moduleConfig" @searchCallback="onAdvancedSearch"
+          @searchParamsChange="onAdvancedSearchParamsChange" />
       </div>
 
       <!--表格-->
@@ -68,10 +68,10 @@
           <template v-for="feature in moduleConfig.Features">
             <vxe-column v-if="feature.IsColumnButton" :field="feature.Name" :title="feature.DisplayName" width="80px"
               :resizable="false" align="center">
-              <template  #default="{row}">
-              <a-button type="link" size="small" @click="handleClick(feature.Name, row)"
-                :icon="h('img', { src: getIcon(feature.IconCss), style: 'width: 16px' })">
-              </a-button>
+              <template #default="{ row }">
+                <a-button type="link" size="small" @click="handleClick(feature.Name, row)"
+                  :icon="h('img', { src: getIcon(feature.IconCss), style: 'width: 16px' })">
+                </a-button>
               </template>
             </vxe-column>
           </template>
@@ -85,6 +85,18 @@
       </div>
     </div>
   </a-spin>
+  <a-modal v-model:open="openExport" :width="500" @ok="handleExport">
+    <template #title>
+      <div class="flex items-center text-lg">
+        <a-button type="link" size="small"
+          :icon="h('img', { src: getIcon('export-icon'), style: 'width: 14px; margin-left:4px' })">
+        </a-button>
+        {{ t('exportTitle', { title: moduleConfig.DisplayName }) }}
+      </div>
+      <ExportPanel :export-selection="exportSelection" :module-config="moduleConfig" :table-level="props.tableLevel"
+        :parent-title="props.parentTitle"></ExportPanel>
+    </template>
+  </a-modal>
 </template>
 <script setup lang="ts">
 import { ref, h, type PropType } from 'vue';
@@ -93,8 +105,11 @@ import { getIcon } from '@/utils/icon-transfer';
 import { message, Modal } from 'ant-design-vue';
 import type { VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table/types/all';
 import { debounce } from 'lodash';
-import { ANDOR, TableLevel, type GridData, type RequestGridParams, type SearchConditionValue } from '@/models/gridDataModel';
+import { ANDOR, ExportType, TableLevel, type ExportParams, type GridData, type RequestGridParams, type SearchConditionValue } from '@/models/gridDataModel';
 import { getGridData } from '@/services/gridData-service';
+import type { ExportSelection } from '../export-panel/ExportPanel.vue';
+import { useExportFile } from '@/hooks/useExportFile';
+const {exportFile} = useExportFile();
 const { t } = useI18n();
 const container = ref<HTMLElement | null>(null);
 const content = ref<HTMLElement | null>(null);
@@ -105,6 +120,12 @@ const tableRef = ref<VxeTableInstance<any>>();
 const resizeObserver = ref<ResizeObserver>();
 const selectedRows = ref<any[]>([]);
 const hasSelection = computed(() => selectedRows.value.length > 0);
+const openExport = ref<boolean>(false);
+const exportParams = ref<any>();                 // 导出时需要使用高级查询的条件   所以条件变化就要更新
+const exportSelection = ref<ExportSelection>({
+  parentSelected: ExportType.AllWithConditions,
+  childSelected: []
+});
 
 const showAdvancedSearch = ref<boolean>(false);
 
@@ -133,6 +154,10 @@ const props = defineProps({
   parentID: {
     type: String,
     require: false
+  },
+  parentTitle: {
+    type: String,
+    require: false
   }
 });
 const moduleConfig = ref<ModuleConfig>({} as ModuleConfig);
@@ -142,6 +167,12 @@ watch(() => props.parentID, (parentId) => {
     loadGridData();
   }
 });
+export interface Pagination {
+  current: number,
+  pageSize: number,
+  pageSizeOptions: number[] | string[],
+  total?: number
+}
 const pagination = reactive<Pagination>({
   current: 1,
   pageSize: 10,
@@ -159,12 +190,7 @@ const sortConfig = (config: ModuleConfig) => {
   return sorted;
 };
 
-interface Pagination {
-  current: number,
-  pageSize: number,
-  pageSizeOptions: number[] | string[],
-  total?: number
-}
+
 const onPageChange = () => {
   loadGridData();
 };
@@ -199,8 +225,8 @@ const loadGridData = async (isAdvancedSearch: boolean = false, searchParams: any
   if (isAdvancedSearch) {
     searchCondition = { AndOr: ANDOR.AND, Conditions: [] };
     Object.entries(searchParams).forEach(([key, value]) => {
-      if(value !== CLEAR_KEY && !isVoid(value) ){
-        const param = {Name:key, Value:value};
+      if (value !== CLEAR_KEY && !isVoid(value)) {
+        const param = { Name: key, Value: value };
         searchCondition.Conditions.push(param);
       }
 
@@ -249,10 +275,21 @@ const onAdvancedSearch = (params: any) => {
   loadGridData(true, params);
 }
 
+const onAdvancedSearchParamsChange = (params: any) => {
+  exportParams.value = params;
+}
+
+const handleExport = () => {
+  openExport.value = false;
+  exportFile(exportSelection.value,exportParams.value,moduleConfig.value,pagination);
+
+}
+
 // 按钮点击事件
-const handleClick = async (featureName: FeatureName, row?:any) => {
+const handleClick = async (featureName: FeatureName, row?: any) => {
   message.success(featureName);
   switch (featureName) {
+    // 重置设置
     case FeatureName.ResetSetting:
       loading.value = true;
       const resetRes = await resetUserSetting(moduleConfig.value.ID);
@@ -264,48 +301,59 @@ const handleClick = async (featureName: FeatureName, row?:any) => {
         loadGridData();
       }
       break;
+    // 保存设置
     case FeatureName.SaveSetting:
       loading.value = true;
       await saveUserSetting(moduleConfig.value);
       loading.value = false;
       break;
+    // 高级查询
     case FeatureName.AdvancedSearch:
       showAdvancedSearch.value = !showAdvancedSearch.value
       break;
+    // 单条记录删除
     case FeatureName.Delete:
       Modal.confirm({
-        title:t('warning'),
-        content:t('deleteTips'),
-        okText:t('confirm'),
-        cancelText:t('cancel'),
-        onOk:async ()=>{
-          const delRes = await deleteRecords(moduleConfig.value.EntityName,[row.ID]);
-          if(delRes.IsSuccess){
+        title: t('warning'),
+        content: t('deleteTips'),
+        okText: t('confirm'),
+        cancelText: t('cancel'),
+        onOk: async () => {
+          const delRes = await deleteRecords(moduleConfig.value.EntityName, [row.ID]);
+          if (delRes.IsSuccess) {
             message.success(t('success'));
             loadGridData();
           }
         }
       });
       break;
+    // 多头记录删除
     case FeatureName.Remove:
-      if(selectedRows.value.length < 1){
+      if (selectedRows.value.length < 1) {
         message.error(t('deleteListNull'));
         return;
       }
       Modal.confirm({
-        title:t('warning'),
-        content:t('deleteTips'),
-        okText:t('confirm'),
-        cancelText:t('cancel'),
-        onOk:async ()=>{
+        title: t('warning'),
+        content: t('deleteTips'),
+        okText: t('confirm'),
+        cancelText: t('cancel'),
+        onOk: async () => {
           const ids = selectedRows.value.map((item) => item.ID);
-          const removeRes = await deleteRecords(moduleConfig.value.EntityName,ids);
-          if(removeRes.IsSuccess){
+          const removeRes = await deleteRecords(moduleConfig.value.EntityName, ids);
+          if (removeRes.IsSuccess) {
             message.success(t('success'));
             loadGridData();
           }
         }
       })
+      break;
+    // 数据导出
+    case FeatureName.Export:
+      openExport.value = true;
+      break;
+    // 下载模板
+    case FeatureName.Download:
       break;
     default:
   }

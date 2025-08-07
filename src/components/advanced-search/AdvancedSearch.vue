@@ -18,7 +18,7 @@
 
 <script lang="ts" setup>
 import { h, ref, watch } from 'vue';
-import { createForm } from "@formily/core";
+import { createForm,onFieldValueChange } from "@formily/core";
 import { FormProvider, createSchemaField } from "@formily/vue";
 import { FormGrid, FormItem, Input, DatePicker,InputNumber } from "@formily/antdv";
 import MySelect from '../my-select/MySelect.vue';
@@ -35,9 +35,16 @@ const props = defineProps({
   },
 });
 
-const emits = defineEmits(['searchCallback']);
+const emits = defineEmits(['searchCallback', 'searchParamsChange']);
 // 初始化Formily
-const form = createForm();
+const form = createForm({
+  effects(form){
+    // 高级查询参数数据变化时要回传，这个数据在导出时要使用
+    onFieldValueChange('*', () => {
+      emits('searchParamsChange', form.values);
+    })
+  }
+});
 const { SchemaField } = createSchemaField({
   components: {
     Input, DatePicker, MySelect,ProvinceCity,InputNumber,

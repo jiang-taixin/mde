@@ -1,5 +1,7 @@
 import axios, { type AxiosResponse, type AxiosError } from "axios";
 import { message as AntMessage } from 'ant-design-vue';
+import { i18n } from "@/language";
+const { t } = i18n.global;
 import { useUserProfileStore } from '@/stores/userProfile';
 declare module "axios" {
   interface AxiosRequestConfig {
@@ -28,7 +30,7 @@ const handleAuthExpired = () => {
 // 创建 axios 实例
 const request = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  timeout: 180000, // 3分钟超时
+  timeout: 300000, // 5分钟超时
   headers: {
     "Content-Type": "application/json",
   },
@@ -103,10 +105,14 @@ request.interceptors.response.use(
     }
 
     // HTTP状态码处理
-    const { status, config } = error.response;
+    const { code, status, config } = error;
     // 认证过期处理
-    if ((status === 401 || status === 403) && !SKIP_AUTH_PATHS.includes(config.url as string)) {
+    if ((status === 401 || status === 403) && !SKIP_AUTH_PATHS.includes(config?.url as string)) {
       handleAuthExpired();
+      return Promise.reject(error);
+    }
+    if (code === "ECONNABORTED") {
+      AntMessage.error(t("timeoutError"));
       return Promise.reject(error);
     }
     // 其他HTTP错误

@@ -75,7 +75,7 @@ export interface Attribute{
   IconCss?:string,
 }
 
-// 操作栏那妞参数
+// 操作栏按钮参数
 export interface Feature{
   CommandName:string,
   CommandParameter:unknown|null,
