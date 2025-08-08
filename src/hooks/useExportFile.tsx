@@ -2,7 +2,7 @@ import type { ExportSelection } from "@/components/export-panel/ExportPanel.vue"
 import type { Pagination } from "@/components/module-table/ModuleTable.vue";
 
 export function useExportFile() {
-  const exportFile = async (exportSelection: ExportSelection, exportParams: any, moduleConfig: ModuleConfig, pagination: Pagination) => {
+  const exportFile = async (exportSelection: ExportSelection, exportParams: any, moduleConfig: ModuleConfig, pagination: Pagination, version:any) => {
     let searchCondition: SearchConditionValue = {} as SearchConditionValue;
     if (exportSelection.parentSelected === ExportType.AllWithConditions) {
       searchCondition = { AndOr: ANDOR.AND, Conditions: [] };
@@ -23,7 +23,7 @@ export function useExportFile() {
       IsAscending: false,
       SearchCondition: exportSelection.parentSelected === ExportType.AllWithConditions ? searchCondition : null,
       SortAttributeConfigName: null,
-      MasterCondition: null,
+      MasterCondition: version?[{"Name":"VersionID","Value":version.ID}]:null,
       AttributeConfigNames: moduleConfig.Attributes.filter(attribute => !attribute.Hidden && attribute.DisplayByDefault).map(attribute => attribute.Name),
       ChildEntityConfigNames: exportSelection.childSelected
     }

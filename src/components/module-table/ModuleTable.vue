@@ -21,15 +21,34 @@
           <!-- 按钮组 超出边界横向滚动-->
           <div ref="content" class="flex" :style="{ transform: `translateX(${scrollOffset}px)` }">
             <a-tooltip :arrow="false" v-for="button in moduleConfig.Features" :title="button.Description">
-              <a-button :disabled="button.Name === FeatureName.Remove && !hasSelection"
-                v-if="!button.IsColumnButton && button.Name !== FeatureName.FuzzySearch" size="small"
-                class="flex-shrink-0 whitespace-nowrap ml-2 flex items-center" @click="handleClick(button.Name)">
-                {{ button.DisplayName }}
-                <template #icon>
-                  <img :src="getIcon(button.IconCss)" v-if="button.Name !== FeatureName.SwitchVersion"
-                    class="w-4 h-4 mr-1" />
-                </template>
-              </a-button>
+              <template v-if="button.Name !== FeatureName.SwitchVersion">
+                <a-button
+                  :disabled="(button.Name === FeatureName.Remove && !hasSelection) || (!canMerge && button.Name === FeatureName.Merge)"
+                  v-if="!button.IsColumnButton && button.Name !== FeatureName.FuzzySearch" size="small"
+                  class="flex-shrink-0 whitespace-nowrap ml-2 flex items-center" @click="handleClick(button.Name)">
+                  {{ button.DisplayName }}
+                  <template #icon>
+                    <img :src="getIcon(button.IconCss)" class="w-4 h-4 mr-1" />
+                  </template>
+                </a-button>
+              </template>
+              <template v-else>
+                <a-popover placement="bottom" :arrow="false" trigger="click">
+                  <a-button v-if="!button.IsColumnButton" size="small"
+                    class="flex-shrink-0 whitespace-nowrap ml-2 flex items-center" @click="handleClick(button.Name)">
+                    {{ `${button.DisplayName}:${activeVersion?.Name}` }}
+                    <template #icon>
+                      <img :src="getIcon(button.IconCss)" v-if="button.Name !== FeatureName.SwitchVersion"
+                        class="w-4 h-4 mr-1" />
+                    </template>
+                  </a-button>
+                  <template #content>
+                    <a-select class="w-36" size="small" @change="changeVersion">
+                      <a-select-option v-for="item in versionList" :value="item.ID">{{ item.Name }}</a-select-option>
+                    </a-select>
+                  </template>
+                </a-popover>
+              </template>
             </a-tooltip>
 
           </div>
@@ -104,12 +123,13 @@ import { FeatureName, type Attribute, type ModuleConfig } from '@/models/moduleC
 import { getIcon } from '@/utils/icon-transfer';
 import { message, Modal } from 'ant-design-vue';
 import type { VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table/types/all';
-import { debounce } from 'lodash';
+import { debounce, template } from 'lodash';
 import { ANDOR, ExportType, TableLevel, type ExportParams, type GridData, type RequestGridParams, type SearchConditionValue } from '@/models/gridDataModel';
 import { getGridData } from '@/services/gridData-service';
 import type { ExportSelection } from '../export-panel/ExportPanel.vue';
 import { useExportFile } from '@/hooks/useExportFile';
-const {exportFile} = useExportFile();
+import type { DefaultOptionType, SelectValue } from 'ant-design-vue/es/select';
+const { exportFile } = useExportFile();
 const { t } = useI18n();
 const container = ref<HTMLElement | null>(null);
 const content = ref<HTMLElement | null>(null);
@@ -120,8 +140,11 @@ const tableRef = ref<VxeTableInstance<any>>();
 const resizeObserver = ref<ResizeObserver>();
 const selectedRows = ref<any[]>([]);
 const hasSelection = computed(() => selectedRows.value.length > 0);
+const canMerge = computed(() => selectedRows.value.length === 2);
 const openExport = ref<boolean>(false);
 const exportParams = ref<any>();                 // 导出时需要使用高级查询的条件   所以条件变化就要更新
+const versionList = ref<any[]>();
+const activeVersion = ref<any>();
 const exportSelection = ref<ExportSelection>({
   parentSelected: ExportType.AllWithConditions,
   childSelected: []
@@ -190,12 +213,11 @@ const sortConfig = (config: ModuleConfig) => {
   return sorted;
 };
 
-
 const onPageChange = () => {
   loadGridData();
 };
 
-onMounted(() => {
+onMounted(async () => {
   // 使用ResizeObserver监听尺寸变化
   resizeObserver.value = new ResizeObserver(calculateMaxScroll);
   if (container.value) {
@@ -208,6 +230,10 @@ onMounted(() => {
   }, 50);
   moduleConfig.value = sortConfig(props.moduleConfig);
   pagination.pageSize = moduleConfig.value.PageSize;
+  // 加载版本的列表    加载条件是按钮组里有版本的按钮
+  if (needLoadVersionList()) {
+    await loadVersionList();
+  }
   if (props.tableLevel === TableLevel.MainTable || props.parentID) {
     // 只有主表在页面加载时就加载数据 子表有选中的主表行时加载
     loadGridData();
@@ -219,9 +245,29 @@ const gridData = reactive<GridData>({
   EntityConfigName: '',
   JsonData: undefined
 });
+
+const needLoadVersionList = () => {
+  return moduleConfig.value.Features.findIndex(item => item.Name === FeatureName.SwitchVersion) !== -1;
+}
+const loadVersionList = async () => {
+  // 获取版本列表 在attributes里面查找AttributeName是VersionID的对象   使用这个对象的TargetEntityName
+  const params: RequestGridParams = {
+    PageIndex: 1,
+    PageSize: -1,
+    EntityConfigName: moduleConfig.value.Attributes.find(item => item.AttributeName === 'VersionID')?.TargetEntityName as string
+  }
+  await getGridData(params).then((res) => {
+    if (res) {
+      versionList.value = JSON.parse(res.JsonData);
+      activeVersion.value = versionList.value?.find(item => item.IsActive === '1');
+    }
+  }).catch(() => {
+  });
+}
 const loadGridData = async (isAdvancedSearch: boolean = false, searchParams: any = null) => {
   loading.value = true;
   let searchCondition: SearchConditionValue = {} as SearchConditionValue;
+  let masterCondition: any = [];
   if (isAdvancedSearch) {
     searchCondition = { AndOr: ANDOR.AND, Conditions: [] };
     Object.entries(searchParams).forEach(([key, value]) => {
@@ -229,11 +275,16 @@ const loadGridData = async (isAdvancedSearch: boolean = false, searchParams: any
         const param = { Name: key, Value: value };
         searchCondition.Conditions.push(param);
       }
-
     });
   }
   else {
     searchCondition = isVoid(searchWord.value) ? null as any : { AndOr: ANDOR.OR, Conditions: [{ Name: '', Value: searchWord.value }] };
+    activeVersion.value && masterCondition.push({
+      Name: 'VersionID', Value: activeVersion.value?.ID
+    });
+    props.tableLevel !== TableLevel.MainTable && masterCondition.push({
+      Name: moduleConfig.value.ForeignKeyPhysicalViewAlias, Value: props.parentID
+    })
   }
 
   const params: RequestGridParams = {
@@ -243,7 +294,7 @@ const loadGridData = async (isAdvancedSearch: boolean = false, searchParams: any
     EntityConfigName: moduleConfig.value.Name,
     IsAscending: false,
     SearchCondition: searchCondition,
-    MasterCondition: props.tableLevel === TableLevel.MainTable ? null : [{ Name: moduleConfig.value.ForeignKeyPhysicalViewAlias, Value: props.parentID }]
+    MasterCondition: masterCondition.length > 0 ? masterCondition : null,
   }
   await getGridData(params).then((res) => {
     loading.value = false;
@@ -281,8 +332,14 @@ const onAdvancedSearchParamsChange = (params: any) => {
 
 const handleExport = () => {
   openExport.value = false;
-  exportFile(exportSelection.value,exportParams.value,moduleConfig.value,pagination);
+  exportFile(exportSelection.value, exportParams.value, moduleConfig.value, pagination, activeVersion.value);
+}
 
+const changeVersion = async (value: SelectValue, option: DefaultOptionType | DefaultOptionType[]) => {
+  // 切换语言
+  const version = versionList.value?.find(item => item.ID === value);
+  activeVersion.value = version;
+  loadGridData();
 }
 
 // 按钮点击事件

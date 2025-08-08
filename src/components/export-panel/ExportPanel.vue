@@ -1,6 +1,5 @@
 <template>
   <a-collapse v-model:active-key="activeKey">
-
     <a-collapse-panel collapsible="disabled" key="parent" :header="t('exportParentTitle')" >
       <a-radio-group v-model:value="params.parentSelected" class="flex flex-col">
         <a-radio :value="ExportType.CurrentPage" class="text-base mb-2">

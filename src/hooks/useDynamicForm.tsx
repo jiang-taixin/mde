@@ -129,7 +129,7 @@ export const useDynamicForm = () => {
       ...COMMON_COMPONENT_PROPS,
       placeholder: attribute.PromptMessage || '',
       entityConfigName: attribute.EntityConfigName,
-      moduleConfig: config
+      targetEntityName: attribute.TargetEntityName
     }
   });
 

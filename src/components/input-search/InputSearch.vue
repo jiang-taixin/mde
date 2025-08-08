@@ -1,5 +1,5 @@
 <template>
-  <a-input-search v-bind="$attrs" v-model:value="selectedUser.EnglishName" :placeholder="props.placeholder" style="width: 100%;" :loading="loading" @search="search">
+  <a-input-search v-bind="$attrs" v-model:value="selectedUser.DisplayName" :placeholder="props.placeholder" style="width: 100%;" :loading="loading" @search="search">
   </a-input-search>
 
   <a-modal v-model:open="open" :width="800" @ok="confirm">
@@ -11,8 +11,8 @@
       </div>
 
     </template>
-    <SearchResult ref="resultRef" v-model:user="selectedUser" :entity-config-name="props.entityConfigName"
-    :module-config="props.moduleConfig" :key-word="keyWord" @confirm="confirm"/>
+    <SearchResult ref="resultRef" v-model:selectedObject="selectedUser" :entity-config-name="props.entityConfigName" :target-entity-name="props.targetEntityName"
+     :key-word="keyWord" @confirm="confirm"/>
   </a-modal>
 
 </template>
@@ -22,13 +22,13 @@ import { h } from 'vue';
 import { getIcon } from '@/utils/icon-transfer';
 import { useField } from '@formily/vue';
 import { message } from 'ant-design-vue';
-import {type UserMessage} from '../search-result/SearchResult.vue';
+import {type SeletedObject} from '../search-result/SearchResult.vue';
 const open = ref<boolean>(false);
 const { t } = useI18n();
 
 const field = useField();
-const selectedUser = ref<UserMessage>({
-  EnglishName: '',
+const selectedUser = ref<SeletedObject>({
+  DisplayName: '',
   Code: ''
 });
 const resultRef = ref(null);
@@ -46,12 +46,18 @@ const props = defineProps({
     require: true,
     default: ''
   },
-  moduleConfig: {
-    type: Object as PropType<ModuleConfig>,
+  targetEntityName: {
+    type: String,
     require: true,
-    default: null
+    default: ''
   }
 });
+
+console.log("--------- config:"+props.entityConfigName)
+
+onMounted(() => {
+
+})
 
 const search = (value: string) =>{
   if(!isVoid(value)){

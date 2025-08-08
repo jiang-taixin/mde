@@ -12,7 +12,7 @@
           show-overflow="ellipsis" @cell-dblclick="cellDblclickEvent"
           @current-row-change="handleCurrentChange"
           >
-          <template v-for="column in props.moduleConfig.Attributes">
+          <template v-if="moduleConfig" v-for="column in moduleConfig.Attributes">
             <template v-if="!column.Hidden">
               <vxe-column :field="column.Name" :title="column.DisplayName"
                 :width="`${column.DisplayWidth > 0 ? column.DisplayWidth : 80}px`" show-header-overflow
@@ -25,7 +25,7 @@
       <div class="flex justify-end py-2 mb-2">
         <a-pagination size="small" v-model:current="pagination.current" v-model:page-size="pagination.pageSize"
           show-quick-jumper :total="pagination.total" @change="onPageChange"
-          :page-size-options="pagination.pageSizeOptions"  />
+          :page-size-options="pagination.pageSizeOptions"  :show-total="(total: any) => t('total', { total: total })"/>
       </div>
     </div>
   </a-spin>
@@ -36,31 +36,33 @@ import { type ModuleConfig } from '@/models/moduleConfigModel';
 import type { VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table/types/all';
 import { ANDOR, type GridData, type RequestGridParams } from '@/models/gridDataModel';
 import { getGridData } from '@/services/gridData-service';
+const { t } = useI18n();
 
-export interface UserMessage{
-  EnglishName:string,
+export interface SeletedObject{
+  DisplayName:string,
   Code:string
 }
 
 const emits = defineEmits(['confirm']);
 const tableRef = ref<VxeTableInstance<any>>();
 const loading = ref<boolean>(false);
-const model = defineModel<UserMessage>('user',{default:() => ({EnglishName:'',Code:''})});
+const moduleConfig = ref<ModuleConfig>();
+const model = defineModel<SeletedObject>('selectedObject',{default:() => ({DisplayName:'',Code:''})});
 const props = defineProps({
   entityConfigName: {
     type: String,
     require: true,
     default: ''
   },
-  moduleConfig: {
-    type: Object as PropType<ModuleConfig>,
-    require: true,
-    default: null
-  },
   keyWord:{
     type: String,
     require: true,
     default: '',
+  },
+  targetEntityName: {
+    type: String,
+    require: true,
+    default: ''
   }
 });
 
@@ -70,6 +72,7 @@ watch(() => props.keyWord, () => {
     loadGridData();
   }
 });
+
 
 
 const pagination = reactive<Pagination>({
@@ -90,7 +93,13 @@ const onPageChange = () => {
   loadGridData();
 };
 
-onMounted(() => {
+onMounted(async () => {
+   if(!moduleConfig.value){
+    loading.value = true;
+    const res = await getModuleConfig(props.targetEntityName);
+    loading.value = true;
+    moduleConfig.value = res;
+  }
   loadGridData();
 });
 
@@ -107,7 +116,7 @@ const loadGridData = async () => {
     PageSize: pagination.pageSize,
     PageIndex: pagination.current,
     SortAttributeConfigName: null,
-    EntityConfigName: props.entityConfigName,
+    EntityConfigName: props.targetEntityName,
     IsAscending: false,
     SearchCondition: searchCondition,
     MasterCondition: null
@@ -116,11 +125,12 @@ const loadGridData = async () => {
     loading.value = false;
     if (res) {
       gridData.JsonData = JSON.parse(res.JsonData);
+      console.log(gridData.JsonData)
       pagination.total = res.TotalRecords;
       if (gridData.JsonData.length !== 0) {
-        tableRef.value?.setCurrentRow(gridData.JsonData[0]);
-        model.value.Code = gridData.JsonData[0].Code;
-        model.value.EnglishName = gridData.JsonData[0].EnglishName;
+        //tableRef.value?.setCurrentRow(gridData.JsonData[0]);
+        //model.value.Code = gridData.JsonData[0].Code;
+        //model.value.DisplayName = gridData.JsonData[0].EnglishName;
       }
     }
   }).catch(() => {
@@ -134,7 +144,7 @@ const cellDblclickEvent: VxeTableEvents.CellDblclick = ({ row, $event }) => {
 }
 const handleCurrentChange: VxeTableEvents.CurrentRowChange = ({ row, $event }) => {
   model.value.Code = row.Code;
-  model.value.EnglishName = row.EnglishName;
+  model.value.DisplayName = row.EnglishName;
 }
 const columnDragConfig = reactive<VxeTablePropTypes.ColumnDragConfig<any>>({
   isCrossDrag: true,

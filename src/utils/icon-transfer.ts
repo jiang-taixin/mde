@@ -21,6 +21,7 @@ import Choose from "@/assets/images/button/choose.png";
 import Active from "@/assets/images/button/active.png";
 import Copy from "@/assets/images/button/copy.png";
 import Publish from "@/assets/images/button/publish.png";
+import Merge from "@/assets/images/button/merge.png";
 
 
 // icon 映射列表
@@ -48,7 +49,8 @@ const iconMap: Record<string, string> = {
   "choose-icon":Choose,
   "settoactive-icon":Active,
   "copytoadd-icon":Copy,
-  "publish-icon":Publish
+  "publish-icon":Publish,
+  "merge-icon":Merge
 };
 
 export function getIcon(iconName: string | null): string {
