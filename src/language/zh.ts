@@ -25,6 +25,13 @@ export default {
   exportAllWithConditions:"导出所有{name}记录(按当前检索条件)",
   exportAll:"{parentTitle} - {childTitle}的所有记录",
   exportChildTitle:"选择子实体",
+  noneSelectionTips:"请选择一条记录",
+  historyTitle:"{title} -- 历史",
+  from:"从",
+  to:"到",
+  operatedBy:"操作人",
+  operatedOn:"操作时间",
+  operationType:"操作类型",
   app: {
     title: "辉瑞中国主数据管理系统",
   },

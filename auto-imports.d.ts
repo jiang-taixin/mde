@@ -39,6 +39,7 @@ declare global {
   const getEnglishDate: typeof import('./src/utils/datetime')['getEnglishDate']
   const getGeoGraphyList: typeof import('./src/services/metaData-service')['getGeoGraphyList']
   const getGridData: typeof import('./src/services/gridData-service')['getGridData']
+  const getHistoryData: typeof import('./src/services/gridData-service')['getHistoryData']
   const getIcon: typeof import('./src/utils/icon-transfer')['getIcon']
   const getLovItems: typeof import('./src/services/metaData-service')['getLovItems']
   const getModuleConfig: typeof import('./src/services/module-service')['getModuleConfig']
@@ -135,7 +136,7 @@ declare global {
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
   // @ts-ignore
-  export type { TableLevel, ANDOR, ExportType, SearchConditionValue, RequestGridParams, ExportParams, GridData } from './src/models/gridDataModel'
+  export type { TableLevel, ANDOR, ExportType, SearchConditionValue, RequestGridParams, RequestHistoryParams, ExportParams, GridData } from './src/models/gridDataModel'
   import('./src/models/gridDataModel')
   // @ts-ignore
   export type { Geography, LovItem } from './src/models/metaDataModel'

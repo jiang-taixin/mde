@@ -97,7 +97,7 @@ onMounted(async () => {
    if(!moduleConfig.value){
     loading.value = true;
     const res = await getModuleConfig(props.targetEntityName);
-    loading.value = true;
+    loading.value = false;
     moduleConfig.value = res;
   }
   loadGridData();
@@ -128,9 +128,6 @@ const loadGridData = async () => {
       console.log(gridData.JsonData)
       pagination.total = res.TotalRecords;
       if (gridData.JsonData.length !== 0) {
-        //tableRef.value?.setCurrentRow(gridData.JsonData[0]);
-        //model.value.Code = gridData.JsonData[0].Code;
-        //model.value.DisplayName = gridData.JsonData[0].EnglishName;
       }
     }
   }).catch(() => {

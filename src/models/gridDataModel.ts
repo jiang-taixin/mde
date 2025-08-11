@@ -31,6 +31,13 @@ export interface RequestGridParams{
   MasterCondition?:Record<string, any>|null,
 }
 
+// 请求历史列表数据
+export interface RequestHistoryParams extends RequestGridParams{
+  OperationOnStart:string,
+  OperationOnEnd:string,
+  DataID:string
+}
+
 
 
 // 导出数据请求

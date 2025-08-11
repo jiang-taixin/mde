@@ -1,8 +1,8 @@
 <template>
-  <a-input-search v-bind="$attrs" v-model:value="selectedUser.DisplayName" :placeholder="props.placeholder" style="width: 100%;" :loading="loading" @search="search">
+  <a-input-search v-bind="$attrs" v-model:value="selectedObject.DisplayName" :placeholder="props.placeholder" style="width: 100%;" :loading="loading" @search="search">
   </a-input-search>
 
-  <a-modal v-model:open="open" :width="800" @ok="confirm">
+  <a-modal v-model:open="open" :width="600" @ok="confirm">
     <template #title>
       <div class="flex items-center">
          {{t('searchButtonTitle')}}
@@ -11,7 +11,7 @@
       </div>
 
     </template>
-    <SearchResult ref="resultRef" v-model:selectedObject="selectedUser" :entity-config-name="props.entityConfigName" :target-entity-name="props.targetEntityName"
+    <SearchResult ref="resultRef" v-model:selectedObject="selectedObject" :entity-config-name="props.entityConfigName" :target-entity-name="props.targetEntityName"
      :key-word="keyWord" @confirm="confirm"/>
   </a-modal>
 
@@ -27,7 +27,7 @@ const open = ref<boolean>(false);
 const { t } = useI18n();
 
 const field = useField();
-const selectedUser = ref<SeletedObject>({
+const selectedObject = ref<SeletedObject>({
   DisplayName: '',
   Code: ''
 });
@@ -53,8 +53,6 @@ const props = defineProps({
   }
 });
 
-console.log("--------- config:"+props.entityConfigName)
-
 onMounted(() => {
 
 })
@@ -70,7 +68,11 @@ const search = (value: string) =>{
 }
 
 const confirm = () =>{
-  (field.value as any).setValue(selectedUser.value.Code);
+  if(isVoid(selectedObject.value.Code)){
+    message.error(t('noneSelectionTips'));
+    return;
+  }
+  (field.value as any).setValue(selectedObject.value.Code);
   open.value = false;
 }
 

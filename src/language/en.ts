@@ -25,6 +25,13 @@ export default {
   exportAllWithConditions:"Export all {name} records (under current search conditions).",
   exportAll:"All records of {parentTitle} - {childTitle}",
   exportChildTitle:"With child entitie(s)",
+  noneSelectionTips:"Please select a record",
+  historyTitle:"{title} -- History",
+  from:"From",
+  to:"To",
+  operatedBy:"Operated By",
+  operatedOn:"Operated On",
+  operationType:"Operation Type",
   app: {
     title: "Pfizer China Master Data Enricher",
   },

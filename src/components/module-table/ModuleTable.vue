@@ -116,6 +116,17 @@
         :parent-title="props.parentTitle"></ExportPanel>
     </template>
   </a-modal>
+  <a-modal v-model:open="openHistory" :width="600">
+    <template #title>
+      <div class="flex items-center text-lg">
+        <a-button type="link" size="small"
+          :icon="h('img', { src: getIcon('history-icon'), style: 'width: 14px; margin-left:4px' })">
+        </a-button>
+        {{ t('historyTitle', { title: moduleConfig.DisplayName }) }}
+      </div>
+      <HistoryPanel ref="resultRef"  :module-config="moduleConfig" :history-id="historyID"/>
+    </template>
+  </a-modal>
 </template>
 <script setup lang="ts">
 import { ref, h, type PropType } from 'vue';
@@ -123,8 +134,8 @@ import { FeatureName, type Attribute, type ModuleConfig } from '@/models/moduleC
 import { getIcon } from '@/utils/icon-transfer';
 import { message, Modal } from 'ant-design-vue';
 import type { VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table/types/all';
-import { debounce, template } from 'lodash';
-import { ANDOR, ExportType, TableLevel, type ExportParams, type GridData, type RequestGridParams, type SearchConditionValue } from '@/models/gridDataModel';
+import { debounce } from 'lodash';
+import { ANDOR, ExportType, TableLevel, type GridData, type RequestGridParams, type SearchConditionValue } from '@/models/gridDataModel';
 import { getGridData } from '@/services/gridData-service';
 import type { ExportSelection } from '../export-panel/ExportPanel.vue';
 import { useExportFile } from '@/hooks/useExportFile';
@@ -149,6 +160,10 @@ const exportSelection = ref<ExportSelection>({
   parentSelected: ExportType.AllWithConditions,
   childSelected: []
 });
+
+const openHistory = ref<boolean>(false);
+const historyID = ref<string>('');
+
 
 const showAdvancedSearch = ref<boolean>(false);
 
@@ -384,7 +399,7 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
         }
       });
       break;
-    // 多头记录删除
+    // 多条记录删除
     case FeatureName.Remove:
       if (selectedRows.value.length < 1) {
         message.error(t('deleteListNull'));
@@ -411,6 +426,12 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
       break;
     // 下载模板
     case FeatureName.Download:
+      break;
+    // 历史
+    case FeatureName.History:
+      historyID.value = row.ID;
+      openHistory.value = true;
+
       break;
     default:
   }
