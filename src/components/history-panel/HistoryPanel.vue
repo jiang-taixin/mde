@@ -20,8 +20,7 @@
         <vxe-table ref="tableRef" :data="gridData.JsonData" max-height="300px" min-height="300px" size="mini" round
           :border="true" :column-config="{ resizable: true, drag: true }" :column-drag-config="columnDragConfig"
           :custom-config="customConfig" :cell-config="{ height: 25 }"
-          :row-config="{ isHover: true, isCurrent: true, keyField: 'ID' }" show-overflow="ellipsis"
-          @current-row-change="handleCurrentChange">
+          :row-config="{ isHover: true, isCurrent: true, keyField: 'ID' }" show-overflow="ellipsis">
           <template v-if="moduleConfig" v-for="column in moduleConfig.Attributes">
             <template v-if="!column.Hidden">
               <vxe-column :field="column.Name" :title="column.DisplayName"
@@ -43,7 +42,7 @@
 <script setup lang="ts">
 import { ref, } from 'vue';
 import { type ModuleConfig } from '@/models/moduleConfigModel';
-import type { VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table/types/all';
+import type { VxeTableInstance, VxeTablePropTypes } from 'vxe-table/types/all';
 import { type GridData, type RequestHistoryParams } from '@/models/gridDataModel';
 const { t } = useI18n();
 import { h } from 'vue';
@@ -60,7 +59,6 @@ const to = ref<string>('');
 const tableRef = ref<VxeTableInstance<any>>();
 const loading = ref<boolean>(false);
 const moduleConfig = ref<ModuleConfig>();
-const model = defineModel<SeletedObject>('selectedObject', { default: () => ({ DisplayName: '', Code: '' }) });
 const props = defineProps({
   moduleConfig: {
     type: Object as PropType<ModuleConfig>,
@@ -273,10 +271,6 @@ const loadHistoryData = async () => {
   });
 }
 
-const handleCurrentChange: VxeTableEvents.CurrentRowChange = ({ row, $event }) => {
-  model.value.Code = row.Code;
-  model.value.DisplayName = row.EnglishName;
-}
 const columnDragConfig = reactive<VxeTablePropTypes.ColumnDragConfig<any>>({
   isCrossDrag: true,
   showGuidesStatus: true,
