@@ -50,7 +50,10 @@ const iconMap: Record<string, string> = {
   "settoactive-icon":Active,
   "copytoadd-icon":Copy,
   "publish-icon":Publish,
-  "merge-icon":Merge
+  "merge-icon":Merge,
+  "up-row-icon":ToUp,
+  "down-row-icon":ToDown,
+  "security-icon":Access
 };
 
 export function getIcon(iconName: string | null): string {

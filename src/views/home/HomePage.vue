@@ -9,7 +9,7 @@
         <HeaderComponent :switchAccountCallback="switchAccount"></HeaderComponent>
       </a-layout-header>
       <a-layout class="flex-1">
-        <a-layout-sider v-model:collapsed="collapsed" collapsible collapsedWidth="40" width="250" :class="['bg-white']">
+        <a-layout-sider v-model:collapsed="collapsed" collapsible collapsedWidth="40" width="250" class="bg-white">
           <SiderComponent :menuList="menuList">
           </SiderComponent>
           <template #trigger>

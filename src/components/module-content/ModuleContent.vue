@@ -16,8 +16,8 @@
     <div class="h-6 flex items-center flex-row my-2">
       <span class="font-bold text-lg">{{ props.moduleTab.MenuPath[props.moduleTab.MenuPath.length - 1] }}</span>
     </div>
-    <!-- 内容 -->
-    <div class="flex-1" v-if="moduleConfig">
+    <!-- 内容  这个是通用页面 -->
+    <div class="flex-1" v-if="moduleConfig && getModulePageType() === ModulePageType.Normal">
       <!-- 主表 -->
       <div :class="['flex-col w-full', (moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0 ? 'h-auto' : 'h-full']" ref="mainTableRef">
         <ModuleTable :module-config="moduleConfig" :has-sub-module-config="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0"
@@ -35,6 +35,22 @@
         </a-tabs>
       </div>
     </div>
+    <!-- 内容  这个是模块页面 -->
+    <div class="flex-1 min-h-0" v-if="getModulePageType() === ModulePageType.ModulePage">
+      <ModulePage />
+    </div>
+    <!-- 内容  这个是医生申请页面 -->
+    <div class="flex-1 min-h-0" v-if="getModulePageType() === ModulePageType.ContactRequestList">
+
+    </div>
+    <!-- 内容  这个是医生申请报告页面 -->
+    <div class="flex-1 min-h-0" v-if="getModulePageType() === ModulePageType.ContactRequestReport">
+
+    </div>
+    <!-- 内容  这个是face讲者申请页面 -->
+    <div class="flex-1 min-h-0" v-if="getModulePageType() === ModulePageType.FaceRequestList">
+
+    </div>
 
   </div>
 </template>
@@ -43,7 +59,7 @@ import type { ModuleTab } from '@/models/moduleItemModel';
 
 import clock from "@/assets/images/others/clock.png";
 import { getWeekNo } from "@/utils/datetime";
-import type { ModuleConfig } from '@/models/moduleConfigModel';
+import { ModulePageType, type ModuleConfig } from '@/models/moduleConfigModel';
 import { TableLevel } from '@/models/gridDataModel';
 const { locale } = useI18n();
 const dateMessage = ref<string>();
@@ -71,7 +87,12 @@ const props = defineProps({
 
 
 onMounted(async () => {
-  loadConfig();
+  if(getModulePageType() === ModulePageType.Normal){
+    loadConfig();
+  }
+  else{
+    props.moduleTab.Loading = false;
+  }
 });
 
 const loadConfig = async () =>{
@@ -80,6 +101,20 @@ const loadConfig = async () =>{
   props.moduleTab.Loading = false;
 }
 
+// 页面URL与模块类型的映射
+const PAGE_URL_MAPPING: Record<string, ModulePageType> = {
+  'ModulePage.aspx': ModulePageType.ModulePage,
+  'ContactRequestList.aspx': ModulePageType.ContactRequestList,
+  'ContactRequestReport.aspx': ModulePageType.ContactRequestReport,
+  'FaceRequestList.aspx': ModulePageType.FaceRequestList};
+// 获取模块类型
+const getModulePageType = (): ModulePageType => {
+  const { Url } = props.moduleTab;
+    // 查找匹配的页面类型
+    const matchedType = Object.entries(PAGE_URL_MAPPING).find(([pageUrl]) =>Url.includes(pageUrl)
+  );
+  return matchedType?.[1] ?? ModulePageType.Normal;
+};
 
 </script>
 <style scoped></style>

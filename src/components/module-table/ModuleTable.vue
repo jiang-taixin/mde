@@ -196,12 +196,19 @@ const props = defineProps({
   parentTitle: {
     type: String,
     require: false
+  },
+  // 这个参数单独给模块管理页面使用
+  fromModule:{
+    type:Boolean,
+    require: false,
+    default: false,
   }
 });
 const moduleConfig = ref<ModuleConfig>({} as ModuleConfig);
 watch(() => props.parentID, (parentId) => {
   if (!isVoid(parentId)) {
-    // 子表在主表被选中某行时才加载数据
+    // 子表在主表被选中某行时才加载数据    parentID变化从首页开始加载
+    pagination.current = 1;
     loadGridData();
   }
 });
@@ -299,7 +306,10 @@ const loadGridData = async (isAdvancedSearch: boolean = false, searchParams: any
     });
     props.tableLevel !== TableLevel.MainTable && masterCondition.push({
       Name: moduleConfig.value.ForeignKeyPhysicalViewAlias, Value: props.parentID
-    })
+    });
+    props.fromModule && masterCondition.push({
+      Name: "ParentID", Value: props.parentID
+    });
   }
 
   const params: RequestGridParams = {
@@ -321,7 +331,7 @@ const loadGridData = async (isAdvancedSearch: boolean = false, searchParams: any
         nextTick(() => {
           selectedRows.value = tableRef.value?.getCheckboxRecords() as any;
         })
-        if (props.tableLevel === TableLevel.MainTable) {
+        if (props.tableLevel === TableLevel.MainTable && !props.fromModule) {
           props.rowClick!(gridData.JsonData[0].ID);
         }
       }
@@ -449,7 +459,7 @@ const cellDblclickEvent: VxeTableEvents.CellDblclick = ({ row, $event }) => {
 }
 
 const cellClickEvent: VxeTableEvents.CellClick<any> = ({ row, $event }) => {
-  if (props.tableLevel === TableLevel.MainTable) {
+  if (props.tableLevel === TableLevel.MainTable && !props.fromModule) {
     props.rowClick!(row.ID);
   }
 }

@@ -53,3 +53,20 @@
 .ant-formily-form-item-feedback-layout-loose{
   margin-bottom: 0px;
 }
+
+// a-tree
+.ant-tree .ant-tree-treenode{
+  padding-bottom: 0px;
+  height: 20px;
+  font-size: 12px;
+}
+.ant-tree .ant-tree-indent-unit{
+  width: 10px;
+}
+.ant-tree .ant-tree-switcher{
+  width: 10px;
+}
+
+.ant-tree .ant-tree-node-content-wrapper{
+  padding: 0 0 0 0;
+}

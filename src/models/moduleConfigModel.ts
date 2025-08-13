@@ -1,5 +1,14 @@
 import type { Language } from "@/language";
 
+// 模块页面类型   其中前4个需要单独页面
+export enum ModulePageType{
+  ModulePage = 1,                   // 模块管理
+  ContactRequestList = 2,           // 医生申请
+  ContactRequestReport = 3,         // 医生申请报告
+  FaceRequestList = 4,              // face讲者申请
+  Normal = 5                        // 通用类型
+}
+
 // 按钮点击事件
 export enum FeatureName{
   FuzzySearch="FuzzySearch",           // 搜索，这个按钮会被替换成搜索框
