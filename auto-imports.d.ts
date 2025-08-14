@@ -18,6 +18,7 @@ declare global {
   const ModulePageType: typeof import('./src/models/moduleConfigModel')['ModulePageType']
   const ModuleType: typeof import('./src/models/moduleItemModel')['ModuleType']
   const Month_Regex: typeof import('./src/constants/index')['Month_Regex']
+  const MoveDirection: typeof import('./src/models/gridDataModel')['MoveDirection']
   const PrincipalType: typeof import('./src/models/userProfileModel')['PrincipalType']
   const TableLevel: typeof import('./src/models/gridDataModel')['TableLevel']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
@@ -68,6 +69,8 @@ declare global {
   const mapWritableState: typeof import('pinia')['mapWritableState']
   const markRaw: typeof import('vue')['markRaw']
   const moduleId: typeof import('./src/constants/index')['moduleId']
+  const moveRecordUpDown: typeof import('./src/services/module-service')['moveRecordUpDown']
+  const name: typeof import('./src/services/module-service')['name']
   const nextTick: typeof import('vue')['nextTick']
   const onActivated: typeof import('vue')['onActivated']
   const onBeforeMount: typeof import('vue')['onBeforeMount']
@@ -120,6 +123,7 @@ declare global {
   const useLink: typeof import('vue-router')['useLink']
   const useModel: typeof import('vue')['useModel']
   const useModuleTabsStore: typeof import('./src/stores/moduleTabs')['useModuleTabsStore']
+  const useMoveUpOrDown: typeof import('./src/hooks/useMoveUpOrDown')['useMoveUpOrDown']
   const useRoute: typeof import('vue-router')['useRoute']
   const useRouter: typeof import('vue-router')['useRouter']
   const useSlots: typeof import('vue')['useSlots']
@@ -137,7 +141,7 @@ declare global {
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
   // @ts-ignore
-  export type { TableLevel, ANDOR, ExportType, SearchConditionValue, RequestGridParams, RequestHistoryParams, ExportParams, GridData } from './src/models/gridDataModel'
+  export type { TableLevel, ANDOR, MoveDirection, ExportType, MoveResult, SearchConditionValue, RequestGridParams, RequestHistoryParams, ExportParams, GridData } from './src/models/gridDataModel'
   import('./src/models/gridDataModel')
   // @ts-ignore
   export type { Geography, LovItem } from './src/models/metaDataModel'

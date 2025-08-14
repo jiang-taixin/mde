@@ -46,9 +46,6 @@ export function useExportFile() {
       URL.revokeObjectURL(url);
     }
   }
-
-
-
   return {
     exportFile
   }

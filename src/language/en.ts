@@ -32,6 +32,11 @@ export default {
   operatedBy:"Operated By",
   operatedOn:"Operated On",
   operationType:"Operation Type",
+  securityTitle:"Security -- {title}",
+  remove:"Remove",
+  add:"Add",
+  save:"Save",
+  close:"Close",
   app: {
     title: "Pfizer China Master Data Enricher",
   },

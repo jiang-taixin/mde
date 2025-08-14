@@ -32,6 +32,11 @@ export default {
   operatedBy:"操作人",
   operatedOn:"操作时间",
   operationType:"操作类型",
+  securityTitle:"权限 -- {title}",
+  remove:"移除",
+  add:"添加",
+  save:"保存",
+  close:"关闭",
   app: {
     title: "辉瑞中国主数据管理系统",
   },

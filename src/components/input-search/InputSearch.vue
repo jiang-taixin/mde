@@ -7,7 +7,7 @@
       <div class="flex items-center">
          {{t('searchButtonTitle')}}
       <a-button type="link" size="small"
-          :icon="h('img', { src: getIcon('filter'), style: 'width: 16px; margin-left:4px' })" @click="openCustom"></a-button>
+          :icon="h('img', { src: getIcon('filter'), style: 'width: 14px; margin-left:4px' })" @click="openCustom"></a-button>
       </div>
 
     </template>

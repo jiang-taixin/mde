@@ -50,18 +50,15 @@
                 </a-popover>
               </template>
             </a-tooltip>
-
           </div>
         </div>
         <a-button type="link" size="small" @click="openCustomEvent"
           :icon="h('img', { src: getIcon('filter'), style: 'width: 16px' })"></a-button>
       </div>
-
       <div v-show="showAdvancedSearch">
         <AdvancedSearch :module-config="moduleConfig" @searchCallback="onAdvancedSearch"
           @searchParamsChange="onAdvancedSearchParamsChange" />
       </div>
-
       <!--表格-->
       <div class="flex-1">
         <vxe-table ref="tableRef" :data="gridData.JsonData" :max-height="props.hasSubModuleConfig ? '300px' : '400px'"
@@ -104,28 +101,40 @@
       </div>
     </div>
   </a-spin>
+  <!--导出弹窗-->
   <a-modal v-model:open="openExport" :width="500" @ok="handleExport">
     <template #title>
       <div class="flex items-center text-lg">
-        <a-button type="link" size="small"
-          :icon="h('img', { src: getIcon('export-icon'), style: 'width: 14px; margin-left:4px' })">
-        </a-button>
+        <img :src="getIcon('export-icon')" class="w-4 h-4 mr-1" />
         {{ t('exportTitle', { title: moduleConfig.DisplayName }) }}
       </div>
-      <ExportPanel :export-selection="exportSelection" :module-config="moduleConfig" :table-level="props.tableLevel"
-        :parent-title="props.parentTitle"></ExportPanel>
     </template>
+    <ExportPanel :export-selection="exportSelection" :module-config="moduleConfig" :table-level="props.tableLevel"
+      :parent-title="props.parentTitle"></ExportPanel>
   </a-modal>
+  <!--历史弹窗-->
   <a-modal v-model:open="openHistory" :width="600">
     <template #title>
       <div class="flex items-center text-lg">
-        <a-button type="link" size="small"
-          :icon="h('img', { src: getIcon('history-icon'), style: 'width: 14px; margin-left:4px' })">
-        </a-button>
+        <img :src="getIcon('history-icon')" class="w-4 h-4 mr-1" />
         {{ t('historyTitle', { title: moduleConfig.DisplayName }) }}
       </div>
-      <HistoryPanel ref="resultRef"  :module-config="moduleConfig" :history-id="historyID"/>
     </template>
+    <HistoryPanel ref="resultRef" :module-config="moduleConfig" :history-id="historyID" />
+  </a-modal>
+  <!--权限弹窗-->
+  <a-modal v-model:open="openSecurity" :width="700" :footer="null">
+    <template #title>
+      <div class="flex items-center text-lg">
+        <img :src="getIcon('security-icon')" class="w-4 h-4 mr-1" />
+        {{ t('securityTitle', { title: moduleConfig.DisplayName }) }}
+        <a-button type="link" size="small"
+          :icon="h('img', { src: getIcon('filter'), style: 'width: 14px; margin-left:4px' })"
+          @click="openSecurityCustomEvent"></a-button>
+      </div>
+    </template>
+    <SecurityPanel ref="securityRef" :export-selection="exportSelection" :module-config="moduleConfig"
+      :table-level="props.tableLevel" :parent-title="props.parentTitle"></SecurityPanel>
   </a-modal>
 </template>
 <script setup lang="ts">
@@ -135,12 +144,13 @@ import { getIcon } from '@/utils/icon-transfer';
 import { message, Modal } from 'ant-design-vue';
 import type { VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table/types/all';
 import { debounce } from 'lodash';
-import { ANDOR, ExportType, TableLevel, type GridData, type RequestGridParams, type SearchConditionValue } from '@/models/gridDataModel';
+import { ANDOR, ExportType, MoveDirection, TableLevel, type GridData, type RequestGridParams, type SearchConditionValue } from '@/models/gridDataModel';
 import { getGridData } from '@/services/gridData-service';
 import type { ExportSelection } from '../export-panel/ExportPanel.vue';
-import { useExportFile } from '@/hooks/useExportFile';
 import type { DefaultOptionType, SelectValue } from 'ant-design-vue/es/select';
+import { useMoveUpOrDown } from '@/hooks/useMoveUpOrDown';
 const { exportFile } = useExportFile();
+const { moveUpOrDown } = useMoveUpOrDown();
 const { t } = useI18n();
 const container = ref<HTMLElement | null>(null);
 const content = ref<HTMLElement | null>(null);
@@ -163,7 +173,8 @@ const exportSelection = ref<ExportSelection>({
 
 const openHistory = ref<boolean>(false);
 const historyID = ref<string>('');
-
+const openSecurity = ref<boolean>(false);
+const securityRef = ref(null);
 
 const showAdvancedSearch = ref<boolean>(false);
 
@@ -198,8 +209,8 @@ const props = defineProps({
     require: false
   },
   // 这个参数单独给模块管理页面使用
-  fromModule:{
-    type:Boolean,
+  fromModule: {
+    type: Boolean,
     require: false,
     default: false,
   }
@@ -441,7 +452,25 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
     case FeatureName.History:
       historyID.value = row.ID;
       openHistory.value = true;
-
+      break;
+    case FeatureName.MoveUp:
+      loading.value = true;
+      const upRes = await moveUpOrDown(row.ID, MoveDirection.Up, gridData);
+      loading.value = false;
+      if(upRes){
+        gridData.JsonData = upRes;
+      }
+      break;
+    case FeatureName.MoveDown:
+      loading.value = true;
+      const downRes = await moveUpOrDown(row.ID, MoveDirection.Down, gridData);
+      loading.value = false;
+      if(downRes){
+        gridData.JsonData = downRes;
+      }
+      break;
+    case FeatureName.Security:
+      openSecurity.value = true;
       break;
     default:
   }
@@ -452,6 +481,12 @@ const openCustomEvent = () => {
   const $table = tableRef.value
   if ($table) {
     $table.openCustom()
+  }
+}
+// 打开子组件字段选择面板 -- 权限
+const openSecurityCustomEvent = () => {
+  if (securityRef.value) {
+    (securityRef.value as any).openCustomEvent();
   }
 }
 const cellDblclickEvent: VxeTableEvents.CellDblclick = ({ row, $event }) => {

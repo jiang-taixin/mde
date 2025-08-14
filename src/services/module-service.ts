@@ -25,3 +25,7 @@ export async function saveUserSetting(params:ModuleConfig):Promise<any> {
 export async function deleteRecords(EntityName:string,DataIDs:string[]):Promise<any> {
   return http.post(`/API/entity/TryDeleteRecords`,{EntityName,DataIDs});
 }
+// 上移下移
+export async function moveRecordUpDown(params:any):Promise<any> {
+  return http.post(`/API/entity/DoEntityCommand`,params);
+}

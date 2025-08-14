@@ -56,6 +56,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SearchResult: typeof import('./src/components/search-result/SearchResult.vue')['default']
+    SecurityPanel: typeof import('./src/components/security-panel/Security-Panel.vue')['default']
     SelectPrincial: typeof import('./src/components/select-principal/SelectPrincial.vue')['default']
     SiderComponent: typeof import('./src/components/sider/SiderComponent.vue')['default']
   }

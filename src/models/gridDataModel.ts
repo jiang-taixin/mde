@@ -9,6 +9,14 @@ export enum ANDOR{
   ANDOR = '2'
 }
 
+// 上移下移结果集
+export type MoveResult = Array<[{ Name: "IDA" | "IDB"; Value: string }]>;
+// 移动方向
+export enum MoveDirection{
+  Up = 'Up',
+  Down = 'Down',
+}
+
 export enum ExportType{
   CurrentPage = 1,               // 导出当前页
   AllWithConditions = 2,         // 导出检索条件下的所有

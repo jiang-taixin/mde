@@ -25,7 +25,10 @@ export enum FeatureName{
   ResetSetting="ResetSetting",         // 重置设置
   SwitchVersion="SwitchVersion",       // 切换版本
   Choose="Choose",                     // 选择
-  Merge="Merge"                        // 合并
+  Merge="Merge",                       // 合并
+  MoveUp="MoveUp",                     // 上移
+  MoveDown="MoveDown",                 // 下移
+  Security="Security",                 // 权限
 }
 
 
