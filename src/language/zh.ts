@@ -37,6 +37,7 @@ export default {
   add:"添加",
   save:"保存",
   close:"关闭",
+  detailTitle:"详情 -- {title}",
   app: {
     title: "辉瑞中国主数据管理系统",
   },

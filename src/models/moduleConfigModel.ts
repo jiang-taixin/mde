@@ -17,7 +17,7 @@ export enum FeatureName{
   Add="Add",                           // 添加
   Remove="Remove",                     // 批量移除
   History="History",                   // 查看历史
-  Detail="Detail",                     // 查看详情
+  Detail="Detail",                     // 查看详情 编辑
   Upload="Upload",                     // 上传
   Export="Export",                     // 导出
   Download="Download",                 // 下载

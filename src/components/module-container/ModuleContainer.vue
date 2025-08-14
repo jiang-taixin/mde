@@ -35,7 +35,6 @@ const remove = (targetKey: string) => {
 };
 
 const handleTabEdit = (e: Key | MouseEvent | KeyboardEvent, action: "add" | "remove") => {
-    console.log("handleTabEdit:" + e);
     remove(e as string);
 }
 

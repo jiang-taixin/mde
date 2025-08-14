@@ -55,6 +55,7 @@
         <a-button type="link" size="small" @click="openCustomEvent"
           :icon="h('img', { src: getIcon('filter'), style: 'width: 16px' })"></a-button>
       </div>
+      <!--高级查询-->
       <div v-show="showAdvancedSearch">
         <AdvancedSearch :module-config="moduleConfig" @searchCallback="onAdvancedSearch"
           @searchParamsChange="onAdvancedSearchParamsChange" />
@@ -113,7 +114,7 @@
       :parent-title="props.parentTitle"></ExportPanel>
   </a-modal>
   <!--历史弹窗-->
-  <a-modal v-model:open="openHistory" :width="600">
+  <a-modal v-model:open="openHistory" :width="600" :footer="null" :destroy-on-close="true">
     <template #title>
       <div class="flex items-center text-lg">
         <img :src="getIcon('history-icon')" class="w-4 h-4 mr-1" />
@@ -133,8 +134,17 @@
           @click="openSecurityCustomEvent"></a-button>
       </div>
     </template>
-    <SecurityPanel ref="securityRef" :export-selection="exportSelection" :module-config="moduleConfig"
-      :table-level="props.tableLevel" :parent-title="props.parentTitle"></SecurityPanel>
+    <SecurityPanel ref="securityRef" @closeCallback="closeSecurityPanel"></SecurityPanel>
+  </a-modal>
+  <!--编辑弹窗-->
+  <a-modal v-model:open="openDetail" :width="500" :footer="null">
+    <template #title>
+      <div class="flex items-center text-lg">
+        <img :src="getIcon('detail-icon')" class="w-4 h-4 mr-1" />
+        {{ t('detailTitle', { title: moduleConfig.DisplayName }) }}
+      </div>
+    </template>
+    <DetailPanel @closeCallback="closeEditPanel" ></DetailPanel>
   </a-modal>
 </template>
 <script setup lang="ts">
@@ -144,16 +154,14 @@ import { getIcon } from '@/utils/icon-transfer';
 import { message, Modal } from 'ant-design-vue';
 import type { VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table/types/all';
 import { debounce } from 'lodash';
-import { ANDOR, ExportType, MoveDirection, TableLevel, type GridData, type RequestGridParams, type SearchConditionValue } from '@/models/gridDataModel';
-import { getGridData } from '@/services/gridData-service';
 import type { ExportSelection } from '../export-panel/ExportPanel.vue';
 import type { DefaultOptionType, SelectValue } from 'ant-design-vue/es/select';
-import { useMoveUpOrDown } from '@/hooks/useMoveUpOrDown';
 const { exportFile } = useExportFile();
 const { moveUpOrDown } = useMoveUpOrDown();
 const { t } = useI18n();
 const container = ref<HTMLElement | null>(null);
 const content = ref<HTMLElement | null>(null);
+const loading = ref<boolean>(false);
 const scrollOffset = ref(0);
 const maxScroll = ref(0);
 const searchWord = ref<string>('');
@@ -170,16 +178,12 @@ const exportSelection = ref<ExportSelection>({
   parentSelected: ExportType.AllWithConditions,
   childSelected: []
 });
-
 const openHistory = ref<boolean>(false);
 const historyID = ref<string>('');
 const openSecurity = ref<boolean>(false);
 const securityRef = ref(null);
-
+const openDetail = ref<boolean>(false);
 const showAdvancedSearch = ref<boolean>(false);
-
-const loading = ref<boolean>(false);
-
 const props = defineProps({
   moduleConfig: {
     type: Object as PropType<ModuleConfig>,
@@ -281,6 +285,9 @@ const gridData = reactive<GridData>({
 
 const needLoadVersionList = () => {
   return moduleConfig.value.Features.findIndex(item => item.Name === FeatureName.SwitchVersion) !== -1;
+}
+const canEditData = () => {
+  return moduleConfig.value.Features.findIndex(item => item.Name === FeatureName.Detail) !== -1;
 }
 const loadVersionList = async () => {
   // 获取版本列表 在attributes里面查找AttributeName是VersionID的对象   使用这个对象的TargetEntityName
@@ -453,24 +460,31 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
       historyID.value = row.ID;
       openHistory.value = true;
       break;
+    // 上移
     case FeatureName.MoveUp:
       loading.value = true;
       const upRes = await moveUpOrDown(row.ID, MoveDirection.Up, gridData);
       loading.value = false;
-      if(upRes){
+      if (upRes) {
         gridData.JsonData = upRes;
       }
       break;
+    // 下移
     case FeatureName.MoveDown:
       loading.value = true;
       const downRes = await moveUpOrDown(row.ID, MoveDirection.Down, gridData);
       loading.value = false;
-      if(downRes){
+      if (downRes) {
         gridData.JsonData = downRes;
       }
       break;
+    // 权限
     case FeatureName.Security:
       openSecurity.value = true;
+      break;
+    // 编辑
+    case FeatureName.Detail:
+      openDetailPanel();
       break;
     default:
   }
@@ -489,8 +503,23 @@ const openSecurityCustomEvent = () => {
     (securityRef.value as any).openCustomEvent();
   }
 }
+// 关闭权限面板
+const closeSecurityPanel = () => {
+  openSecurity.value = false;
+}
+// 关闭编辑面板
+const closeEditPanel = () => {
+  openDetail.value = false;
+}
+// 打开编辑面板
+const openDetailPanel = () => {
+  openDetail.value = true;
+}
 const cellDblclickEvent: VxeTableEvents.CellDblclick = ({ row, $event }) => {
-
+  // 双击编辑数据   和点击详情同样的操作   可编辑条件是列表中包含详情按钮列
+  if (canEditData()) {
+    openDetailPanel();
+  }
 }
 
 const cellClickEvent: VxeTableEvents.CellClick<any> = ({ row, $event }) => {
@@ -566,15 +595,10 @@ const customConfig = reactive<VxeTablePropTypes.CustomConfig<Attribute>>({
     return !['check'].includes(column.field) && !moduleConfig.value.Features.find(item => item.Name === column.field)
   }
 })
-
 const columnDragConfig = reactive<VxeTablePropTypes.ColumnDragConfig<any>>({
   isCrossDrag: true,
   showGuidesStatus: true,
   showIcon: false,
   trigger: 'cell'
 })
-
-
 </script>
-<style lang="sass">
-</style>
