@@ -77,6 +77,7 @@ export default {
   security:{
     removeTips:"单击“保存”，然后授权删除此类记录将不会被还原，确认要继续吗？",
     saveTips:"没有新记录添加到任何授权的未经授权的操作中，不会保存到相关机构，确认要继续吗？",
+    noneSelectTips:"请选择至少一条记录！",
   },
   principalName:{
     user:"用户",

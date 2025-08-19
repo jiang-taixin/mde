@@ -149,7 +149,7 @@ declare global {
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
   // @ts-ignore
-  export type { ResourceType, SecurityPrincipalType, PrincipalScope, PermissionFlagType, CustomColumn, PermissionFlag, SecurityItem } from './src/models/SecurityModel'
+  export type { ResourceType, SecurityPrincipalType, PrincipalScope, PermissionFlagType, CustomColumn, PermissionFlag, SecurityItem, SecurityRacItem } from './src/models/SecurityModel'
   import('./src/models/SecurityModel')
   // @ts-ignore
   export type { TableLevel, ANDOR, MoveDirection, ExportType, MoveResult, SearchConditionValue, RequestGridParams, RequestHistoryParams, ExportParams, GridData } from './src/models/gridDataModel'

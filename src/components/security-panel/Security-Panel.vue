@@ -42,7 +42,7 @@
 
     </div>
     <a-modal v-model:open="open" :width="700" :title="t('customColumnTitle.principal')" :destroy-on-close="true" :footer="null">
-      <AddPrincipal @closeAddPanel="closeAddPanel"/>
+      <AddPrincipal @closeAddPanel="closeAddPanel" @confirmAddPanel="confirmAddPanel" :principal-list="securityList"/>
     </a-modal>
   </div>
 </template>
@@ -92,8 +92,8 @@ const resourceType = ref<ResourceType>(ResourceType.Module);
 const scopeOptions = ref([
   { value: PrincipalScope.Current, label: 'Self' }, { value: PrincipalScope.Child, label: 'Direct reports' }, { value: PrincipalScope.All, label: 'All reports' }
 ]);
-const NewRacList = ref<SecurityItem[]>([]);
-const RemoveRacList = ref<SecurityItem[]>([]);
+const NewRacList = ref<SecurityRacItem[]>([]);
+const RemoveRacList = ref<SecurityRacItem[]>([]);
 const UpdateScopeList = ref<SecurityItem[]>([]);
 
 onMounted(() => {
@@ -138,12 +138,43 @@ const updatePermission = (row: SecurityItem, columnName: string, event: any) => 
         ID: row.ID,
         PermissionFlag: permissionType
       });
+      const addItem:SecurityRacItem = {
+      ID: parentId,
+      PermissionFlag: permissionType,
+      PrincipalID: row.PrincipalID,
+      PrincipalName: row.PrincipalName,
+      PrincipalType: row.PrincipalType,
+      ResourceID: props.securityId,
+      ResourceType: row.ResourceType
+    }
+    if (!NewRacList.value.includes(addItem)) {
+      NewRacList.value.push(addItem);
+    }
+    if(RemoveRacList.value.includes(addItem)){
+      _.remove(RemoveRacList.value, item => item.ResourceID === addItem.ResourceID);
+    }
     }
   } else {
     // 移除权限
+    const removeId = row.PermissionFlags.find(item => item.PermissionFlag === permissionType)?.ID as string;
     row.PermissionFlags = row.PermissionFlags.filter(
       f => f.PermissionFlag !== permissionType
     );
+    const addItem:SecurityRacItem = {
+      ID: removeId,
+      PermissionFlag: permissionType,
+      PrincipalID: row.PrincipalID,
+      PrincipalName: row.PrincipalName,
+      PrincipalType: row.PrincipalType,
+      ResourceID: props.securityId,
+      ResourceType: row.ResourceType
+    }
+    if (!RemoveRacList.value.includes(addItem)) {
+      RemoveRacList.value.push(addItem);
+    }
+    if(NewRacList.value.includes(addItem)){
+      _.remove(NewRacList.value, item => item.ResourceID === addItem.ResourceID);
+    }
   }
 };
 
@@ -164,7 +195,11 @@ const add = () => {
   open.value = true;
 }
 const save = () => {
-    Modal.confirm({
+  if(UpdateScopeList.value.length === 0 && NewRacList.value.length === 0 && RemoveRacList.value.length === 0){
+    emit('closeCallback');
+    return;
+  }
+  Modal.confirm({
     title: t('warning'),
     content: t('security.saveTips'),
     okText: t('confirm'),
@@ -190,7 +225,7 @@ const remove = () => {
     onOk: async () => {
       selectedRows.value.forEach(item => {
         _.remove(securityList.value, security => security.ID === item.ID);
-        const index = UpdateScopeList.value.findIndex(
+        const index = RemoveRacList.value.findIndex(
           record => record.ID === item.ID
         );
         if (index !== -1) {
@@ -199,7 +234,6 @@ const remove = () => {
         else {
           RemoveRacList.value.push(item);
         }
-        console.log(RemoveRacList.value);
       })
     }
   })
@@ -239,6 +273,26 @@ const columnDragConfig = reactive<VxeTablePropTypes.ColumnDragConfig<any>>({
 
 // 关闭权限面板
 const closeAddPanel = () => {
+  open.value = false;
+}
+
+// 添加权限确认
+const confirmAddPanel = (principalType: SecurityPrincipalType,principalList:any[]) => {
+  principalList.forEach(item => {
+    const newPrincipal:SecurityItem = {
+      ID: parentId,
+      PermissionFlag: PermissionFlagType.Read,
+      PrincipalID: item.ID,
+      PrincipalName: item.Name,
+      ResourceID: '',
+      ResourceName: null,
+      ResourceType: resourceType.value,
+      Scope: 0,
+      PermissionFlags: [],
+      PrincipalType:principalType
+    }
+    securityList.value.push(newPrincipal);
+  });
   open.value = false;
 }
 

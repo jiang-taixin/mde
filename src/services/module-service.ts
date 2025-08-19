@@ -9,8 +9,8 @@ export async function getModulesList(moduleId: string): Promise<[ModuleItem]> {
 }
 
 // 获取模块配置(包括操作栏和表头信息)
-export async function getModuleConfig(entityConfigName: string): Promise<ModuleConfig> {
-  return http.get("/API/application/GetEntityByUser", { params:{entityConfigName} });
+export async function getModuleConfig(entityConfigName: string, showLoading?:boolean): Promise<ModuleConfig> {
+  return http.get("/API/application/GetEntityByUser", { params:{entityConfigName} ,loading:showLoading});
 }
 
 // 重置配置

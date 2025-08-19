@@ -52,7 +52,7 @@ onMounted(async () => {
 })
 
 const loadConfig = async () => {
-  const res = await getModuleConfig("ModuleConfig");
+  const res = await getModuleConfig("ModuleConfig",true);
   moduleConfig.value = res;
 }
 

@@ -77,6 +77,7 @@ export default {
   security:{
     removeTips:"Click Save and then authorized to remove such records will not be restored, confirm that you want to continue ?",
     saveTips:"No new records added to any unauthorized actions authorized, will not be saved to the relevant authority, confirm that you want to continue ?",
+    noneSelectTips:"Please select one record at least!",
   },
   principalName:{
     user:"User",

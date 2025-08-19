@@ -55,6 +55,7 @@ export interface SecurityItem{
   ResourceType:ResourceType,
   Scope:number,
   PermissionFlags:PermissionFlag[];
+  PrincipalType:SecurityPrincipalType
 }
 
 

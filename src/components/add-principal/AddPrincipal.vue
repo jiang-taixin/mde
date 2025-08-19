@@ -30,7 +30,7 @@
         <vxe-table ref="tableRef" :data="gridData.JsonData"
           height="300px" size="mini" round :border="true"
           :column-config="{ resizable: true, drag: true }" :column-drag-config="columnDragConfig"
-          :checkbox-config="{ highlight: true }" :cell-config="{ height: 25 }" :custom-config="customConfig"
+          :checkbox-config="checkboxConfig" :cell-config="{ height: 25 }" :custom-config="customConfig"
           :row-config="{ isHover: true, isCurrent: true, keyField: 'ID' }" :empty-text="t('empty')"
           show-overflow="ellipsis"
           @checkbox-change="checkboxChange" @checkbox-all="checkAll">
@@ -69,7 +69,8 @@ import type { VxeTableInstance, VxeTablePropTypes } from 'vxe-table';
 import { ref, h } from 'vue';
 import { FeatureName, type Attribute, type ModuleConfig } from '@/models/moduleConfigModel';
 import { getIcon } from '@/utils/icon-transfer';
-const emit = defineEmits(['closeAddPanel']);
+import { message } from 'ant-design-vue';
+const emit = defineEmits(['closeAddPanel', 'confirmAddPanel']);
 const { t } = useI18n();
 const principalOptions = ref([{
   label:t('principalName.user'),value:SecurityPrincipalType.User
@@ -79,7 +80,21 @@ const principalOptions = ref([{
   label:t('principalName.organization'),value:SecurityPrincipalType.Organization
 },{
   label:t('principalName.title'),value:SecurityPrincipalType.Title
-}])
+}]);
+const props = defineProps({
+  principalList: {
+    type: Object as PropType<SecurityItem[]>,
+    require: true,
+    default: null
+  },
+});
+const checkboxConfig = reactive<VxeTablePropTypes.CheckboxConfig<any>>({
+  highlight:true,
+  checkMethod:({row} ) =>{
+    return props.principalList.findIndex(item => item.PrincipalID === row.ID) === -1;
+  }
+})
+console.log(props.principalList);
 const selectedPrincipal = ref<SecurityPrincipalType>(SecurityPrincipalType.User);
 const loading = ref<boolean>(false);
 const selectedRows = ref<any[]>([]);
@@ -98,7 +113,6 @@ const gridData = reactive<GridData>({
   JsonData: undefined
 });
 watch(() => selectedPrincipal.value, (principalType) => {
-  console.log("---------------change")
   if (!isVoid(principalType)) {
     // 子表在主表被选中某行时才加载数据    parentID变化从首页开始加载
     pagination.current = 1;
@@ -148,7 +162,11 @@ const loadGridData = async () => {
 }
 
 const confirm = () =>{
-  emit('closeAddPanel');
+  if(selectedRows.value.length === 0){
+    message.error(t('security.noneSelectTips'));
+    return;
+  }
+  emit('confirmAddPanel', selectedPrincipal.value ,selectedRows.value);
 }
 const close = () =>{
   emit('closeAddPanel');
