@@ -97,7 +97,7 @@
       <!--分页-->
       <div class="flex justify-end py-2 mb-2">
         <a-pagination size="small" v-model:current="pagination.current" v-model:page-size="pagination.pageSize"
-          show-quick-jumper :total="pagination.total" @change="onPageChange"
+          show-quick-jumper :total="pagination.total" @change="onPageChange" show-size-changer
           :page-size-options="pagination.pageSizeOptions" :show-total="(total: any) => t('total', { total: total })" />
       </div>
     </div>
@@ -121,10 +121,10 @@
         {{ t('historyTitle', { title: moduleConfig.DisplayName }) }}
       </div>
     </template>
-    <HistoryPanel ref="resultRef" :module-config="moduleConfig" :history-id="historyID" />
+    <HistoryPanel ref="resultRef" :module-config="moduleConfig" :history-id="rowID"/>
   </a-modal>
   <!--权限弹窗-->
-  <a-modal v-model:open="openSecurity" :width="700" :footer="null">
+  <a-modal v-model:open="openSecurity" :width="700" :footer="null" :destroy-on-close="true">
     <template #title>
       <div class="flex items-center text-lg">
         <img :src="getIcon('security-icon')" class="w-4 h-4 mr-1" />
@@ -134,10 +134,10 @@
           @click="openSecurityCustomEvent"></a-button>
       </div>
     </template>
-    <SecurityPanel ref="securityRef" @closeCallback="closeSecurityPanel"></SecurityPanel>
+    <SecurityPanel ref="securityRef" @closeCallback="closeSecurityPanel" :module-config="moduleConfig" :security-id="rowID"></SecurityPanel>
   </a-modal>
   <!--编辑弹窗-->
-  <a-modal v-model:open="openDetail" :width="500" :footer="null">
+  <a-modal v-model:open="openDetail" :width="500" :footer="null" :destroy-on-close="true">
     <template #title>
       <div class="flex items-center text-lg">
         <img :src="getIcon('detail-icon')" class="w-4 h-4 mr-1" />
@@ -179,7 +179,7 @@ const exportSelection = ref<ExportSelection>({
   childSelected: []
 });
 const openHistory = ref<boolean>(false);
-const historyID = ref<string>('');
+const rowID = ref<string>('');
 const openSecurity = ref<boolean>(false);
 const securityRef = ref(null);
 const openDetail = ref<boolean>(false);
@@ -457,7 +457,7 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
       break;
     // 历史
     case FeatureName.History:
-      historyID.value = row.ID;
+      rowID.value = row.ID;
       openHistory.value = true;
       break;
     // 上移
@@ -480,6 +480,7 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
       break;
     // 权限
     case FeatureName.Security:
+      rowID.value = row.ID;
       openSecurity.value = true;
       break;
     // 编辑

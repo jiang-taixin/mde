@@ -18,6 +18,7 @@ declare module 'vue' {
     ACollapsePanel: typeof import('ant-design-vue/es')['CollapsePanel']
     AConfigProvider: typeof import('ant-design-vue/es')['ConfigProvider']
     ADatePicker: typeof import('ant-design-vue/es')['DatePicker']
+    AddPrincipal: typeof import('./src/components/add-principal/AddPrincipal.vue')['default']
     ADropdownButton: typeof import('ant-design-vue/es')['DropdownButton']
     AdvancedSearch: typeof import('./src/components/advanced-search/AdvancedSearch.vue')['default']
     AForm: typeof import('ant-design-vue/es')['Form']

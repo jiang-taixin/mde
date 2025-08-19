@@ -23,6 +23,12 @@ import Copy from "@/assets/images/button/copy.png";
 import Publish from "@/assets/images/button/publish.png";
 import Merge from "@/assets/images/button/merge.png";
 
+// 权限用的四个图标
+import User from "@/assets/images/security/user.png";
+import Group from "@/assets/images/security/group.png";
+import Organization from "@/assets/images/security/organization.png";
+import Title from "@/assets/images/security/title.png";
+
 
 // icon 映射列表
 const iconMap: Record<string, string> = {
@@ -53,7 +59,11 @@ const iconMap: Record<string, string> = {
   "merge-icon":Merge,
   "up-row-icon":ToUp,
   "down-row-icon":ToDown,
-  "security-icon":Access
+  "security-icon":Access,
+  "user":User,
+  "group":Group,
+  "organization":Organization,
+  "title":Title
 };
 
 export function getIcon(iconName: string | null): string {

@@ -65,6 +65,23 @@ export default {
   },
   module:{
     moreWarningTips:"Tab浏览器超过10个页面会变慢，确定继续打开新的页面吗？",
-
+  },
+  customColumnTitle:{
+    principal:"角色",
+    scope:"范围",
+    read:"读取",
+    create:"创建",
+    update:"更新",
+    delete:"删除"
+  },
+  security:{
+    removeTips:"单击“保存”，然后授权删除此类记录将不会被还原，确认要继续吗？",
+    saveTips:"没有新记录添加到任何授权的未经授权的操作中，不会保存到相关机构，确认要继续吗？",
+  },
+  principalName:{
+    user:"用户",
+    group:"群组",
+    organization:"组织",
+    title:"职称",
   }
 };

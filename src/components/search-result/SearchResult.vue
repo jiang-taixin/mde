@@ -24,7 +24,7 @@
       </div>
       <div class="flex justify-end py-2 mb-2">
         <a-pagination size="small" v-model:current="pagination.current" v-model:page-size="pagination.pageSize"
-          show-quick-jumper :total="pagination.total" @change="onPageChange"
+          show-quick-jumper show-size-changer :total="pagination.total" @change="onPageChange"
           :page-size-options="pagination.pageSizeOptions"  :show-total="(total: any) => t('total', { total: total })"/>
       </div>
     </div>

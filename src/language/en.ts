@@ -65,6 +65,23 @@ export default {
   },
   module:{
     moreWarningTips:"The browser would be slowly if over 10 pages opened in TabExplorer, are you sure continue to open new page?",
-
+  },
+  customColumnTitle:{
+    principal:"Principal",
+    scope:"Scope",
+    read:"Read",
+    create:"Create",
+    update:"Update",
+    delete:"Delete",
+  },
+  security:{
+    removeTips:"Click Save and then authorized to remove such records will not be restored, confirm that you want to continue ?",
+    saveTips:"No new records added to any unauthorized actions authorized, will not be saved to the relevant authority, confirm that you want to continue ?",
+  },
+  principalName:{
+    user:"User",
+    group:"Group",
+    organization:"Organization",
+    title:"Title",
   }
 };

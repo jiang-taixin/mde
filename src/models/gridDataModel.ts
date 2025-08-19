@@ -41,8 +41,8 @@ export interface RequestGridParams{
 
 // 请求历史列表数据
 export interface RequestHistoryParams extends RequestGridParams{
-  OperationOnStart:string | undefined,
-  OperationOnEnd:string | undefined,
+  OperationOnStart:string,
+  OperationOnEnd:string,
   DataID:string
 }
 

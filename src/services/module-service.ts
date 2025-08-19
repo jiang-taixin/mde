@@ -1,6 +1,7 @@
 import http from "@/http";
 import type { ModuleConfig } from "@/models/moduleConfigModel";
 import type { ModuleItem } from "@/models/moduleItemModel";
+import type { ResourceType, SecurityItem } from "@/models/SecurityModel";
 
 // 获取模块列表
 export async function getModulesList(moduleId: string): Promise<[ModuleItem]> {
@@ -28,4 +29,14 @@ export async function deleteRecords(EntityName:string,DataIDs:string[]):Promise<
 // 上移下移
 export async function moveRecordUpDown(params:any):Promise<any> {
   return http.post(`/API/entity/DoEntityCommand`,params);
+}
+
+// 获取权限列表
+export async function getSecurityList(resourceType:ResourceType,resourceId:string):Promise<SecurityItem[]> {
+  return http.get("/API/security/GetPermissionSetsByResource", { params:{resourceType,resourceId} });
+}
+
+// 保存权限
+export async function saveSecuritySets(params:any):Promise<any> {
+  return http.post("/API/security/SavePermissionSets",  params);
 }

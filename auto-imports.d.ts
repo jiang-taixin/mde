@@ -19,7 +19,11 @@ declare global {
   const ModuleType: typeof import('./src/models/moduleItemModel')['ModuleType']
   const Month_Regex: typeof import('./src/constants/index')['Month_Regex']
   const MoveDirection: typeof import('./src/models/gridDataModel')['MoveDirection']
+  const PermissionFlagType: typeof import('./src/models/SecurityModel')['PermissionFlagType']
+  const PrincipalScope: typeof import('./src/models/SecurityModel')['PrincipalScope']
   const PrincipalType: typeof import('./src/models/userProfileModel')['PrincipalType']
+  const ResourceType: typeof import('./src/models/SecurityModel')['ResourceType']
+  const SecurityPrincipalType: typeof import('./src/models/SecurityModel')['SecurityPrincipalType']
   const TableLevel: typeof import('./src/models/gridDataModel')['TableLevel']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const computed: typeof import('vue')['computed']
@@ -33,6 +37,7 @@ declare global {
   const downloadFile: typeof import('./src/services/download-file')['downloadFile']
   const effectScope: typeof import('vue')['effectScope']
   const en: typeof import('./src/language/en')['default']
+  const filter_security_columns: typeof import('./src/constants/index')['filter_security_columns']
   const getActivePinia: typeof import('pinia')['getActivePinia']
   const getComboxItems: typeof import('./src/services/metaData-service')['getComboxItems']
   const getCurrentInstance: typeof import('vue')['getCurrentInstance']
@@ -46,6 +51,7 @@ declare global {
   const getLovItems: typeof import('./src/services/metaData-service')['getLovItems']
   const getModuleConfig: typeof import('./src/services/module-service')['getModuleConfig']
   const getModulesList: typeof import('./src/services/module-service')['getModulesList']
+  const getSecurityList: typeof import('./src/services/module-service')['getSecurityList']
   const getWeekNo: typeof import('./src/utils/datetime')['getWeekNo']
   const h: typeof import('vue')['h']
   const hideLoading: typeof import('./src/utils/loading')['hideLoading']
@@ -69,6 +75,7 @@ declare global {
   const mapWritableState: typeof import('pinia')['mapWritableState']
   const markRaw: typeof import('vue')['markRaw']
   const moduleId: typeof import('./src/constants/index')['moduleId']
+  const module_security_columns: typeof import('./src/constants/index')['module_security_columns']
   const moveRecordUpDown: typeof import('./src/services/module-service')['moveRecordUpDown']
   const name: typeof import('./src/services/module-service')['name']
   const nextTick: typeof import('vue')['nextTick']
@@ -96,6 +103,7 @@ declare global {
   const resetUserSetting: typeof import('./src/services/module-service')['resetUserSetting']
   const resolveComponent: typeof import('vue')['resolveComponent']
   const router: typeof import('./src/router/index')['default']
+  const saveSecuritySets: typeof import('./src/services/module-service')['saveSecuritySets']
   const saveUserSetting: typeof import('./src/services/module-service')['saveUserSetting']
   const setActivePinia: typeof import('pinia')['setActivePinia']
   const setLanuguage: typeof import('./src/services/login-service')['setLanuguage']
@@ -140,6 +148,9 @@ declare global {
   // @ts-ignore
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
+  // @ts-ignore
+  export type { ResourceType, SecurityPrincipalType, PrincipalScope, PermissionFlagType, CustomColumn, PermissionFlag, SecurityItem } from './src/models/SecurityModel'
+  import('./src/models/SecurityModel')
   // @ts-ignore
   export type { TableLevel, ANDOR, MoveDirection, ExportType, MoveResult, SearchConditionValue, RequestGridParams, RequestHistoryParams, ExportParams, GridData } from './src/models/gridDataModel'
   import('./src/models/gridDataModel')
