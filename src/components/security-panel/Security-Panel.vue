@@ -20,8 +20,8 @@
               </div>
             </template>
             <template #default="{ row }" v-if="column.Name === 'Scope'" align="center">
-              <a-select style="font-size: 12px;" :options="scopeOptions" v-model:value="row.Scope" class="w-full" size="small"
-                v-if="row.PrincipalType === SecurityPrincipalType.User" @change="updateScope(row)">
+              <a-select style="font-size: 12px;" :options="scopeOptions" v-model:value="row.Scope" class="w-full"
+                size="small" v-if="row.PrincipalType === SecurityPrincipalType.User" @change="updateScope(row)">
               </a-select>
             </template>
             <template #default="{ row }" v-if="isCheckBoxColumn(column.Name)" align="center">
@@ -34,15 +34,16 @@
     </div>
     <div class="flex justify-end gap-2 w-full mt-3">
       <a-button class="w-28" size="small" :disabled="selectedRows.length < 1" @click="remove">
-        {{ t('remove')}}
+        {{ t('remove') }}
       </a-button>
       <a-button class="w-28" size="small" @click="add">{{ t('add') }}</a-button>
       <a-button class="w-28" size="small" @click="save">{{ t('save') }}</a-button>
       <a-button class="w-28" size="small" @click="close">{{ t('close') }}</a-button>
 
     </div>
-    <a-modal v-model:open="open" :width="700" :title="t('customColumnTitle.principal')" :destroy-on-close="true" :footer="null">
-      <AddPrincipal @closeAddPanel="closeAddPanel" @confirmAddPanel="confirmAddPanel" :principal-list="securityList"/>
+    <a-modal v-model:open="open" :width="700" :title="t('customColumnTitle.principal')" :destroy-on-close="true"
+      :footer="null">
+      <AddPrincipal @closeAddPanel="closeAddPanel" @confirmAddPanel="confirmAddPanel" :principal-list="securityList" />
     </a-modal>
   </div>
 </template>
@@ -138,21 +139,24 @@ const updatePermission = (row: SecurityItem, columnName: string, event: any) => 
         ID: row.ID,
         PermissionFlag: permissionType
       });
-      const addItem:SecurityRacItem = {
-      ID: parentId,
-      PermissionFlag: permissionType,
-      PrincipalID: row.PrincipalID,
-      PrincipalName: row.PrincipalName,
-      PrincipalType: row.PrincipalType,
-      ResourceID: props.securityId,
-      ResourceType: row.ResourceType
-    }
-    if (!NewRacList.value.includes(addItem)) {
-      NewRacList.value.push(addItem);
-    }
-    if(RemoveRacList.value.includes(addItem)){
-      _.remove(RemoveRacList.value, item => item.ResourceID === addItem.ResourceID);
-    }
+      const addItem: SecurityRacItem = {
+        ID: parentId,
+        PermissionFlag: permissionType,
+        PrincipalID: row.PrincipalID,
+        PrincipalName: row.PrincipalName,
+        PrincipalType: row.PrincipalType,
+        ResourceID: props.securityId,
+        ResourceType: row.ResourceType,
+        Scope: row.Scope
+      }
+      if (!NewRacList.value.includes(addItem)) {
+        // Scope变化时   后端好像用第一个为准
+        NewRacList.value.unshift(addItem);
+      }
+
+      if (RemoveRacList.value.includes(addItem)) {
+        _.remove(RemoveRacList.value, item => item.ResourceID === addItem.ResourceID);
+      }
     }
   } else {
     // 移除权限
@@ -160,19 +164,20 @@ const updatePermission = (row: SecurityItem, columnName: string, event: any) => 
     row.PermissionFlags = row.PermissionFlags.filter(
       f => f.PermissionFlag !== permissionType
     );
-    const addItem:SecurityRacItem = {
+    const addItem: SecurityRacItem = {
       ID: removeId,
       PermissionFlag: permissionType,
       PrincipalID: row.PrincipalID,
       PrincipalName: row.PrincipalName,
       PrincipalType: row.PrincipalType,
       ResourceID: props.securityId,
-      ResourceType: row.ResourceType
+      ResourceType: row.ResourceType,
+      Scope: row.Scope,
     }
     if (!RemoveRacList.value.includes(addItem)) {
       RemoveRacList.value.push(addItem);
     }
-    if(NewRacList.value.includes(addItem)){
+    if (NewRacList.value.includes(addItem)) {
       _.remove(NewRacList.value, item => item.ResourceID === addItem.ResourceID);
     }
   }
@@ -180,14 +185,17 @@ const updatePermission = (row: SecurityItem, columnName: string, event: any) => 
 
 // 只有scope变化的时候才用UpdateScopeList数组
 const updateScope = (row: SecurityItem) => {
-  const index = UpdateScopeList.value.findIndex(
-    record => record.ID === row.ID
-  );
-  if (index !== -1) {
-    UpdateScopeList.value[index] = row;
-  }
-  else {
-    UpdateScopeList.value.push(row);
+  console.log(row);
+  if (row.ID !== parentId) {
+    const index = UpdateScopeList.value.findIndex(
+      record => record.ID === row.ID
+    );
+    if (index !== -1) {
+      UpdateScopeList.value[index] = row;
+    }
+    else {
+      UpdateScopeList.value.push(row);
+    }
   }
 }
 
@@ -195,7 +203,7 @@ const add = () => {
   open.value = true;
 }
 const save = () => {
-  if(UpdateScopeList.value.length === 0 && NewRacList.value.length === 0 && RemoveRacList.value.length === 0){
+  if (UpdateScopeList.value.length === 0 && NewRacList.value.length === 0 && RemoveRacList.value.length === 0) {
     emit('closeCallback');
     return;
   }
@@ -205,7 +213,7 @@ const save = () => {
     okText: t('confirm'),
     cancelText: t('cancel'),
     onOk: async () => {
-      const params = {"UpdateScopeList":UpdateScopeList.value, "NewRacList":NewRacList.value, "RemoveRacList":RemoveRacList.value};
+      const params = { "UpdateScopeList": UpdateScopeList.value, "NewRacList": NewRacList.value, "RemoveRacList": RemoveRacList.value };
       await saveSecuritySets(params);
       emit('closeCallback');
     }
@@ -224,16 +232,25 @@ const remove = () => {
     cancelText: t('cancel'),
     onOk: async () => {
       selectedRows.value.forEach(item => {
-        _.remove(securityList.value, security => security.ID === item.ID);
-        const index = RemoveRacList.value.findIndex(
+        const index = securityList.value.findIndex(
           record => record.ID === item.ID
         );
-        if (index !== -1) {
-          RemoveRacList.value[index] = item;
-        }
-        else {
-          RemoveRacList.value.push(item);
-        }
+        securityList.value[index].PermissionFlags.forEach(flag => {
+          const addItem: SecurityRacItem = {
+            ID: flag.ID,
+            PermissionFlag: flag.PermissionFlag,
+            PrincipalID: securityList.value[index].PrincipalID,
+            PrincipalName: securityList.value[index].PrincipalName,
+            PrincipalType: securityList.value[index].PrincipalType,
+            ResourceID: props.securityId,
+            ResourceType: securityList.value[index].ResourceType,
+            Scope: securityList.value[index].Scope,
+          }
+          if (!RemoveRacList.value.includes(addItem)) {
+            RemoveRacList.value.push(addItem);
+          }
+        });
+        _.remove(securityList.value, security => security.ID === item.ID);
       })
     }
   })
@@ -277,9 +294,9 @@ const closeAddPanel = () => {
 }
 
 // 添加权限确认
-const confirmAddPanel = (principalType: SecurityPrincipalType,principalList:any[]) => {
+const confirmAddPanel = (principalType: SecurityPrincipalType, principalList: any[]) => {
   principalList.forEach(item => {
-    const newPrincipal:SecurityItem = {
+    const newPrincipal: SecurityItem = {
       ID: parentId,
       PermissionFlag: PermissionFlagType.Read,
       PrincipalID: item.ID,
@@ -287,9 +304,9 @@ const confirmAddPanel = (principalType: SecurityPrincipalType,principalList:any[
       ResourceID: '',
       ResourceName: null,
       ResourceType: resourceType.value,
-      Scope: 0,
+      Scope: PrincipalScope.Current,
       PermissionFlags: [],
-      PrincipalType:principalType
+      PrincipalType: principalType
     }
     securityList.value.push(newPrincipal);
   });

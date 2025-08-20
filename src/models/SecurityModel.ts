@@ -53,7 +53,7 @@ export interface SecurityItem{
   ResourceID:string,
   ResourceName:string|null,
   ResourceType:ResourceType,
-  Scope:number,
+  Scope:PrincipalScope,
   PermissionFlags:PermissionFlag[];
   PrincipalType:SecurityPrincipalType
 }
@@ -68,4 +68,5 @@ export interface SecurityRacItem{
   PrincipalType:SecurityPrincipalType,
   ResourceID:string,
   ResourceType:ResourceType,
+  Scope:PrincipalScope
 }
