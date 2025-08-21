@@ -125,7 +125,6 @@ const loadGridData = async () => {
     loading.value = false;
     if (res) {
       gridData.JsonData = JSON.parse(res.JsonData);
-      console.log(gridData.JsonData)
       pagination.total = res.TotalRecords;
       if (gridData.JsonData.length !== 0) {
       }

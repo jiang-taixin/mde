@@ -17,6 +17,8 @@
 
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue';
+import { useField } from '@formily/vue';
+const field = useField();
 
 const emit = defineEmits(['dropdownVisibleChange']);
 const attrs = useAttrs();
@@ -32,4 +34,10 @@ const selectProps = computed(() => {
 function handleDropdown(open:boolean) {
   emit('dropdownVisibleChange', open);
 }
+onMounted(() => {
+  if(attrs.isStatus){
+    // 如果是状态下拉框   默认是Active   Active的value=0
+    (field.value as any).setValue(0);
+  }
+})
 </script>

@@ -75,7 +75,7 @@ const loadCity = async (open: boolean) => {
           cityOptions.value.push(cityData);
         })
     } catch (error) {
-      console.error('加载城市数据失败:', error);
+
     } finally {
       loadingCity.value = false;
     }

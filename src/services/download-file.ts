@@ -1,12 +1,18 @@
-import type { ExportParams } from "@/models/gridDataModel";
+import type { DownloadParams, ExportParams } from "@/models/gridDataModel";
 
-// 下载excel 模板
-export async function ExportExcelTemplate(entityName: string): Promise<any> {
+// 下载excel 模板   不带数据
+export async function downloadTemplate(entityName:string): Promise<any> {
   return http.get(`/API/excel/ExportExcelTemplate?entityName=${entityName}`,{responseType:'blob',loading:true,timeout:0});
 }
 
+// 下载excel 模板   带数据
+export async function downloadTemplateWithData(params: DownloadParams): Promise<any> {
+  return http.post('/API/excel/ExportExcelTemplateWithData',params,{responseType:'blob',loading:true,timeout:0});
+}
+
+
 
 // 导出excel数据
-export async function ExportExcelData(params:ExportParams):Promise<any> {
+export async function exportExcelData(params:ExportParams):Promise<any> {
   return http.post('/API/excel/ExportExcelData',params,{responseType:'blob',loading:true,timeout:0});
 }

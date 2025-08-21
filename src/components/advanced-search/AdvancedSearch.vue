@@ -35,14 +35,14 @@ const props = defineProps({
   },
 });
 
-const emits = defineEmits(['searchCallback', 'searchParamsChange']);
+const emits = defineEmits(['searchCallback']);
 // 初始化Formily
 const form = createForm({
   effects(form){
     // 高级查询参数数据变化时要回传，这个数据在导出时要使用
-    onFieldValueChange('*', () => {
-      emits('searchParamsChange', form.values);
-    })
+    // onFieldValueChange('*', () => {
+    //   emits('searchParamsChange', form.values);
+    // })
   }
 });
 const { SchemaField } = createSchemaField({

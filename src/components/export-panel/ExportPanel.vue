@@ -33,8 +33,6 @@ export interface ExportSelection{
 
 const { t } = useI18n();
 const activeKey = ref<string[]>(['parent','child']);
-
-
 const params = defineModel<ExportSelection>('exportSelection',{
   required:true
 })

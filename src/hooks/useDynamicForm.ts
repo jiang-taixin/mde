@@ -19,14 +19,17 @@ const COMMON_COMPONENT_PROPS = {
 const createDataSourceOptions = <T extends Record<string, any>>(
   items: T[],
   labelKey: keyof T,
-  valueKey: keyof T
-) => [
-    CLEAR_OPTION,
-    ...items.map(item => ({
-      label: item[labelKey],
-      value: item[valueKey]
-    }))
-  ];
+  valueKey: keyof T,
+  includeClearOption: boolean = true
+) => {
+  const options = items.map(item => ({
+    label: item[labelKey],
+    value: item[valueKey]
+  }));
+  // 状态下拉框不要清空的选项    默认是Active
+  return includeClearOption ? [CLEAR_OPTION, ...options] : options;
+};
+
 
 const updateFieldProps = (field: any, dataSource: any[]) => {
   field.dataSource = dataSource;
@@ -59,12 +62,13 @@ const fetchData = async (
   fetchFn: (params: any) => Promise<any>,
   params: any,
   labelKey: string,
-  valueKey: string
+  valueKey: string,
+  includeClearOption: boolean = true,
 ) => {
   try {
     handleLoadingState(field, true);
     const response = await fetchFn(params);
-    const dataSource = createDataSourceOptions(response, labelKey, valueKey);
+    const dataSource = createDataSourceOptions(response, labelKey, valueKey, includeClearOption);
     updateFieldProps(field, dataSource);
   } catch (error) {
     field.dataSource = [];
@@ -83,7 +87,7 @@ export const useDynamicForm = () => {
   // 定义异步获取下拉信息
   const getComboxList = async (field: any, attributeName: string, open: boolean) => {
     if (!open || field.dataSource?.length > 0) return;
-    await fetchData(field, getComboxItems, attributeName, 'Name', 'Value');
+    await fetchData(field, getComboxItems, attributeName, 'Name', 'Value', attributeName === "Status" ? false : true);
   };
 
   // 定义异步获取实体数据列表的函数
@@ -145,8 +149,12 @@ export const useDynamicForm = () => {
       showSearch: true,
       filterOption: false,
       placeholder: attribute.PromptMessage || '',
+      isStatus: attribute.AttributeName === 'Status' ? true : false,
     },
-    'x-reactions': (field: any) => {
+    'x-reactions': async (field: any) => {
+      if (attribute.AttributeName === 'Status') {
+        await fetchFn(field, fetchParam, true);
+      }
       field.componentProps.onDropdownVisibleChange = async (open: boolean) => {
         await fetchFn(field, fetchParam, open);
       };

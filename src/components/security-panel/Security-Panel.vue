@@ -185,7 +185,7 @@ const updatePermission = (row: SecurityItem, columnName: string, event: any) => 
 
 // 只有scope变化的时候才用UpdateScopeList数组
 const updateScope = (row: SecurityItem) => {
-  console.log(row);
+  // 新增的角色不用更新UpdateScopeList
   if (row.ID !== parentId) {
     const index = UpdateScopeList.value.findIndex(
       record => record.ID === row.ID
@@ -197,6 +197,11 @@ const updateScope = (row: SecurityItem) => {
       UpdateScopeList.value.push(row);
     }
   }
+  NewRacList.value.forEach(item => {
+    if(item.PrincipalID === row.PrincipalID){
+      item.Scope = row.Scope;
+    }
+  })
 }
 
 const add = () => {

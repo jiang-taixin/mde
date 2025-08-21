@@ -1,22 +1,25 @@
-import type { ExportSelection } from "@/components/export-panel/ExportPanel.vue";
-import type { Pagination } from "@/components/module-table/ModuleTable.vue";
-import { ExportType } from "@/models/gridDataModel";
 
-export function useExportFile() {
-  const exportFile = async (exportSelection: ExportSelection, advancedParams: any, moduleConfig: ModuleConfig, pagination: Pagination,
+import type { Pagination } from "@/components/module-table/ModuleTable.vue";
+import { DownloadType, TableLevel, type DownloadParams } from "@/models/gridDataModel";
+
+export function useDownloadFile() {
+  const downloadFile = async (typeSelection: DownloadType, advancedParams: any, moduleConfig: ModuleConfig, pagination: Pagination,
     tableLevel: TableLevel, parentID: string, version: any) => {
     let searchCondition: SearchConditionValue = {} as SearchConditionValue;
     let masterCondition: any = [];
-    searchCondition = { AndOr: ANDOR.AND, Conditions: [] };
-    if (advancedParams) {
-      Object.entries(advancedParams).forEach(([key, value]) => {
-        if (value !== CLEAR_KEY && !isVoid(value)) {
-          const param = { Name: key, Value: value };
-          searchCondition.Conditions.push(param);
-        }
-      });
+    if (typeSelection !== DownloadType.WithoutRecords) {
+      searchCondition = { AndOr: ANDOR.AND, Conditions: [] };
+      if (advancedParams) {
+        Object.entries(advancedParams).forEach(([key, value]) => {
+          if (value !== CLEAR_KEY && !isVoid(value)) {
+            const param = { Name: key, Value: value };
+            searchCondition.Conditions.push(param);
+          }
+        });
+      }
+
     }
-    if (tableLevel === TableLevel.SubTable) {
+    if (tableLevel === TableLevel.SubTable && typeSelection !== DownloadType.AllRecords) {
       masterCondition.push({
         Name: moduleConfig.ForeignKeyPhysicalViewAlias, Value: parentID
       });
@@ -26,18 +29,17 @@ export function useExportFile() {
         Name: "VersionID", Value: version.ID
       })
     }
-    const params: ExportParams = {
-      PageSize: exportSelection.parentSelected === ExportType.CurrentPage ? pagination.pageSize : -1,
-      PageIndex: exportSelection.parentSelected === ExportType.CurrentPage ? pagination.current : 1,
+    const params: DownloadParams = {
+      PageSize: typeSelection === DownloadType.CurrentPage ? pagination.pageSize : -1,
+      PageIndex: typeSelection === DownloadType.CurrentPage ? pagination.current : 1,
       EntityConfigName: moduleConfig.Name,
+      EntityName: moduleConfig.EntityName,
       IsAscending: false,
       SearchCondition: searchCondition,
       SortAttributeConfigName: null,
       MasterCondition: masterCondition,
-      AttributeConfigNames: moduleConfig.Attributes.filter(attribute => !attribute.Hidden && attribute.DisplayByDefault).map(attribute => attribute.Name),
-      ChildEntityConfigNames: exportSelection.childSelected
     }
-    const res = await exportExcelData(params);
+    const res = typeSelection === DownloadType.WithoutRecords ? (await downloadTemplate(moduleConfig.EntityName)) : (await downloadTemplateWithData(params));
     if (res.status === 200) {
       const contentDisposition = (res as any).headers['content-disposition'];
       let filename = 'report.xlsx';
@@ -57,6 +59,6 @@ export function useExportFile() {
     }
   }
   return {
-    exportFile
+    downloadFile
   }
 };

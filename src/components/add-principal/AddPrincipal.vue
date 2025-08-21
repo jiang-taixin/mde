@@ -97,7 +97,6 @@ const checkboxConfig = reactive<VxeTablePropTypes.CheckboxConfig<any>>({
     return props.principalList.findIndex(item => item.PrincipalID === row.ID) === -1;
   }
 })
-console.log(props.principalList);
 const selectedPrincipal = ref<SecurityPrincipalType>(SecurityPrincipalType.User);
 const loading = ref<boolean>(false);
 const selectedRows = ref<any[]>([]);

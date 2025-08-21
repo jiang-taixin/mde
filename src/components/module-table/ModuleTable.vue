@@ -57,8 +57,7 @@
       </div>
       <!--高级查询-->
       <div v-show="showAdvancedSearch">
-        <AdvancedSearch :module-config="moduleConfig" @searchCallback="onAdvancedSearch"
-          @searchParamsChange="onAdvancedSearchParamsChange" />
+        <AdvancedSearch :module-config="moduleConfig" @searchCallback="onAdvancedSearch" />
       </div>
       <!--表格-->
       <div class="flex-1">
@@ -103,7 +102,7 @@
     </div>
   </a-spin>
   <!--导出弹窗-->
-  <a-modal v-model:open="openExport" :width="500" @ok="handleExport">
+  <a-modal v-model:open="openExport" :width="500" @ok="handleExport" :destroy-on-close="true">
     <template #title>
       <div class="flex items-center text-lg">
         <img :src="getIcon('export-icon')" class="w-4 h-4 mr-1" />
@@ -113,6 +112,17 @@
     <ExportPanel :export-selection="exportSelection" :module-config="moduleConfig" :table-level="props.tableLevel"
       :parent-title="props.parentTitle"></ExportPanel>
   </a-modal>
+  <!--模板弹窗-->
+  <a-modal v-model:open="openDownload" :width="500" @ok="handleDownload" :destroy-on-close="true">
+    <template #title>
+      <div class="flex items-center text-lg">
+        <img :src="getIcon('download-icon')" class="w-4 h-4 mr-1" />
+        {{ t('downloadTitle', { title: moduleConfig.DisplayName }) }}
+      </div>
+    </template>
+    <DownloadPabel :download-selection="downloadSelection" :module-config="moduleConfig" :table-level="props.tableLevel"
+      :parent-title="props.parentTitle"></DownloadPabel>
+  </a-modal>
   <!--历史弹窗-->
   <a-modal v-model:open="openHistory" :width="600" :footer="null" :destroy-on-close="true">
     <template #title>
@@ -121,7 +131,7 @@
         {{ t('historyTitle', { title: moduleConfig.DisplayName }) }}
       </div>
     </template>
-    <HistoryPanel ref="resultRef" :module-config="moduleConfig" :history-id="rowID"/>
+    <HistoryPanel ref="resultRef" :module-config="moduleConfig" :history-id="rowID" />
   </a-modal>
   <!--权限弹窗-->
   <a-modal v-model:open="openSecurity" :width="700" :footer="null" :destroy-on-close="true">
@@ -134,7 +144,8 @@
           @click="openSecurityCustomEvent"></a-button>
       </div>
     </template>
-    <SecurityPanel ref="securityRef" @closeCallback="closeSecurityPanel" :module-config="moduleConfig" :security-id="rowID"></SecurityPanel>
+    <SecurityPanel ref="securityRef" @closeCallback="closeSecurityPanel" :module-config="moduleConfig"
+      :security-id="rowID"></SecurityPanel>
   </a-modal>
   <!--编辑弹窗-->
   <a-modal v-model:open="openDetail" :width="500" :footer="null" :destroy-on-close="true">
@@ -144,7 +155,7 @@
         {{ t('detailTitle', { title: moduleConfig.DisplayName }) }}
       </div>
     </template>
-    <DetailPanel @closeCallback="closeEditPanel" ></DetailPanel>
+    <DetailPanel @closeCallback="closeEditPanel"></DetailPanel>
   </a-modal>
 </template>
 <script setup lang="ts">
@@ -156,8 +167,12 @@ import type { VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-ta
 import { debounce } from 'lodash';
 import type { ExportSelection } from '../export-panel/ExportPanel.vue';
 import type { DefaultOptionType, SelectValue } from 'ant-design-vue/es/select';
+import type { DownloadSelection } from '../download-panel/DownloadPabel.vue';
+import { DownloadType } from '@/models/gridDataModel';
 const { exportFile } = useExportFile();
 const { moveUpOrDown } = useMoveUpOrDown();
+const { downloadFile } = useDownloadFile();
+const emits = defineEmits(['parentVersionChange']);
 const { t } = useI18n();
 const container = ref<HTMLElement | null>(null);
 const content = ref<HTMLElement | null>(null);
@@ -171,12 +186,16 @@ const selectedRows = ref<any[]>([]);
 const hasSelection = computed(() => selectedRows.value.length > 0);
 const canMerge = computed(() => selectedRows.value.length === 2);
 const openExport = ref<boolean>(false);
-const exportParams = ref<any>();                 // 导出时需要使用高级查询的条件   所以条件变化就要更新
+const openDownload = ref<boolean>(false);
+const advancedParams = ref<any>();                 // 导出和下载时需要使用高级查询的条件   所以条件变化就要更新
 const versionList = ref<any[]>();
 const activeVersion = ref<any>();
 const exportSelection = ref<ExportSelection>({
   parentSelected: ExportType.AllWithConditions,
   childSelected: []
+});
+const downloadSelection = ref<DownloadSelection>({
+  typeSelected: DownloadType.WithoutRecords,
 });
 const openHistory = ref<boolean>(false);
 const rowID = ref<string>('');
@@ -217,6 +236,11 @@ const props = defineProps({
     type: Boolean,
     require: false,
     default: false,
+  },
+  parentVersion:{
+    type: Object,
+    require: false,
+    default: null,
   }
 });
 const moduleConfig = ref<ModuleConfig>({} as ModuleConfig);
@@ -227,6 +251,9 @@ watch(() => props.parentID, (parentId) => {
     loadGridData();
   }
 });
+watch(() => activeVersion, (newVersion) => {
+  emits('parentVersionChange',newVersion.value);
+},{deep:true})
 export interface Pagination {
   current: number,
   pageSize: number,
@@ -296,12 +323,15 @@ const loadVersionList = async () => {
     PageSize: -1,
     EntityConfigName: moduleConfig.value.Attributes.find(item => item.AttributeName === 'VersionID')?.TargetEntityName as string
   }
+  loading.value = true;
   await getGridData(params).then((res) => {
     if (res) {
       versionList.value = JSON.parse(res.JsonData);
       activeVersion.value = versionList.value?.find(item => item.IsActive === '1');
     }
   }).catch(() => {
+  }).finally(() => {
+    loading.value = false;
   });
 }
 const loadGridData = async (isAdvancedSearch: boolean = false, searchParams: any = null) => {
@@ -340,7 +370,7 @@ const loadGridData = async (isAdvancedSearch: boolean = false, searchParams: any
     MasterCondition: masterCondition.length > 0 ? masterCondition : null,
   }
   await getGridData(params).then((res) => {
-    loading.value = false;
+
     if (res) {
       gridData.JsonData = JSON.parse(res.JsonData);
       pagination.total = res.TotalRecords;
@@ -355,6 +385,8 @@ const loadGridData = async (isAdvancedSearch: boolean = false, searchParams: any
       }
     }
   }).catch(() => {
+
+  }).finally(() => {
     loading.value = false;
   });
 
@@ -366,16 +398,18 @@ const onSearch = () => {
 };
 
 const onAdvancedSearch = (params: any) => {
+  advancedParams.value = params;
   loadGridData(true, params);
-}
-
-const onAdvancedSearchParamsChange = (params: any) => {
-  exportParams.value = params;
 }
 
 const handleExport = () => {
   openExport.value = false;
-  exportFile(exportSelection.value, exportParams.value, moduleConfig.value, pagination, activeVersion.value);
+  exportFile(exportSelection.value, advancedParams.value, moduleConfig.value, pagination, props.tableLevel, props.parentID as string, props.tableLevel === TableLevel.MainTable?activeVersion.value:props.parentVersion);
+}
+
+const handleDownload = () => {
+  openDownload.value = false;
+  downloadFile(downloadSelection.value.typeSelected, advancedParams.value, moduleConfig.value, pagination, props.tableLevel, props.parentID as string, props.tableLevel === TableLevel.MainTable?activeVersion.value:props.parentVersion);
 }
 
 const changeVersion = async (value: SelectValue, option: DefaultOptionType | DefaultOptionType[]) => {
@@ -454,6 +488,7 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
       break;
     // 下载模板
     case FeatureName.Download:
+      openDownload.value = true;
       break;
     // 历史
     case FeatureName.History:

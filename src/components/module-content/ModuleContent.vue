@@ -21,7 +21,7 @@
       <!-- 主表 -->
       <div :class="['flex-col w-full', (moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0 ? 'h-auto' : 'h-full']" ref="mainTableRef">
         <ModuleTable :module-config="moduleConfig" :has-sub-module-config="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0"
-          :table-level="TableLevel.MainTable" :row-click="parentIDChange"/>
+          :table-level="TableLevel.MainTable" :row-click="parentIDChange" @parentVersionChange="parentVersionChange"/>
       </div>
       <!-- 从表 -->
       <div class="border-t-2" v-if="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0">
@@ -29,7 +29,7 @@
           <a-tab-pane v-for="subConfig in moduleConfig?.ChildEntityConfigs" :key="subConfig.ID" :tab="subConfig.DisplayName">
              <div class="h-full">
               <ModuleTable :module-config="subConfig" :has-sub-module-config="(moduleConfig?.ChildEntityConfigs as ModuleConfig[]).length > 0"
-                :table-level="TableLevel.SubTable" :parentID="parentID" :parent-title="props.moduleTab.MenuPath[props.moduleTab.MenuPath.length - 1]"/>
+                :table-level="TableLevel.SubTable" :parentID="parentID" :parent-version="parentVersion" :parent-title="props.moduleTab.MenuPath[props.moduleTab.MenuPath.length - 1]"/>
              </div>
           </a-tab-pane>
         </a-tabs>
@@ -66,8 +66,13 @@ const dateMessage = ref<string>();
 const mainTableRef = ref<HTMLElement | null>(null);
 const moduleConfig = ref<ModuleConfig>();
 const parentID = ref<string>('');
+const parentVersion = ref<any>();
 const parentIDChange = (newID: string) => {
   parentID.value = newID;
+}
+
+const parentVersionChange = (newVersion:any) => {
+  parentVersion.value = newVersion;
 }
 watch(locale, () => {
   if (locale.value === Language.ZH_CN) {

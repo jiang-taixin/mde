@@ -8,9 +8,8 @@ export {}
 declare global {
   const ANDOR: typeof import('./src/models/gridDataModel')['ANDOR']
   const CLEAR_KEY: typeof import('./src/constants/index')['CLEAR_KEY']
+  const DownloadType: typeof import('./src/models/gridDataModel')['DownloadType']
   const EffectScope: typeof import('vue')['EffectScope']
-  const ExportExcelData: typeof import('./src/services/download-file')['ExportExcelData']
-  const ExportExcelTemplate: typeof import('./src/services/download-file')['ExportExcelTemplate']
   const ExportType: typeof import('./src/models/gridDataModel')['ExportType']
   const FeatureName: typeof import('./src/models/moduleConfigModel')['FeatureName']
   const Language: typeof import('./src/language/index')['Language']
@@ -34,9 +33,11 @@ declare global {
   const defineComponent: typeof import('vue')['defineComponent']
   const defineStore: typeof import('pinia')['defineStore']
   const deleteRecords: typeof import('./src/services/module-service')['deleteRecords']
-  const downloadFile: typeof import('./src/services/download-file')['downloadFile']
+  const downloadTemplate: typeof import('./src/services/download-file')['downloadTemplate']
+  const downloadTemplateWithData: typeof import('./src/services/download-file')['downloadTemplateWithData']
   const effectScope: typeof import('vue')['effectScope']
   const en: typeof import('./src/language/en')['default']
+  const exportExcelData: typeof import('./src/services/download-file')['exportExcelData']
   const filter_security_columns: typeof import('./src/constants/index')['filter_security_columns']
   const getActivePinia: typeof import('pinia')['getActivePinia']
   const getComboxItems: typeof import('./src/services/metaData-service')['getComboxItems']
@@ -77,7 +78,6 @@ declare global {
   const moduleId: typeof import('./src/constants/index')['moduleId']
   const module_security_columns: typeof import('./src/constants/index')['module_security_columns']
   const moveRecordUpDown: typeof import('./src/services/module-service')['moveRecordUpDown']
-  const name: typeof import('./src/services/module-service')['name']
   const nextTick: typeof import('vue')['nextTick']
   const onActivated: typeof import('vue')['onActivated']
   const onBeforeMount: typeof import('vue')['onBeforeMount']
@@ -124,6 +124,7 @@ declare global {
   const useAttrs: typeof import('vue')['useAttrs']
   const useCssModule: typeof import('vue')['useCssModule']
   const useCssVars: typeof import('vue')['useCssVars']
+  const useDownloadFile: typeof import('./src/hooks/useDownloadFile')['useDownloadFile']
   const useDynamicForm: typeof import('./src/hooks/useDynamicForm')['useDynamicForm']
   const useExportFile: typeof import('./src/hooks/useExportFile')['useExportFile']
   const useI18n: typeof import('vue-i18n')['useI18n']
@@ -152,7 +153,7 @@ declare global {
   export type { ResourceType, SecurityPrincipalType, PrincipalScope, PermissionFlagType, CustomColumn, PermissionFlag, SecurityItem, SecurityRacItem } from './src/models/SecurityModel'
   import('./src/models/SecurityModel')
   // @ts-ignore
-  export type { TableLevel, ANDOR, MoveDirection, ExportType, MoveResult, SearchConditionValue, RequestGridParams, RequestHistoryParams, ExportParams, GridData } from './src/models/gridDataModel'
+  export type { TableLevel, ANDOR, MoveDirection, ExportType, DownloadType, MoveResult, SearchConditionValue, RequestGridParams, RequestHistoryParams, ExportParams, DownloadParams, GridData } from './src/models/gridDataModel'
   import('./src/models/gridDataModel')
   // @ts-ignore
   export type { Geography, LovItem } from './src/models/metaDataModel'
