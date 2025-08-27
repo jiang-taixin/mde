@@ -22,6 +22,7 @@ import Active from "@/assets/images/button/active.png";
 import Copy from "@/assets/images/button/copy.png";
 import Publish from "@/assets/images/button/publish.png";
 import Merge from "@/assets/images/button/merge.png";
+import PrimaryAssistant from "@/assets/images/button/primary-assistant.png";
 
 // 权限用的四个图标
 import User from "@/assets/images/security/user.png";
@@ -60,6 +61,7 @@ const iconMap: Record<string, string> = {
   "up-row-icon":ToUp,
   "down-row-icon":ToDown,
   "security-icon":Access,
+  "settoprimaryassistant-icon":PrimaryAssistant,
   "user":User,
   "group":Group,
   "organization":Organization,

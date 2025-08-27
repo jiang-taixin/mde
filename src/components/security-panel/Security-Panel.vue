@@ -150,8 +150,7 @@ const updatePermission = (row: SecurityItem, columnName: string, event: any) => 
         Scope: row.Scope
       }
       if (!NewRacList.value.includes(addItem)) {
-        // Scope变化时   后端好像用第一个为准
-        NewRacList.value.unshift(addItem);
+        NewRacList.value.push(addItem);
       }
 
       if (RemoveRacList.value.includes(addItem)) {

@@ -33,14 +33,17 @@ declare global {
   const defineComponent: typeof import('vue')['defineComponent']
   const defineStore: typeof import('pinia')['defineStore']
   const deleteRecords: typeof import('./src/services/module-service')['deleteRecords']
-  const downloadTemplate: typeof import('./src/services/download-file')['downloadTemplate']
-  const downloadTemplateWithData: typeof import('./src/services/download-file')['downloadTemplateWithData']
+  const downloadTemplate: typeof import('./src/services/download-file-service')['downloadTemplate']
+  const downloadTemplateWithData: typeof import('./src/services/download-file-service')['downloadTemplateWithData']
   const effectScope: typeof import('vue')['effectScope']
   const en: typeof import('./src/language/en')['default']
-  const exportExcelData: typeof import('./src/services/download-file')['exportExcelData']
+  const exportExcelData: typeof import('./src/services/download-file-service')['exportExcelData']
   const filter_security_columns: typeof import('./src/constants/index')['filter_security_columns']
   const getActivePinia: typeof import('pinia')['getActivePinia']
   const getComboxItems: typeof import('./src/services/metaData-service')['getComboxItems']
+  const getContactRequestList: typeof import('./src/services/apply-contact-service')['getContactRequestList']
+  const getContactRequestQueues: typeof import('./src/services/apply-contact-service')['getContactRequestQueues']
+  const getContactRequestSummary: typeof import('./src/services/apply-contact-service')['getContactRequestSummary']
   const getCurrentInstance: typeof import('vue')['getCurrentInstance']
   const getCurrentScope: typeof import('vue')['getCurrentScope']
   const getDateMessage: typeof import('./src/utils/datetime')['getDateMessage']
@@ -121,6 +124,7 @@ declare global {
   const toValue: typeof import('vue')['toValue']
   const triggerRef: typeof import('vue')['triggerRef']
   const unref: typeof import('vue')['unref']
+  const uploadFile: typeof import('./src/services/upload-file-service')['uploadFile']
   const useAttrs: typeof import('vue')['useAttrs']
   const useCssModule: typeof import('vue')['useCssModule']
   const useCssVars: typeof import('vue')['useCssVars']
@@ -138,6 +142,7 @@ declare global {
   const useSlots: typeof import('vue')['useSlots']
   const useTemplateRef: typeof import('vue')['useTemplateRef']
   const useUserProfileStore: typeof import('./src/stores/userProfile')['useUserProfileStore']
+  const validateFile: typeof import('./src/services/upload-file-service')['validateFile']
   const watch: typeof import('vue')['watch']
   const watchEffect: typeof import('vue')['watchEffect']
   const watchPostEffect: typeof import('vue')['watchPostEffect']
@@ -152,6 +157,9 @@ declare global {
   // @ts-ignore
   export type { ResourceType, SecurityPrincipalType, PrincipalScope, PermissionFlagType, CustomColumn, PermissionFlag, SecurityItem, SecurityRacItem } from './src/models/SecurityModel'
   import('./src/models/SecurityModel')
+  // @ts-ignore
+  export type { ContactRequestQueue, ContactRequestSummary, RequestContactParam } from './src/models/applyDataModel'
+  import('./src/models/applyDataModel')
   // @ts-ignore
   export type { TableLevel, ANDOR, MoveDirection, ExportType, DownloadType, MoveResult, SearchConditionValue, RequestGridParams, RequestHistoryParams, ExportParams, DownloadParams, GridData } from './src/models/gridDataModel'
   import('./src/models/gridDataModel')

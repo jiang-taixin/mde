@@ -87,5 +87,31 @@ export default {
     group:"Group",
     organization:"Organization",
     title:"Title",
+  },
+  hcpApply:{
+    overviewTitle:"Contact Request OverView",
+    detailTitle:"{sub} Request List Of {main}",
+    detailTitleDefault:"Contact Request",
+    salesUnit:"Sales Unit",
+    typeName:"Request Type",
+    expired:"Expired",
+    expiring:"Expiring",
+    finished:"Finished",
+    new:"New",
+    summary:"Summary"
+  },
+  upload:{
+    title:"Upload Excel",
+    validate:"Validate",
+    import:"Import",
+    excelTips:"Excel File",
+    selectTips:"Select An Excel",
+    results:"Results",
+    operationTips:"Operation Tips",
+    isIncremental:"Is Incremental?",
+    validateFailed:"Validate data failed.",
+    operationTips1:"Please click the",
+    operationTips2:"to check",
+    download:"download",
   }
 };

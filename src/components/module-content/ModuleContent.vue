@@ -41,15 +41,15 @@
     </div>
     <!-- 内容  这个是医生申请页面 -->
     <div class="flex-1 min-h-0" v-if="getModulePageType() === ModulePageType.ContactRequestList">
-
+      <HcpApply />
     </div>
     <!-- 内容  这个是医生申请报告页面 -->
     <div class="flex-1 min-h-0" v-if="getModulePageType() === ModulePageType.ContactRequestReport">
-
+      <HcpApplyReport />
     </div>
     <!-- 内容  这个是face讲者申请页面 -->
     <div class="flex-1 min-h-0" v-if="getModulePageType() === ModulePageType.FaceRequestList">
-
+      <FaceSpeakerApply />
     </div>
 
   </div>

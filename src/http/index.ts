@@ -7,6 +7,7 @@ declare module "axios" {
   interface AxiosRequestConfig {
     loading?: boolean;   // 是否显示loading框
     skipAuth?: boolean; // 是否跳过身份验证
+    formData?: boolean;  // 是否发送表单
   }
 }
 
@@ -30,7 +31,7 @@ const handleAuthExpired = () => {
 // 创建 axios 实例
 const request = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  timeout: 300000, // 5分钟超时
+  timeout: 900000, // 15分钟超时
   headers: {
     "Content-Type": "application/json",
   },
@@ -41,6 +42,9 @@ request.interceptors.request.use(
     // 显示loading
     if (config.loading) {
       loading.show();
+    }
+    if(config.formData){
+      config.headers["Content-Type"] = 'multipart/form-data';
     }
     // 添加认证令牌
     if (!config.skipAuth && !SKIP_AUTH_PATHS.includes(config.url || '')) {

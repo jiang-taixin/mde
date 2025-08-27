@@ -87,5 +87,31 @@ export default {
     group:"群组",
     organization:"组织",
     title:"职称",
+  },
+  hcpApply:{
+    overviewTitle:"医生申请预览",
+    detailTitle:"{main}{sub}",
+    detailTitleDefault:"医生申请",
+    salesUnit:"销售单元",
+    typeName:"请求类型",
+    expired:"终止",
+    expiring:"正终止",
+    finished:"已处理",
+    new:"新",
+    summary:"总计"
+  },
+  upload:{
+    title:"上传Excel",
+    validate:"校验",
+    import:"导入",
+    excelTips:"Excel 文件",
+    selectTips:"选择Excel文件",
+    results:"结果",
+    operationTips:"操作提示",
+    isIncremental:"是否递增？",
+    validateFailed:"数据校验失败.",
+    operationTips1:"请点击",
+    operationTips2:"进行检查",
+    download:"下载",
   }
 };

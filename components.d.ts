@@ -23,6 +23,7 @@ declare module 'vue' {
     AdvancedSearch: typeof import('./src/components/advanced-search/AdvancedSearch.vue')['default']
     AForm: typeof import('ant-design-vue/es')['Form']
     AFormItem: typeof import('ant-design-vue/es')['FormItem']
+    AInput: typeof import('ant-design-vue/es')['Input']
     AInputSearch: typeof import('ant-design-vue/es')['InputSearch']
     ALayout: typeof import('ant-design-vue/es')['Layout']
     ALayoutContent: typeof import('ant-design-vue/es')['LayoutContent']
@@ -43,9 +44,13 @@ declare module 'vue' {
     ATabs: typeof import('ant-design-vue/es')['Tabs']
     ATooltip: typeof import('ant-design-vue/es')['Tooltip']
     ATree: typeof import('ant-design-vue/es')['Tree']
+    AUpload: typeof import('ant-design-vue/es')['Upload']
     DetailPanel: typeof import('./src/components/detail-panel/DetailPanel.vue')['default']
     DownloadPabel: typeof import('./src/components/download-panel/DownloadPabel.vue')['default']
     ExportPanel: typeof import('./src/components/export-panel/ExportPanel.vue')['default']
+    FaceSpeakerApply: typeof import('./src/components/face-speaker-apply/FaceSpeakerApply.vue')['default']
+    HcpApply: typeof import('./src/components/hcp-apply/HcpApply.vue')['default']
+    HcpApplyReport: typeof import('./src/components/hcp-apply-report/HcpApplyReport.vue')['default']
     HeaderComponent: typeof import('./src/components/header/HeaderComponent.vue')['default']
     HistoryPanel: typeof import('./src/components/history-panel/HistoryPanel.vue')['default']
     InputSearch: typeof import('./src/components/input-search/InputSearch.vue')['default']
@@ -61,5 +66,6 @@ declare module 'vue' {
     SecurityPanel: typeof import('./src/components/security-panel/Security-Panel.vue')['default']
     SelectPrincial: typeof import('./src/components/select-principal/SelectPrincial.vue')['default']
     SiderComponent: typeof import('./src/components/sider/SiderComponent.vue')['default']
+    UploadPanel: typeof import('./src/components/upload-panel/UploadPanel.vue')['default']
   }
 }

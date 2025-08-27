@@ -157,6 +157,16 @@
     </template>
     <DetailPanel @closeCallback="closeEditPanel"></DetailPanel>
   </a-modal>
+  <!--上传弹窗-->
+  <a-modal v-model:open="openUpload" :width="500" :footer="null" :destroy-on-close="true">
+    <template #title>
+      <div class="flex items-center text-lg">
+        <img :src="getIcon('upload-icon')" class="w-5 h-5 mr-1" />
+        {{ t('upload.title') }}
+      </div>
+    </template>
+    <UploadPanel @closeCallback="closeUploadPanel" :module-config="moduleConfig"></UploadPanel>
+  </a-modal>
 </template>
 <script setup lang="ts">
 import { ref, h, type PropType } from 'vue';
@@ -202,6 +212,7 @@ const rowID = ref<string>('');
 const openSecurity = ref<boolean>(false);
 const securityRef = ref(null);
 const openDetail = ref<boolean>(false);
+const openUpload = ref<boolean>(false);
 const showAdvancedSearch = ref<boolean>(false);
 const props = defineProps({
   moduleConfig: {
@@ -522,6 +533,10 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
     case FeatureName.Detail:
       openDetailPanel();
       break;
+    // 上传
+    case FeatureName.Upload:
+      openUpload.value = true;
+      break;
     default:
   }
 }
@@ -550,6 +565,11 @@ const closeEditPanel = () => {
 // 打开编辑面板
 const openDetailPanel = () => {
   openDetail.value = true;
+}
+
+// 关闭上传面板
+const closeUploadPanel = () => {
+  openUpload.value = false;
 }
 const cellDblclickEvent: VxeTableEvents.CellDblclick = ({ row, $event }) => {
   // 双击编辑数据   和点击详情同样的操作   可编辑条件是列表中包含详情按钮列
