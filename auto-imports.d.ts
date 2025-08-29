@@ -50,7 +50,9 @@ declare global {
   const getCurrentInstance: typeof import('vue')['getCurrentInstance']
   const getCurrentScope: typeof import('vue')['getCurrentScope']
   const getDateMessage: typeof import('./src/utils/datetime')['getDateMessage']
+  const getDeletionImpactEntityData: typeof import('./src/services/upload-file-service')['getDeletionImpactEntityData']
   const getEnglishDate: typeof import('./src/utils/datetime')['getEnglishDate']
+  const getExcelValidationPreview: typeof import('./src/services/upload-file-service')['getExcelValidationPreview']
   const getGeoGraphyList: typeof import('./src/services/metaData-service')['getGeoGraphyList']
   const getGridData: typeof import('./src/services/gridData-service')['getGridData']
   const getHistoryData: typeof import('./src/services/gridData-service')['getHistoryData']
@@ -102,6 +104,7 @@ declare global {
   const onUpdated: typeof import('vue')['onUpdated']
   const onWatcherCleanup: typeof import('vue')['onWatcherCleanup']
   const parentId: typeof import('./src/constants/index')['parentId']
+  const proceedDeletion: typeof import('./src/services/upload-file-service')['proceedDeletion']
   const provide: typeof import('vue')['provide']
   const reactive: typeof import('vue')['reactive']
   const readonly: typeof import('vue')['readonly']
@@ -176,7 +179,7 @@ declare global {
   export type { ModuleType, ModuleTab, ModuleItem } from './src/models/moduleItemModel'
   import('./src/models/moduleItemModel')
   // @ts-ignore
-  export type { ValidationType, UploadResponse, Summary, ValidateResponse } from './src/models/uploadModel'
+  export type { ValidationType, UploadResponse, Summary, ImpactEntity, ValidateResponse, PreviewRequest } from './src/models/uploadModel'
   import('./src/models/uploadModel')
   // @ts-ignore
   export type { PrincipalType, Principal, UserProfile } from './src/models/userProfileModel'

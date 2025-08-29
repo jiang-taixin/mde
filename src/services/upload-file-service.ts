@@ -16,3 +16,14 @@ export async function getExcelValidationPreview(params:PreviewRequest):Promise<a
   return http.post(`/API/entity/GetExcelValidationPreview`,params);
 }
 
+// 获取删除的数据
+export async function getDeletionImpactEntityData(params:PreviewRequest):Promise<any> {
+  return http.post(`/API/entity/GetDeletionImpactEntityData`,params);
+}
+
+// 执行process删除
+export async function proceedDeletion(sessionID:string):Promise<any> {
+  return http.get(`/API/entity/ProceedDeletion?sessionID=${sessionID}`);
+}
+
+

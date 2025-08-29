@@ -125,5 +125,8 @@ export default {
     merge:"Merge:",
     errorCode:"Error Code",
     errorMsg:"Error Message",
+    deleteImpact:"Impact Entities",
+    process:"Process",
+    deleteTips:"Direct delete related data"
   }
 };

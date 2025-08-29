@@ -43,7 +43,7 @@
         {{ t('upload.deleteTitle',{name:props.moduleConfig.DisplayName}) }}
       </div>
     </template>
-    <DeletePanel></DeletePanel>
+    <DeletePanel @closeCallback="closeDeletePanel" :impact-entities="impactEntities" :session-id="sessionID"></DeletePanel>
   </a-modal>
   <!--预览弹窗-->
   <a-modal v-model:open="openReview" :width="500" :footer="null" :destroy-on-close="true">
@@ -64,7 +64,7 @@ import { isVoid } from '../../utils/datacheck';
 import { ImportType } from '@/models/moduleConfigModel';
 import DeletePanel from '../delete-panel/DeletePanel.vue';
 import PreviewPanel from '../preview-panel/PreviewPanel.vue';
-import { ValidationType, type Summary } from '@/models/uploadModel';
+import { ValidationType, type ImpactEntity, type Summary } from '@/models/uploadModel';
 const { t } = useI18n();
 const contentContainer = ref<HTMLDivElement|null>(null);
 const fileList = ref<UploadProps['fileList']>([]);
@@ -74,7 +74,7 @@ const isDisabled = ref<boolean>(true);
 const openDelete = ref<boolean>(false);
 const openReview = ref<boolean>(false);
 const sessionID = ref<string>('');
-
+const impactEntities = ref<ImpactEntity[]>([]);
 const resultMessage = ref<string>('');
 const operationMessage = ref<string>('');
 const canUpload = ref<boolean>(false);
@@ -193,6 +193,7 @@ const handleValidate = async () => {
       if (summaryCount.inValidateTotal === 0 && ImpactEntities && ImpactEntities.length > 0) {
         //如果验证都成功但是存在删除依赖则进行预览
         //这里是直接打开删除的弹框
+        impactEntities.value = ImpactEntities;
         openDelete.value = true;
       }
       else if (summaryCount.inValidateTotal === 0) {
@@ -224,6 +225,10 @@ const beforeUpload: UploadProps['beforeUpload'] = file => {
 const importData = () => {
   emit('closeCallback');
 };
+
+const closeDeletePanel = () =>{
+  openDelete.value = false;
+}
 
 const handleDownloadClick = async () =>{
   const res = await downloadValidatedExcel(props.moduleConfig.EntityName, sessionID.value);

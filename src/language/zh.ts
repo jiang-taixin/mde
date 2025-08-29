@@ -117,7 +117,7 @@ export default {
     hasCount:'总量: <button style="cursor:hand;font-weight:bold; text-decoration:underline; color: blue;" class="total-button">{total}</button>; 有效数量: <button style="cursor:hand;font-weight:bold; text-decoration:underline; color: green;" class="validate-button">{validate}</button>; 无效数量: <button style="cursor:hand;font-weight:bold; text-decoration:underline; color: red;" class="invalidate-button">{invalidate}</button>.;请点击 <button style="cursor:hand; text-decoration:underline; color: blue;" class="download-button">下载</button> 进行检查',
     onlyDownload:'请点击 <button style="cursor:hand; text-decoration:underline; color: blue;" class="download-button">下载</button> 进行检查',
     previewTitle:"数据预览 -- {name}",
-    deleteTitle:"删除反馈 -- {name}",
+    deleteTitle:"删除影响 -- {name}",
     total:"总计:",
     new:"新建:",
     update:"更新:",
@@ -125,5 +125,8 @@ export default {
     merge:"合并:",
     errorCode:"错误编码",
     errorMsg:"错误信息",
+    deleteImpact:"影响实体",
+    process:"执行",
+    deleteTips:"被删除的直接关联数据"
   }
 };

@@ -20,22 +20,33 @@ export interface Summary{
   Update:number
 }
 
+export interface ImpactEntity{
+  DisplayName:string,
+  EntityName:string,
+  EntityConfigID:string,
+  EntityConfigName:string,
+  EntityConfigDisplayName:string|null,
+  ImpactType:number,
+  Count:number,
+  DataIDs:string[],
+}
+
 // 校验结果
 export interface ValidateResponse{
   ValidSummary:Summary|null,
   InValidSummary:Summary|null,
   ReportType:number,
-  ImpactEntities:[]|null
+  ImpactEntities:ImpactEntity[]|null
 }
 
 // 获取预览数据
 export interface PreviewRequest{
   SessionID:string,
   EntityConfigName:string,
-  IsAscending:boolean,
+  IsAscending?:boolean,
   PageIndex:number,
   PageSize:number,
-  ValidationType:ValidationType,
-  OperationType:number
+  ValidationType?:ValidationType,
+  OperationType?:number
 }
 

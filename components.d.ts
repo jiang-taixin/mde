@@ -54,6 +54,7 @@ declare module 'vue' {
     HcpApplyReport: typeof import('./src/components/hcp-apply-report/HcpApplyReport.vue')['default']
     HeaderComponent: typeof import('./src/components/header/HeaderComponent.vue')['default']
     HistoryPanel: typeof import('./src/components/history-panel/HistoryPanel.vue')['default']
+    ImpactPreviewPanel: typeof import('./src/components/impact-preview-panel/ImpactPreviewPanel.vue')['default']
     InputSearch: typeof import('./src/components/input-search/InputSearch.vue')['default']
     ModuleContainer: typeof import('./src/components/module-container/ModuleContainer.vue')['default']
     ModuleContent: typeof import('./src/components/module-content/ModuleContent.vue')['default']
