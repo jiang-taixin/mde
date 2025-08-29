@@ -180,8 +180,6 @@ const loadHistoryData = async () => {
     if (res) {
       gridData.JsonData = JSON.parse(res.JsonData);
       pagination.total = res.TotalRecords;
-      if (gridData.JsonData.length !== 0) {
-      }
     }
   }).catch(() => {
     loading.value = false;

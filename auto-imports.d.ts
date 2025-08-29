@@ -12,6 +12,7 @@ declare global {
   const EffectScope: typeof import('vue')['EffectScope']
   const ExportType: typeof import('./src/models/gridDataModel')['ExportType']
   const FeatureName: typeof import('./src/models/moduleConfigModel')['FeatureName']
+  const ImportType: typeof import('./src/models/moduleConfigModel')['ImportType']
   const Language: typeof import('./src/language/index')['Language']
   const LanguageNames: typeof import('./src/language/index')['LanguageNames']
   const ModulePageType: typeof import('./src/models/moduleConfigModel')['ModulePageType']
@@ -24,6 +25,7 @@ declare global {
   const ResourceType: typeof import('./src/models/SecurityModel')['ResourceType']
   const SecurityPrincipalType: typeof import('./src/models/SecurityModel')['SecurityPrincipalType']
   const TableLevel: typeof import('./src/models/gridDataModel')['TableLevel']
+  const ValidationType: typeof import('./src/models/uploadModel')['ValidationType']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const computed: typeof import('vue')['computed']
   const createApp: typeof import('vue')['createApp']
@@ -35,6 +37,7 @@ declare global {
   const deleteRecords: typeof import('./src/services/module-service')['deleteRecords']
   const downloadTemplate: typeof import('./src/services/download-file-service')['downloadTemplate']
   const downloadTemplateWithData: typeof import('./src/services/download-file-service')['downloadTemplateWithData']
+  const downloadValidatedExcel: typeof import('./src/services/download-file-service')['downloadValidatedExcel']
   const effectScope: typeof import('vue')['effectScope']
   const en: typeof import('./src/language/en')['default']
   const exportExcelData: typeof import('./src/services/download-file-service')['exportExcelData']
@@ -167,11 +170,14 @@ declare global {
   export type { Geography, LovItem } from './src/models/metaDataModel'
   import('./src/models/metaDataModel')
   // @ts-ignore
-  export type { ModulePageType, FeatureName, Attribute, Feature, ModuleConfig } from './src/models/moduleConfigModel'
+  export type { ModulePageType, ImportType, FeatureName, Attribute, Feature, ModuleConfig } from './src/models/moduleConfigModel'
   import('./src/models/moduleConfigModel')
   // @ts-ignore
   export type { ModuleType, ModuleTab, ModuleItem } from './src/models/moduleItemModel'
   import('./src/models/moduleItemModel')
+  // @ts-ignore
+  export type { ValidationType, UploadResponse, Summary, ValidateResponse } from './src/models/uploadModel'
+  import('./src/models/uploadModel')
   // @ts-ignore
   export type { PrincipalType, Principal, UserProfile } from './src/models/userProfileModel'
   import('./src/models/userProfileModel')

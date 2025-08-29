@@ -22,6 +22,7 @@ export const i18n = createI18n({
     "en-US": enUS,
     "zh-CN": zhCN,
   },
+  warnHtmlInMessage:false
 });
 
 export function setupI18n(){

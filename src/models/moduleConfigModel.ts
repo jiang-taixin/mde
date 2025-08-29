@@ -9,6 +9,13 @@ export enum ModulePageType{
   Normal = 5                        // 通用类型
 }
 
+export enum ImportType{
+  All = 1,
+  IncrementalData = 2,
+  Full = 3,
+  NotSupport = 4,
+}
+
 // 按钮点击事件
 export enum FeatureName{
   FuzzySearch="FuzzySearch",           // 搜索，这个按钮会被替换成搜索框
@@ -125,7 +132,7 @@ export interface ModuleConfig {
   ForeignKeyPhysicalViewAlias:unknown,
   GroupingPhysicalViewAlias:unknown,
   ID:string,
-  ImportTypeEnum:number,
+  ImportTypeEnum:ImportType,
   IsSystem:boolean,
   Language:Language|null,
   Name:string,

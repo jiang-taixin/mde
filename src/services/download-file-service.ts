@@ -16,3 +16,9 @@ export async function downloadTemplateWithData(params: DownloadParams): Promise<
 export async function exportExcelData(params:ExportParams):Promise<any> {
   return http.post('/API/excel/ExportExcelData',params,{responseType:'blob',loading:true,timeout:0});
 }
+
+
+// 上传文件时下载检查文件
+export async function downloadValidatedExcel(entityName:string,sessionID:string):Promise<any> {
+  return http.get(`/API/excel/DownLoadValidatedExcel?entityName=${entityName}&sessionID=${sessionID}`,{responseType:'blob',loading:true,timeout:0});
+}
