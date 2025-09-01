@@ -31,6 +31,7 @@ import ImpactPreviewPanel from '../impact-preview-panel/ImpactPreviewPanel.vue';
 const openReview = ref<boolean>(false);
 const { t } = useI18n();
 const emit = defineEmits(['closeCallback']);
+const finishDelete = inject<() => void>('finishDelete');
 const props = defineProps({
   impactEntities: {
     type: Object as PropType<ImpactEntity[]>,
@@ -52,6 +53,7 @@ const review = (entity:ImpactEntity) =>{
 const process = async () =>{
   const res = await proceedDeletion(props.sessionId);
   if(res.IsSuccess){
+    finishDelete?.();
     emit('closeCallback');
   }
 }

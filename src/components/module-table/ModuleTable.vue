@@ -167,6 +167,15 @@
     </template>
     <UploadPanel @closeCallback="closeUploadPanel" :module-config="moduleConfig"></UploadPanel>
   </a-modal>
+  <!--删除弹窗-->
+  <a-modal v-model:open="openDelete" :width="500" :footer="null" :destroy-on-close="true">
+    <template #title>
+      <div class="flex items-center text-lg">
+        {{ t('upload.deleteTitle',{name:props.moduleConfig.DisplayName}) }}
+      </div>
+    </template>
+    <DeletePanel @closeCallback="closeDeletePanel" :impact-entities="impactEntities" :session-id="sessionID"></DeletePanel>
+  </a-modal>
 </template>
 <script setup lang="ts">
 import { ref, h, type PropType } from 'vue';
@@ -197,6 +206,9 @@ const hasSelection = computed(() => selectedRows.value.length > 0);
 const canMerge = computed(() => selectedRows.value.length === 2);
 const openExport = ref<boolean>(false);
 const openDownload = ref<boolean>(false);
+const openDelete = ref<boolean>(false);
+const sessionID = ref<string>('');
+const impactEntities = ref<ImpactEntity[]>([]);
 const advancedParams = ref<any>();                 // 导出和下载时需要使用高级查询的条件   所以条件变化就要更新
 const versionList = ref<any[]>();
 const activeVersion = ref<any>();
@@ -466,6 +478,12 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
         onOk: async () => {
           const delRes = await deleteRecords(moduleConfig.value.EntityName, [row.ID]);
           if (delRes.IsSuccess) {
+            if (delRes.ImpactEntities && delRes.ImpactEntities.length > 0) {
+              impactEntities.value = delRes.ImpactEntities;
+              sessionID.value = delRes.SesssionID;
+              openDelete.value = true;
+              return;
+            }
             message.success(t('success'));
             loadGridData();
           }
@@ -487,6 +505,12 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
           const ids = selectedRows.value.map((item) => item.ID);
           const removeRes = await deleteRecords(moduleConfig.value.EntityName, ids);
           if (removeRes.IsSuccess) {
+             if (removeRes.ImpactEntities && removeRes.ImpactEntities.length > 0) {
+              impactEntities.value = removeRes.ImpactEntities;
+              sessionID.value = removeRes.SesssionID;
+              openDelete.value = true;
+              return;
+            }
             message.success(t('success'));
             loadGridData();
           }
@@ -571,6 +595,17 @@ const openDetailPanel = () => {
 const closeUploadPanel = () => {
   openUpload.value = false;
 }
+// 关闭删除面板
+const closeDeletePanel = () =>{
+  openDelete.value = false;
+}
+
+// 执行process后真正删除
+const finishDelete = () =>{
+  openDelete.value = false;
+  loadGridData();
+}
+provide('finishDelete',finishDelete);
 const cellDblclickEvent: VxeTableEvents.CellDblclick = ({ row, $event }) => {
   // 双击编辑数据   和点击详情同样的操作   可编辑条件是列表中包含详情按钮列
   if (canEditData()) {

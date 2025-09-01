@@ -167,6 +167,7 @@ const handleValidate = async () => {
     const { ValidSummary, InValidSummary, ReportType, ImpactEntities } = validateRes;
     validateSummary.value = ValidSummary as Summary;
     invalidateSummary.value = InValidSummary as Summary;
+    // reportType = 0数据字段验证未通过   1表示，业务验证未通过
     if (ReportType === 0) {
       if (ValidSummary) {
         summaryCount.validateTotal = ValidSummary.Insert + ValidSummary.Update + ValidSummary.Delete + ValidSummary.Merge;

@@ -78,7 +78,9 @@ onMounted(async () => {
 });
 
 const loadConfig = async () => {
+  loading.value = true;
   const res = await getModuleConfig(props.impactEntity.EntityConfigName);
+  loading.value = false;
   moduleConfig.value = res;
   pagination.pageSize = moduleConfig.value.PageSize;
   loadData();
