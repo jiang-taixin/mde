@@ -45,6 +45,7 @@ declare module 'vue' {
     ATooltip: typeof import('ant-design-vue/es')['Tooltip']
     ATree: typeof import('ant-design-vue/es')['Tree']
     AUpload: typeof import('ant-design-vue/es')['Upload']
+    ChoosePanel: typeof import('./src/components/choose-panel.vue/ChoosePanel.vue')['default']
     DeletePanel: typeof import('./src/components/delete-panel/DeletePanel.vue')['default']
     DetailPanel: typeof import('./src/components/detail-panel/DetailPanel.vue')['default']
     DownloadPabel: typeof import('./src/components/download-panel/DownloadPabel.vue')['default']

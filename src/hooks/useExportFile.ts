@@ -4,7 +4,7 @@ import { ExportType } from "@/models/gridDataModel";
 
 export function useExportFile() {
   const exportFile = async (exportSelection: ExportSelection, advancedParams: any, moduleConfig: ModuleConfig, pagination: Pagination,
-    tableLevel: TableLevel, parentID: string, version: any) => {
+    tableLevel: TableLevel, parentID: string, version: any, keyword:string) => {
     let searchCondition: SearchConditionValue = {} as SearchConditionValue;
     let masterCondition: any = [];
     searchCondition = { AndOr: ANDOR.AND, Conditions: [] };
@@ -16,6 +16,10 @@ export function useExportFile() {
         }
       });
     }
+   if(!isVoid(keyword)){
+           searchCondition.AndOr = ANDOR.OR;
+           searchCondition.Conditions = [{Name:'',Value:keyword}];
+         }
     if (tableLevel === TableLevel.SubTable) {
       masterCondition.push({
         Name: moduleConfig.ForeignKeyPhysicalViewAlias, Value: parentID

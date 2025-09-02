@@ -1,10 +1,10 @@
 
 import type { Pagination } from "@/components/module-table/ModuleTable.vue";
-import { DownloadType, TableLevel, type DownloadParams } from "@/models/gridDataModel";
+import { ANDOR, DownloadType, TableLevel, type DownloadParams } from "@/models/gridDataModel";
 
 export function useDownloadFile() {
   const downloadFile = async (typeSelection: DownloadType, advancedParams: any, moduleConfig: ModuleConfig, pagination: Pagination,
-    tableLevel: TableLevel, parentID: string, version: any) => {
+    tableLevel: TableLevel, parentID: string, version: any, keyword:string) => {
     let searchCondition: SearchConditionValue = {} as SearchConditionValue;
     let masterCondition: any = [];
     if (typeSelection !== DownloadType.WithoutRecords) {
@@ -16,6 +16,10 @@ export function useDownloadFile() {
             searchCondition.Conditions.push(param);
           }
         });
+      }
+      if(!isVoid(keyword)){
+        searchCondition.AndOr = ANDOR.OR;
+        searchCondition.Conditions = [{Name:'',Value:keyword}];
       }
 
     }

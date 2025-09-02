@@ -128,5 +128,8 @@ export default {
     deleteImpact:"影响实体",
     process:"执行",
     deleteTips:"被删除的直接关联数据"
+  },
+  choose:{
+    title:"添加 -- {name}",
   }
 };

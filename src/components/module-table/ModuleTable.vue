@@ -176,6 +176,15 @@
     </template>
     <DeletePanel @closeCallback="closeDeletePanel" :impact-entities="impactEntities" :session-id="sessionID"></DeletePanel>
   </a-modal>
+  <!--选择弹窗-->
+  <a-modal v-model:open="openChoose" :width="500" :footer="null" :destroy-on-close="true">
+    <template #title>
+      <div class="flex items-center text-lg">
+        {{ t('choose.title',{name:props.moduleConfig.DisplayName}) }}
+      </div>
+    </template>
+    <ChoosePanel @closeCallback="closeChoosePanel" :module-config="moduleConfig" :parent-id="props.parentID"></ChoosePanel>
+  </a-modal>
 </template>
 <script setup lang="ts">
 import { ref, h, type PropType } from 'vue';
@@ -209,6 +218,7 @@ const openDownload = ref<boolean>(false);
 const openDelete = ref<boolean>(false);
 const sessionID = ref<string>('');
 const impactEntities = ref<ImpactEntity[]>([]);
+const openChoose = ref<boolean>(false);
 const advancedParams = ref<any>();                 // 导出和下载时需要使用高级查询的条件   所以条件变化就要更新
 const versionList = ref<any[]>();
 const activeVersion = ref<any>();
@@ -427,12 +437,12 @@ const onAdvancedSearch = (params: any) => {
 
 const handleExport = () => {
   openExport.value = false;
-  exportFile(exportSelection.value, advancedParams.value, moduleConfig.value, pagination, props.tableLevel, props.parentID as string, props.tableLevel === TableLevel.MainTable?activeVersion.value:props.parentVersion);
+  exportFile(exportSelection.value, advancedParams.value, moduleConfig.value, pagination, props.tableLevel, props.parentID as string, props.tableLevel === TableLevel.MainTable?activeVersion.value:props.parentVersion,searchWord.value);
 }
 
 const handleDownload = () => {
   openDownload.value = false;
-  downloadFile(downloadSelection.value.typeSelected, advancedParams.value, moduleConfig.value, pagination, props.tableLevel, props.parentID as string, props.tableLevel === TableLevel.MainTable?activeVersion.value:props.parentVersion);
+  downloadFile(downloadSelection.value.typeSelected, advancedParams.value, moduleConfig.value, pagination, props.tableLevel, props.parentID as string, props.tableLevel === TableLevel.MainTable?activeVersion.value:props.parentVersion,searchWord.value);
 }
 
 const changeVersion = async (value: SelectValue, option: DefaultOptionType | DefaultOptionType[]) => {
@@ -487,6 +497,9 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
             message.success(t('success'));
             loadGridData();
           }
+          else{
+            message.error(delRes.ErrorMessage)
+          }
         }
       });
       break;
@@ -513,6 +526,9 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
             }
             message.success(t('success'));
             loadGridData();
+          }
+          else{
+            message.error(removeRes.ErrorMessage)
           }
         }
       })
@@ -561,6 +577,10 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
     case FeatureName.Upload:
       openUpload.value = true;
       break;
+    // 选择
+    case FeatureName.Choose:
+      openChoose.value = true;
+      break;
     default:
   }
 }
@@ -598,6 +618,10 @@ const closeUploadPanel = () => {
 // 关闭删除面板
 const closeDeletePanel = () =>{
   openDelete.value = false;
+}
+// 关闭选择面板
+const closeChoosePanel = () =>{
+  openChoose.value = false;
 }
 
 // 执行process后真正删除

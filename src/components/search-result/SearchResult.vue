@@ -68,13 +68,9 @@ const props = defineProps({
 
 watch(() => props.keyWord, () => {
   if (!isVoid(props.keyWord)) {
-    // 子表在主表被选中某行时才加载数据
     loadGridData();
   }
 });
-
-
-
 const pagination = reactive<Pagination>({
   current: 1,
   pageSize: 10,
@@ -126,8 +122,6 @@ const loadGridData = async () => {
     if (res) {
       gridData.JsonData = JSON.parse(res.JsonData);
       pagination.total = res.TotalRecords;
-      if (gridData.JsonData.length !== 0) {
-      }
     }
   }).catch(() => {
     loading.value = false;

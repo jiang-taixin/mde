@@ -128,5 +128,8 @@ export default {
     deleteImpact:"Impact Entities",
     process:"Process",
     deleteTips:"Direct delete related data"
+  },
+  choose:{
+    title:"Add -- {name}",
   }
 };

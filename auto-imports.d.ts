@@ -43,6 +43,7 @@ declare global {
   const exportExcelData: typeof import('./src/services/download-file-service')['exportExcelData']
   const filter_security_columns: typeof import('./src/constants/index')['filter_security_columns']
   const getActivePinia: typeof import('pinia')['getActivePinia']
+  const getChooseGridData: typeof import('./src/services/choose-service')['getChooseGridData']
   const getComboxItems: typeof import('./src/services/metaData-service')['getComboxItems']
   const getContactRequestList: typeof import('./src/services/apply-contact-service')['getContactRequestList']
   const getContactRequestQueues: typeof import('./src/services/apply-contact-service')['getContactRequestQueues']
@@ -60,6 +61,7 @@ declare global {
   const getLovItems: typeof import('./src/services/metaData-service')['getLovItems']
   const getModuleConfig: typeof import('./src/services/module-service')['getModuleConfig']
   const getModulesList: typeof import('./src/services/module-service')['getModulesList']
+  const getRefEntityConfig: typeof import('./src/services/choose-service')['getRefEntityConfig']
   const getSecurityList: typeof import('./src/services/module-service')['getSecurityList']
   const getWeekNo: typeof import('./src/utils/datetime')['getWeekNo']
   const h: typeof import('vue')['h']
@@ -166,6 +168,9 @@ declare global {
   // @ts-ignore
   export type { ContactRequestQueue, ContactRequestSummary, RequestContactParam } from './src/models/applyDataModel'
   import('./src/models/applyDataModel')
+  // @ts-ignore
+  export type { ChooseParams } from './src/models/chooseModel'
+  import('./src/models/chooseModel')
   // @ts-ignore
   export type { TableLevel, ANDOR, MoveDirection, ExportType, DownloadType, MoveResult, SearchConditionValue, RequestGridParams, RequestHistoryParams, ExportParams, DownloadParams, GridData } from './src/models/gridDataModel'
   import('./src/models/gridDataModel')
