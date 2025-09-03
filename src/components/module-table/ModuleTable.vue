@@ -22,8 +22,7 @@
           <div ref="content" class="flex" :style="{ transform: `translateX(${scrollOffset}px)` }">
             <a-tooltip :arrow="false" v-for="button in moduleConfig.Features" :title="button.Description">
               <template v-if="button.Name !== FeatureName.SwitchVersion">
-                <a-button
-                  :disabled="(button.Name === FeatureName.Remove && !hasSelection) || (!canMerge && button.Name === FeatureName.Merge)"
+                <a-button :disabled="button.Disable"
                   v-if="!button.IsColumnButton && button.Name !== FeatureName.FuzzySearch" size="small"
                   class="flex-shrink-0 whitespace-nowrap ml-2 flex items-center" @click="handleClick(button.Name)">
                   {{ button.DisplayName }}
@@ -171,19 +170,21 @@
   <a-modal v-model:open="openDelete" :width="500" :footer="null" :destroy-on-close="true">
     <template #title>
       <div class="flex items-center text-lg">
-        {{ t('upload.deleteTitle',{name:props.moduleConfig.DisplayName}) }}
+        {{ t('upload.deleteTitle', { name: props.moduleConfig.DisplayName }) }}
       </div>
     </template>
-    <DeletePanel @closeCallback="closeDeletePanel" :impact-entities="impactEntities" :session-id="sessionID"></DeletePanel>
+    <DeletePanel @closeCallback="closeDeletePanel" :impact-entities="impactEntities" :session-id="sessionID">
+    </DeletePanel>
   </a-modal>
   <!--选择弹窗-->
   <a-modal v-model:open="openChoose" :width="500" :footer="null" :destroy-on-close="true">
     <template #title>
       <div class="flex items-center text-lg">
-        {{ t('choose.title',{name:props.moduleConfig.DisplayName}) }}
+        {{ t('choose.title', { name: props.moduleConfig.DisplayName }) }}
       </div>
     </template>
-    <ChoosePanel @closeCallback="closeChoosePanel" :module-config="moduleConfig" :parent-id="props.parentID"></ChoosePanel>
+    <ChoosePanel @closeCallback="closeChoosePanel" :module-config="moduleConfig" :parent-id="props.parentID">
+    </ChoosePanel>
   </a-modal>
 </template>
 <script setup lang="ts">
@@ -211,8 +212,6 @@ const searchWord = ref<string>('');
 const tableRef = ref<VxeTableInstance<any>>();
 const resizeObserver = ref<ResizeObserver>();
 const selectedRows = ref<any[]>([]);
-const hasSelection = computed(() => selectedRows.value.length > 0);
-const canMerge = computed(() => selectedRows.value.length === 2);
 const openExport = ref<boolean>(false);
 const openDownload = ref<boolean>(false);
 const openDelete = ref<boolean>(false);
@@ -270,7 +269,7 @@ const props = defineProps({
     require: false,
     default: false,
   },
-  parentVersion:{
+  parentVersion: {
     type: Object,
     require: false,
     default: null,
@@ -285,8 +284,79 @@ watch(() => props.parentID, (parentId) => {
   }
 });
 watch(() => activeVersion, (newVersion) => {
-  emits('parentVersionChange',newVersion.value);
-},{deep:true})
+  emits('parentVersionChange', newVersion.value);
+}, { deep: true });
+
+watch(selectedRows, () => {
+  moduleConfig.value.Features.forEach(feature => {
+    let enable = null;
+    if (feature.Name == "Merge") {
+      enable = false;
+      if (selectedRows.value && selectedRows.value.length == 2) {
+        enable = ((selectedRows.value[0].Status.toUpperCase() == "NO" && selectedRows.value[1].Status.toUpperCase() == "NO")
+          || (selectedRows.value[0].Status == "0" && selectedRows.value[1].Status == "0"));
+        if (enable && selectedRows.value[0].HospitalID) {
+          enable = (selectedRows.value[0].HospitalID == selectedRows.value[1].HospitalID);
+        }
+      }
+    }
+    else if (feature.Name == "SetToActive") {
+      enable = false;
+      if (selectedRows.value && selectedRows.value.length == 1) {
+        enable = selectedRows.value[0].Status == "0" && selectedRows.value[0].IsPublish == "1" && selectedRows.value[0].IsActive == "0";
+        if (selectedRows.value.length > 1) enable = false;
+      }
+    }
+    else if (feature.Name == "SetToPrimaryAssistant") {
+      enable = false;
+      if (selectedRows.value && selectedRows.value.length == 1) {
+        enable = selectedRows.value[0].Status == "0" && selectedRows.value[0].IsPrimaryAssistantLovItemName != "Y";
+        if (selectedRows.value.length > 1) {
+          enable = false;
+        }
+      }
+    }
+    else if (feature.Name == "CopyToAdd") {
+      enable = false;
+      if (selectedRows.value && selectedRows.value.length == 1) {
+        enable = (selectedRows.value[0].Status == "0");
+      }
+    }
+
+    else if (feature.Name == "Remove") {
+      enable = false;
+      if (selectedRows.value && selectedRows.value.length > 0) {
+        selectedRows.value.forEach(item => {
+          enable = ((item.Status == "0") || (item.Status.toUpperCase() == "NO"));
+          if (!enable) {
+            return false;
+          }
+        })
+      }
+    }
+    else if (feature.Name == "DeleteVersion") {
+      enable = false;
+      if (selectedRows.value && selectedRows.value.length == 1) {
+        enable = selectedRows.value[0].Status == "0";
+      }
+    }
+    else if (feature.Name == "Publish") {
+      enable = false;
+      if (selectedRows.value && selectedRows.value.length > 0) {
+        selectedRows.value.forEach(item => {
+          enable = ((item.Status == "0") || (item.IsPublish == "0"));
+          if (!enable) {
+            return false;
+          }
+        })
+      }
+    }
+    if (enable !== null) {
+      feature.Disable = !enable;
+    }
+  })
+}, { deep: true });
+
 export interface Pagination {
   current: number,
   pageSize: number,
@@ -437,12 +507,12 @@ const onAdvancedSearch = (params: any) => {
 
 const handleExport = () => {
   openExport.value = false;
-  exportFile(exportSelection.value, advancedParams.value, moduleConfig.value, pagination, props.tableLevel, props.parentID as string, props.tableLevel === TableLevel.MainTable?activeVersion.value:props.parentVersion,searchWord.value);
+  exportFile(exportSelection.value, advancedParams.value, moduleConfig.value, pagination, props.tableLevel, props.parentID as string, props.tableLevel === TableLevel.MainTable ? activeVersion.value : props.parentVersion, searchWord.value);
 }
 
 const handleDownload = () => {
   openDownload.value = false;
-  downloadFile(downloadSelection.value.typeSelected, advancedParams.value, moduleConfig.value, pagination, props.tableLevel, props.parentID as string, props.tableLevel === TableLevel.MainTable?activeVersion.value:props.parentVersion,searchWord.value);
+  downloadFile(downloadSelection.value.typeSelected, advancedParams.value, moduleConfig.value, pagination, props.tableLevel, props.parentID as string, props.tableLevel === TableLevel.MainTable ? activeVersion.value : props.parentVersion, searchWord.value);
 }
 
 const changeVersion = async (value: SelectValue, option: DefaultOptionType | DefaultOptionType[]) => {
@@ -494,10 +564,10 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
               openDelete.value = true;
               return;
             }
-            message.success(t('success'));
+            pagination.current = 1;
             loadGridData();
           }
-          else{
+          else {
             message.error(delRes.ErrorMessage)
           }
         }
@@ -518,17 +588,17 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
           const ids = selectedRows.value.map((item) => item.ID);
           const removeRes = await deleteRecords(moduleConfig.value.EntityName, ids);
           if (removeRes.IsSuccess) {
-             if (removeRes.ImpactEntities && removeRes.ImpactEntities.length > 0) {
+            if (removeRes.ImpactEntities && removeRes.ImpactEntities.length > 0) {
               impactEntities.value = removeRes.ImpactEntities;
               sessionID.value = removeRes.SesssionID;
               openDelete.value = true;
               return;
             }
-            message.success(t('success'));
+            pagination.current = 1;
             loadGridData();
           }
-          else{
-            message.error(removeRes.ErrorMessage)
+          else {
+            message.error(removeRes.ErrorMessage);
           }
         }
       })
@@ -581,6 +651,33 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
     case FeatureName.Choose:
       openChoose.value = true;
       break;
+    // 设置为主助理
+    case FeatureName.SetToPrimaryAssistant:
+      if (selectedRows.value.length === 0) {
+        return;
+      }
+      Modal.confirm({
+        title: t('warning'),
+        content: t('setToPrimaryTips'),
+        okText: t('confirm'),
+        cancelText: t('cancel'),
+        onOk: async () => {
+          const params = {
+            CommandName: FeatureName.SetToPrimaryAssistant,
+            EntityName: moduleConfig.value.EntityName,
+            Records: [[{ Name: 'ID', Value: selectedRows.value[0].ID }]]
+          }
+          const setRes = await moveRecordUpDown(params);
+          if (setRes.IsSuccess) {
+            loadGridData();
+          }
+          else{
+            message.error(setRes.ErrorMessage);
+          }
+        }
+      })
+
+      break;
     default:
   }
 }
@@ -616,20 +713,25 @@ const closeUploadPanel = () => {
   openUpload.value = false;
 }
 // 关闭删除面板
-const closeDeletePanel = () =>{
+const closeDeletePanel = () => {
   openDelete.value = false;
 }
 // 关闭选择面板
-const closeChoosePanel = () =>{
+const closeChoosePanel = (operation: boolean) => {
   openChoose.value = false;
+  if (operation) {
+    loadGridData();
+  }
 }
 
 // 执行process后真正删除
-const finishDelete = () =>{
+const finishDelete = () => {
   openDelete.value = false;
+  pagination.current = 1;
   loadGridData();
 }
-provide('finishDelete',finishDelete);
+provide('finishDelete', finishDelete);
+
 const cellDblclickEvent: VxeTableEvents.CellDblclick = ({ row, $event }) => {
   // 双击编辑数据   和点击详情同样的操作   可编辑条件是列表中包含详情按钮列
   if (canEditData()) {

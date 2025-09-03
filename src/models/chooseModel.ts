@@ -10,3 +10,9 @@ export interface ChooseParams{
   RelationshipEntityConfigName:string,
   RelationshipFilterDataID:string
 }
+
+// 选择插入数据
+export interface InsertParams{
+  EntityName:string,
+  Records:any[]
+}

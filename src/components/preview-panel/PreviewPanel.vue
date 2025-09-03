@@ -87,7 +87,6 @@ const props = defineProps({
     default: ''
   }
 });
-console.log(props.moduleConfig)
 const tableRef = ref<VxeTableInstance<any>>();
 const loading = ref<boolean>(false);
 const previewAttributes = ref<Attribute[]>([]);
@@ -205,7 +204,6 @@ onMounted(async () => {
     TargetValueMemberName: null
   });
   props.moduleConfig?.Attributes.forEach(attribute => {
-    console.log(attribute.Name);
     if((attribute.ExcelColumn && attribute.ExcelColumn != null)){
       previewAttributes.value.push(attribute);
     }

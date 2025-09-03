@@ -36,6 +36,11 @@ export enum FeatureName{
   MoveUp="MoveUp",                     // 上移
   MoveDown="MoveDown",                 // 下移
   Security="Security",                 // 权限
+  SetToActive="SetToActive",           // 激活
+  SetToPrimaryAssistant="SetToPrimaryAssistant",  // 设为主助理
+  CopyToAdd="CopyToAdd",               // 拷贝添加
+  DeleteVersion="DeleteVersion",       // 删除版本
+  Publish="Publish",                   // 发布
 }
 
 
@@ -110,7 +115,8 @@ export interface Feature{
   Language:Language,
   MaskFlag:number,
   Name:FeatureName,
-  Sequence:number
+  Sequence:number,
+  Disable:boolean
 }
 
 // 模块配置信息

@@ -60,11 +60,12 @@ import { h } from 'vue';
 import type { Attribute, ModuleConfig } from '@/models/moduleConfigModel';
 import type { ChooseParams } from '@/models/chooseModel';
 import { getChooseGridData } from '@/services/choose-service';
+import { message } from 'ant-design-vue';
 const { t } = useI18n();
 const searchWord = ref<string>('');
 const emit = defineEmits(['closeCallback']);
 const selectedRows = ref<any[]>([]);
-
+const parentConfig = inject<any>('parentConfig');
 const props = defineProps({
   moduleConfig: {
     type: Object as PropType<ModuleConfig>,
@@ -78,7 +79,6 @@ const props = defineProps({
   }
 });
 
-console.log(props.moduleConfig)
 const moduleConfig = ref<ModuleConfig>();
 const tableRef = ref<VxeTableInstance<any>>();
 const loading = ref<boolean>(false);
@@ -121,7 +121,7 @@ const loadData = async () => {
     PageSize: pagination.pageSize,
     PageIndex: pagination.current,
     EntityConfigName: moduleConfig.value?.Name as string,
-    RelationshipEntityConfigName: props.moduleConfig.ParentEntityConfigName as string,
+    RelationshipEntityConfigName: props.moduleConfig.Name as string,
     RelationshipFilterDataID: props.parentId,
     SortAttributeConfigName: null,
     IsAscending: false,
@@ -147,6 +147,7 @@ const loadData = async () => {
 }
 
 const onSearch = () =>{
+  pagination.current = 1;
   loadData();
 }
 
@@ -160,11 +161,44 @@ const checkAll = () => {
 }
 
 const close = () => {
-  emit('closeCallback');
+  emit('closeCallback', false);
 };
 
-const save = () => {
-  emit('closeCallback');
+const save = async () => {
+  if (selectedRows.value.length === 0) {
+    message.error(t('security.noneSelectTips'));
+    return;
+  }
+  let records: { Name: string; Value: any; }[][] = [];
+   var downGridAttributes = (props.moduleConfig as ModuleConfig).Attributes;
+    var upGridConfigID = parentConfig.value.EntityID;
+    var refEntityConfigID = (moduleConfig.value as ModuleConfig).EntityID;
+    let firstName = '';
+    let secondName = '';
+   for (var i = 0; i < downGridAttributes.length; i++) {
+     if (downGridAttributes[i].RefEntity == upGridConfigID) {
+         firstName = downGridAttributes[i].Name;
+     }
+     if (downGridAttributes[i].RefEntity == refEntityConfigID) {
+         secondName = downGridAttributes[i].AttributeName;
+     }
+ }
+  selectedRows.value.forEach(item => {
+    let record = []
+    record.push({Name:firstName,Value:props.parentId},{Name:secondName,Value:item.ID});
+    records.push(record);
+  })
+  const params:InsertParams = {
+    EntityName: props.moduleConfig.EntityName as string,
+    Records:records
+  }
+  loading.value = true;
+  const res = await insertRecords(params);
+  loading.value = false;
+  if(res.IsSuccess){
+    emit('closeCallback', true);
+  }
+
 }
 
 const gridData = reactive<GridData>({

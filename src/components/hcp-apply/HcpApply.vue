@@ -139,7 +139,6 @@ const getColor = (name: string) => {
 }
 
 const cellClickEvent = (params: any) => {
-  console.log(params.row);
   if (params.column.field !== 'TypeName') {
     subTitle.value = t('hcpApply.detailTitle', { main: params.row.TypeName, sub: params.column.title });
     let status: any = null;

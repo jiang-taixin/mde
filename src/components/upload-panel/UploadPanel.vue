@@ -252,7 +252,6 @@ const handleDownloadClick = async () =>{
     }
 };
 const handleTotalClick = () =>{
-  console.log('total click');
   if(summaryCount.validateTotal + summaryCount.inValidateTotal === 0){
     return;
   }
@@ -265,7 +264,6 @@ const handleTotalClick = () =>{
   openReview.value = true;
 };
 const handleValidateClick = () =>{
-  console.log('validate click');
   if(summaryCount.validateTotal === 0){
     return;
   }
@@ -278,7 +276,6 @@ const handleValidateClick = () =>{
   openReview.value = true;
 };
 const handleInvalidateClick = () =>{
-  console.log('invalidate click');
   if(summaryCount.inValidateTotal === 0){
     return;
   }

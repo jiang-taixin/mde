@@ -69,6 +69,7 @@ declare global {
   const http: typeof import('./src/http/index')['default']
   const i18n: typeof import('./src/language/index')['i18n']
   const inject: typeof import('vue')['inject']
+  const insertRecords: typeof import('./src/services/choose-service')['insertRecords']
   const isElement: typeof import('./src/utils/datacheck')['isElement']
   const isNil: typeof import('./src/utils/datacheck')['isNil']
   const isNull: typeof import('./src/utils/datacheck')['isNull']
@@ -169,7 +170,7 @@ declare global {
   export type { ContactRequestQueue, ContactRequestSummary, RequestContactParam } from './src/models/applyDataModel'
   import('./src/models/applyDataModel')
   // @ts-ignore
-  export type { ChooseParams } from './src/models/chooseModel'
+  export type { ChooseParams, InsertParams } from './src/models/chooseModel'
   import('./src/models/chooseModel')
   // @ts-ignore
   export type { TableLevel, ANDOR, MoveDirection, ExportType, DownloadType, MoveResult, SearchConditionValue, RequestGridParams, RequestHistoryParams, ExportParams, DownloadParams, GridData } from './src/models/gridDataModel'

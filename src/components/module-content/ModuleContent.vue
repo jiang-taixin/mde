@@ -67,6 +67,7 @@ const mainTableRef = ref<HTMLElement | null>(null);
 const moduleConfig = ref<ModuleConfig>();
 const parentID = ref<string>('');
 const parentVersion = ref<any>();
+provide('parentConfig', moduleConfig);
 const parentIDChange = (newID: string) => {
   parentID.value = newID;
 }

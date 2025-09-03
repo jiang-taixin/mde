@@ -12,6 +12,7 @@ export default {
   searchButtonTitle:"搜索",
   typeKeywords:"请输入关键字",
   deleteTips:"确认删除这些记录吗？",
+  setToPrimaryTips:"确认将选中的记录作为主助理吗?",
   deleteListNull:"请先选择要删除的数据",
   advancedSearchTips:"高级查询筛选",
   total:"总计:{total}",
