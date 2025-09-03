@@ -64,3 +64,29 @@ export const filter_security_columns: CustomColumn[] = [{
   SortOrder:null
 }
 ]
+
+export const merge_columns:CustomColumn[] = [
+{
+  Name: "field",
+  DisplayName: t('customColumnTitle.field'),
+  SortOrder:null,
+  DefaultWidth:200
+}, {
+  Name: "record1",
+  DisplayName: t('customColumnTitle.record1'),
+  DefaultWidth:300,
+  SortOrder:null
+},
+{
+  Name: "record2",
+  DisplayName: t('customColumnTitle.record2'),
+  DefaultWidth:300,
+  SortOrder:null
+},
+{
+  Name: "result",
+  DisplayName: t('customColumnTitle.result'),
+  DefaultWidth:300,
+  SortOrder:null
+}
+]

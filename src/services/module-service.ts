@@ -40,3 +40,8 @@ export async function getSecurityList(resourceType:ResourceType,resourceId:strin
 export async function saveSecuritySets(params:any):Promise<any> {
   return http.post("/API/security/SavePermissionSets",  params);
 }
+
+// 合并
+export async function doMerge(params:any):Promise<any> {
+  return http.post("/API/entity/MergeRecords",  params);
+}

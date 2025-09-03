@@ -76,7 +76,11 @@ export default {
     read:"读取",
     create:"创建",
     update:"更新",
-    delete:"删除"
+    delete:"删除",
+    field:"字段名",
+    record1:"记录 1",
+    record2:"记录 2",
+    result:"结果",
   },
   security:{
     removeTips:"单击“保存”，然后授权删除此类记录将不会被还原，确认要继续吗？",
@@ -132,5 +136,9 @@ export default {
   },
   choose:{
     title:"添加 -- {name}",
+  },
+  merge:{
+    title:"合并 {name} 记录",
+    merge:"合并"
   }
 };

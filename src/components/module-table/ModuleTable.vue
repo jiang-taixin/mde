@@ -170,6 +170,7 @@
   <a-modal v-model:open="openDelete" :width="500" :footer="null" :destroy-on-close="true">
     <template #title>
       <div class="flex items-center text-lg">
+        <img :src="getIcon('delete-icon')" class="w-5 h-5 mr-1" />
         {{ t('upload.deleteTitle', { name: props.moduleConfig.DisplayName }) }}
       </div>
     </template>
@@ -180,11 +181,26 @@
   <a-modal v-model:open="openChoose" :width="500" :footer="null" :destroy-on-close="true">
     <template #title>
       <div class="flex items-center text-lg">
+        <img :src="getIcon('choose-icon')" class="w-5 h-5 mr-1" />
         {{ t('choose.title', { name: props.moduleConfig.DisplayName }) }}
       </div>
     </template>
     <ChoosePanel @closeCallback="closeChoosePanel" :module-config="moduleConfig" :parent-id="props.parentID">
     </ChoosePanel>
+  </a-modal>
+  <!--合并弹窗-->
+  <a-modal v-model:open="openMerge" :width="1200" :footer="null" :destroy-on-close="true">
+    <template #title>
+      <div class="flex items-center text-lg">
+        <img :src="getIcon('merge-icon')" class="w-5 h-5 mr-1" />
+        {{ t('merge.title', { name: props.moduleConfig.DisplayName }) }}
+        <a-button type="link" size="small"
+          :icon="h('img', { src: getIcon('filter'), style: 'width: 14px; margin-left:4px' })"
+          @click="openMergeCustomEvent"></a-button>
+      </div>
+    </template>
+    <MergePanel ref="mergeRef" @closeCallback="closeMergePanel" :module-config="moduleConfig" :record-list="selectedRows">
+    </MergePanel>
   </a-modal>
 </template>
 <script setup lang="ts">
@@ -200,6 +216,7 @@ import type { DownloadSelection } from '../download-panel/DownloadPabel.vue';
 import { DownloadType } from '@/models/gridDataModel';
 const { exportFile } = useExportFile();
 const { moveUpOrDown } = useMoveUpOrDown();
+const {getConfigName} = useGetVersionConfigName();
 const { downloadFile } = useDownloadFile();
 const emits = defineEmits(['parentVersionChange']);
 const { t } = useI18n();
@@ -218,6 +235,7 @@ const openDelete = ref<boolean>(false);
 const sessionID = ref<string>('');
 const impactEntities = ref<ImpactEntity[]>([]);
 const openChoose = ref<boolean>(false);
+const openMerge = ref<boolean>(false);
 const advancedParams = ref<any>();                 // 导出和下载时需要使用高级查询的条件   所以条件变化就要更新
 const versionList = ref<any[]>();
 const activeVersion = ref<any>();
@@ -232,6 +250,7 @@ const openHistory = ref<boolean>(false);
 const rowID = ref<string>('');
 const openSecurity = ref<boolean>(false);
 const securityRef = ref(null);
+const mergeRef = ref(null);
 const openDetail = ref<boolean>(false);
 const openUpload = ref<boolean>(false);
 const showAdvancedSearch = ref<boolean>(false);
@@ -420,11 +439,11 @@ const canEditData = () => {
   return moduleConfig.value.Features.findIndex(item => item.Name === FeatureName.Detail) !== -1;
 }
 const loadVersionList = async () => {
-  // 获取版本列表 在attributes里面查找AttributeName是VersionID的对象   使用这个对象的TargetEntityName
+  // 获取版本列表
   const params: RequestGridParams = {
     PageIndex: 1,
     PageSize: -1,
-    EntityConfigName: moduleConfig.value.Attributes.find(item => item.AttributeName === 'VersionID')?.TargetEntityName as string
+    EntityConfigName: getConfigName(moduleConfig.value.EntityName)
   }
   loading.value = true;
   await getGridData(params).then((res) => {
@@ -676,7 +695,10 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
           }
         }
       })
-
+      break;
+    // 合并
+    case FeatureName.Merge:
+      openMerge.value = true;
       break;
     default:
   }
@@ -694,6 +716,16 @@ const openSecurityCustomEvent = () => {
   if (securityRef.value) {
     (securityRef.value as any).openCustomEvent();
   }
+}
+// 打开子组件字段选择面板 -- 合并
+const openMergeCustomEvent = () => {
+  if (mergeRef.value) {
+    (mergeRef.value as any).openCustomEvent();
+  }
+}
+// 关闭合并面板
+const closeMergePanel = () => {
+  openMerge.value = false;
 }
 // 关闭权限面板
 const closeSecurityPanel = () => {

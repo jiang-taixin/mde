@@ -140,6 +140,7 @@ declare global {
   const useDownloadFile: typeof import('./src/hooks/useDownloadFile')['useDownloadFile']
   const useDynamicForm: typeof import('./src/hooks/useDynamicForm')['useDynamicForm']
   const useExportFile: typeof import('./src/hooks/useExportFile')['useExportFile']
+  const useGetVersionConfigName: typeof import('./src/hooks/useGetVersionConfigName')['useGetVersionConfigName']
   const useI18n: typeof import('vue-i18n')['useI18n']
   const useId: typeof import('vue')['useId']
   const useLink: typeof import('vue-router')['useLink']

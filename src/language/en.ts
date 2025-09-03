@@ -77,6 +77,10 @@ export default {
     create:"Create",
     update:"Update",
     delete:"Delete",
+    field:"Field",
+    record1:"Record 1",
+    record2:"Record 2",
+    result:"Result",
   },
   security:{
     removeTips:"Click Save and then authorized to remove such records will not be restored, confirm that you want to continue ?",
@@ -132,5 +136,9 @@ export default {
   },
   choose:{
     title:"Add -- {name}",
+  },
+  merge:{
+    title:"Merge Records of {name}",
+    merge:"Merge"
   }
 };

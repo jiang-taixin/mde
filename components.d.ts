@@ -57,6 +57,7 @@ declare module 'vue' {
     HistoryPanel: typeof import('./src/components/history-panel/HistoryPanel.vue')['default']
     ImpactPreviewPanel: typeof import('./src/components/impact-preview-panel/ImpactPreviewPanel.vue')['default']
     InputSearch: typeof import('./src/components/input-search/InputSearch.vue')['default']
+    MergePanel: typeof import('./src/components/merge-panel/MergePanel.vue')['default']
     ModuleContainer: typeof import('./src/components/module-container/ModuleContainer.vue')['default']
     ModuleContent: typeof import('./src/components/module-content/ModuleContent.vue')['default']
     ModulePage: typeof import('./src/components/module-page/ModulePage.vue')['default']
