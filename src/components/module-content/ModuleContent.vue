@@ -86,7 +86,7 @@ watch(locale, () => {
 const props = defineProps({
   moduleTab: {
     type: Object as PropType<ModuleTab>,
-    require: true,
+    required: true,
     default: null
   },
 });

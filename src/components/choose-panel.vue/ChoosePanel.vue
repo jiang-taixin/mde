@@ -69,12 +69,12 @@ const parentConfig = inject<any>('parentConfig');
 const props = defineProps({
   moduleConfig: {
     type: Object as PropType<ModuleConfig>,
-    require: true,
+    required: true,
     default: null
   },
   parentId:{
     type: String,
-    require: true,
+    required: true,
     default:''
   }
 });

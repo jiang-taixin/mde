@@ -25,7 +25,7 @@ let lastOpenKeys: Key[] = [];
 const props = defineProps({
   menuList:{
     type:Array<ModuleItem>,
-    require:true,
+    required:true,
     default:[]
   }
 })

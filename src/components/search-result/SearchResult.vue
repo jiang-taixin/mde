@@ -51,17 +51,17 @@ const model = defineModel<SeletedObject>('selectedObject',{default:() => ({Displ
 const props = defineProps({
   entityConfigName: {
     type: String,
-    require: true,
+    required: true,
     default: ''
   },
   keyWord:{
     type: String,
-    require: true,
+    required: true,
     default: '',
   },
   targetEntityName: {
     type: String,
-    require: true,
+    required: true,
     default: ''
   }
 });

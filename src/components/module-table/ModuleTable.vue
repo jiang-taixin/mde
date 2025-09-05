@@ -257,40 +257,40 @@ const showAdvancedSearch = ref<boolean>(false);
 const props = defineProps({
   moduleConfig: {
     type: Object as PropType<ModuleConfig>,
-    require: true,
+    required: true,
     default: null
   },
   hasSubModuleConfig: {
     type: Boolean,
-    require: true,
+    required: true,
     default: false
   },
   tableLevel: {
     type: Number as PropType<TableLevel>,
-    require: true,
+    required: true,
     default: TableLevel.MainTable
   },
   rowClick: {
     type: Function,
-    require: false,
+    required: false,
   },
   parentID: {
     type: String,
-    require: false
+    required: false
   },
   parentTitle: {
     type: String,
-    require: false
+    required: false
   },
   // 这个参数单独给模块管理页面使用
   fromModule: {
     type: Boolean,
-    require: false,
+    required: false,
     default: false,
   },
   parentVersion: {
     type: Object,
-    require: false,
+    required: false,
     default: null,
   }
 });

@@ -43,12 +43,12 @@ const props = defineProps({
   },
   entityConfigName:{
     type: String,
-    require: true,
+    required: true,
     default: ''
   },
   targetEntityName: {
     type: String,
-    require: true,
+    required: true,
     default: ''
   }
 });

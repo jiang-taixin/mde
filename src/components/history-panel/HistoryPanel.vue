@@ -62,12 +62,12 @@ const moduleConfig = ref<ModuleConfig>();
 const props = defineProps({
   moduleConfig: {
     type: Object as PropType<ModuleConfig>,
-    require: true,
+    required: true,
     default: null
   },
   historyId:{
     type: String,
-    reruire: true,
+    reruired: true,
     default: ''
   }
 });

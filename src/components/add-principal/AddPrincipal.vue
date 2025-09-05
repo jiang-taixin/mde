@@ -87,7 +87,7 @@ const principalOptions = ref([{
 const props = defineProps({
   principalList: {
     type: Object as PropType<SecurityItem[]>,
-    require: true,
+    required: true,
     default: null
   },
 });

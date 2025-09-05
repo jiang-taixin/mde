@@ -40,17 +40,17 @@ const params = defineModel<ExportSelection>('exportSelection',{
 const props = defineProps({
   moduleConfig: {
     type: Object as PropType<ModuleConfig>,
-    require: true,
+    required: true,
     default: null
   },
   tableLevel: {
     type: Number as PropType<TableLevel>,
-    require: true,
+    required: true,
     default: TableLevel.MainTable
   },
   parentTitle: {
     type: String,
-    require: false
+    required: false
   }
 });
 

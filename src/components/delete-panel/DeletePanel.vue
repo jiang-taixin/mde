@@ -35,12 +35,12 @@ const finishDelete = inject<() => void>('finishDelete');
 const props = defineProps({
   impactEntities: {
     type: Object as PropType<ImpactEntity[]>,
-    require: true,
+    required: true,
     default: []
   },
   sessionId:{
     type:String,
-    require:true,
+    required:true,
     default:''
   }
 });

@@ -73,17 +73,17 @@ const props = defineProps({
   },
   moduleConfig: {
     type: Object as PropType<ModuleConfig>,
-    require: true,
+    required: true,
     default:null
   },
   validateType:{
     type: Object as PropType<ValidationType>,
-    require: true,
+    required: true,
     default:ValidationType.All
   },
   sessionId: {
     type:String,
-    require: true,
+    required: true,
     default: ''
   }
 });

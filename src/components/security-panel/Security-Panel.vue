@@ -65,12 +65,12 @@ const tableRef = ref<VxeTableInstance<any>>();
 const props = defineProps({
   moduleConfig: {
     type: Object as PropType<ModuleConfig>,
-    require: true,
+    required: true,
     default: null
   },
   securityId: {
     type: String,
-    require: true,
+    required: true,
     default: '',
   }
 });

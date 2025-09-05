@@ -89,7 +89,7 @@ const languageOptions = computed(() => {
 const props = defineProps({
   switchAccountCallback:{
     type:Function,
-    require:true,
+    required:true,
   },
 })
 const expand = ref<boolean>(true);

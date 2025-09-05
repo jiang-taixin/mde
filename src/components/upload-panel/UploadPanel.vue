@@ -82,7 +82,7 @@ const canImport = ref<boolean>(false);
 const props = defineProps({
   moduleConfig: {
     type: Object as PropType<ModuleConfig>,
-    require: true,
+    required: true,
     default: null
   }
 });
