@@ -179,7 +179,6 @@ const openCustomEvent = () => {
     $table.openCustom()
   }
 }
-
 const columnDragConfig = reactive<VxeTablePropTypes.ColumnDragConfig<any>>({
   isCrossDrag: true,
   showGuidesStatus: true,

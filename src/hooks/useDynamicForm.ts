@@ -124,7 +124,7 @@ export const useDynamicForm = () => {
     }
   });
 
-  const createInputSearchFieldConfig = (attribute: Attribute, config: ModuleConfig) => ({
+  const createInputSearchFieldConfig = (attribute: Attribute) => ({
     type: 'string' as const,
     title: attribute.DisplayName,
     'x-decorator': 'FormItem' as const,
@@ -161,7 +161,7 @@ export const useDynamicForm = () => {
     },
   });
 
-  const generateFieldSchema = (attribute: Attribute, config: ModuleConfig) => {
+  const generateFieldSchema = (attribute: Attribute) => {
     switch (attribute.ExtControlType) {
       case 'entitydatafield':
         return createSelectorFieldConfig(
@@ -188,7 +188,7 @@ export const useDynamicForm = () => {
         };
       case 'inputcheckfield':
         return {
-          ...createInputSearchFieldConfig(attribute, config),
+          ...createInputSearchFieldConfig(attribute),
           'x-component': 'InputSearch' as const,
         };
       case 'datefield':

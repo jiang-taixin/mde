@@ -72,7 +72,7 @@ const setupSchema = (config: ModuleConfig) => {
   const newProperties: Record<string, any> = {};
   config.Attributes.forEach(item => {
     if (item.IsAdvancedFilter) {
-      newProperties[item.Name] = generateFieldSchema(item,config);
+      newProperties[item.Name] = generateFieldSchema(item);
     }
   });
   schema.value = {
