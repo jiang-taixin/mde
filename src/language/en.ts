@@ -140,5 +140,8 @@ export default {
   merge:{
     title:"Merge Records of {name}",
     merge:"Merge"
+  },
+  validString:{
+    notNull:"请输入必填项",
   }
 };

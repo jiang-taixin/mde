@@ -6,6 +6,11 @@ export async function getGeoGraphyList(parentId: string): Promise<[Geography]> {
   return http.get("/API/entity/GetGeographyItem",{params:{parentId}});
 }
 
+// 通过下级ID取上级
+export async function getParentGeoGraphy(id: string): Promise<Geography> {
+  return http.get("/API/entity/GetParentGeographyItem",{params:{id}});
+}
+
 
 // 获取lov信息
 export async function getLovItems(lovId:string):Promise<[LovItem]>{

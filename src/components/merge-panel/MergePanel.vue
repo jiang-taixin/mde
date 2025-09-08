@@ -6,7 +6,7 @@
         :column-config="{ resizable: true, drag: true }" :column-drag-config="columnDragConfig"
         :checkbox-config="{ highlight: true }" :cell-config="{ height: 25 }"
         :row-config="{ isHover: true, isCurrent: true, keyField: 'ID' }" :empty-text="t('empty')"
-        show-overflow="ellipsis">
+        show-overflow="ellipsis" :row-class-name="getRowClassName">
         <template v-for="column in columns">
           <vxe-column :field="column.Name" :title="column.DisplayName"
             :width="`${(column.DefaultWidth ?? 0) > 0 ? column.DefaultWidth : 50}px`" show-header-overflow>
@@ -18,18 +18,23 @@
               <div class="w-full h-full flex items-center">
                 <a-radio :checked="firstRecord[row.AttributeName].Checked"
                   @change="() => clickRecordFirst(row.AttributeName)"></a-radio>
-                {{ firstRecord[row.AttributeName].Value }}
+                <CustomComponent :disabled="true" :default-value="firstRecord[row.AttributeName].Value"
+                :attribute="validAttributeList.find(item => item.AttributeName === row.AttributeName)" :module-config="props.moduleConfig"
+                />
               </div>
             </template>
             <template #default="{ row }" v-if="column.Name === 'record2'" align="center">
               <div class="w-full h-full flex items-center">
                 <a-radio :checked="secondRecord[row.AttributeName].Checked"
                   @change="() => clickRecordSecond(row.AttributeName)"></a-radio>
-                {{ secondRecord[row.AttributeName].Value }}
+                <CustomComponent :disabled="true" :default-value="secondRecord[row.AttributeName].Value"
+                :attribute="validAttributeList.find(item => item.AttributeName === row.AttributeName)" :module-config="props.moduleConfig"/>
               </div>
             </template>
             <template #default="{ row }" v-if="column.Name === 'result'" align="center">
-              {{ resultRecord[row.AttributeName].Value }}
+              <CustomComponent :disabled="row.AttributeName === 'Code'" :default-value="resultRecord[row.AttributeName].Value"
+              :attribute="validAttributeList.find(item => item.AttributeName === row.AttributeName)" :module-config="props.moduleConfig"
+              @update-value="handleUpdateValue"/>
             </template>
           </vxe-column>
         </template>
@@ -123,16 +128,7 @@ const close = () => {
 }
 
 const merge = () => {
-  // 构造合并后的数据（提取resultRecord中的Value）
-  const mergedRecord: { [key: string]: any } = {};
-  getValidFieldNames().forEach(key => {
-    mergedRecord[key] = resultRecord.value[key].Value;
-  });
-  // 保留主键，从第一条记录获取
-  mergedRecord.ID = props.recordList[0].ID;
-  // 通知父组件合并结果
-  emit('mergeCallback', mergedRecord);
-  close(); // 合并后关闭弹窗
+  console.log(resultRecord.value)
 };
 
 const clickRecordFirst = (attributeName: string) => {
@@ -153,6 +149,18 @@ const clickRecordFirst = (attributeName: string) => {
     resultRecord.value[attributeName].Value = firstRecord.value[attributeName].Value;
   }
 }
+
+// 新增：处理子组件的更新事件，更新resultRecord
+const handleUpdateValue = (data: { attributeName: string; value: any }) => {
+    const { attributeName, value } = data;
+    // 更新resultRecord中对应属性的值
+    if (resultRecord.value[attributeName]) {
+        resultRecord.value[attributeName].Value = value;
+    } else {
+        // 若属性不存在则初始化（一般不会触发）
+        resultRecord.value[attributeName] = { Value: value, Checked: false };
+    }
+};
 
 const clickRecordSecond = (attributeName: string) => {
   // 如果当前已经选中，则不做处理
@@ -189,4 +197,10 @@ const columnDragConfig = reactive<VxeTablePropTypes.ColumnDragConfig<any>>({
 defineExpose({
   openCustomEvent
 })
+
+const getRowClassName = ({row}:{row:any}) => {
+  if(secondRecord.value[row.AttributeName].Value !== firstRecord.value[row.AttributeName].Value){
+    return 'yellow-row';
+  }
+}
 </script>

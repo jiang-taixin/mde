@@ -17,7 +17,7 @@ export interface LovItem{
   LOVName: string,
   LovDisplayName:string|null,
   Name:string,
-  Value:number,
+  Value:number|string,
   Squeue:number,
   IsDefault:boolean,
   Language:Language|null,

@@ -140,5 +140,8 @@ export default {
   merge:{
     title:"合并 {name} 记录",
     merge:"合并"
+  },
+  validString:{
+    notNull:"This field is required",
   }
 };

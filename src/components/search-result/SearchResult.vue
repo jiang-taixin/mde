@@ -63,6 +63,11 @@ const props = defineProps({
     type: String,
     required: true,
     default: ''
+  },
+  forMerge:{
+    type:Boolean,
+    required:false,
+    default:false,
   }
 });
 
@@ -133,8 +138,9 @@ const cellDblclickEvent: VxeTableEvents.CellDblclick = ({ row, $event }) => {
   emits('confirm');
 }
 const handleCurrentChange: VxeTableEvents.CurrentRowChange = ({ row, $event }) => {
-  model.value.Code = row.Code;
-  model.value.DisplayName = row.EnglishName;
+  // 合并功能里面用的是Name和ID
+  model.value.Code = props.forMerge?row.ID:row.Code;
+  model.value.DisplayName = props.forMerge?row.Name:row.EnglishName;
 }
 const columnDragConfig = reactive<VxeTablePropTypes.ColumnDragConfig<any>>({
   isCrossDrag: true,
