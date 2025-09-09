@@ -142,6 +142,9 @@ export default {
     merge:"Merge"
   },
   validString:{
-    notNull:"请输入必填项",
+    notNull:"This field is required",
+    overLength:"Must be less than max length:{length}",
+    overMax:"Must be less than max value:{count}",
+    inValidError:"Input fromat invalid: valid format is {format}",
   }
 };

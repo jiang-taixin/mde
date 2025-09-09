@@ -5,9 +5,11 @@
         v-model:value="localValue" @input="handleValueChange"></a-input>
     </template>
     <template v-if="props.attribute.ExtControlType === 'provincecityfield'">
-      <a-select class="w-1/2" size="small" v-model:value="provinceValue"
-        :field-names="{ label: 'ChineseName', value: 'ID' }" :disabled="props.disabled" :options="provinceOptions"
-        @change="handleProvinceChange"></a-select>
+      <a-form-item-rest>
+        <a-select class="w-1/2" size="small" v-model:value="provinceValue"
+          :field-names="{ label: 'ChineseName', value: 'ID' }" :disabled="props.disabled" :options="provinceOptions"
+          @change="handleProvinceChange"></a-select>
+      </a-form-item-rest>
       <a-select class="w-1/2" size="small" v-model:value="localValue"
         :field-names="{ label: 'ChineseName', value: 'ID' }" :disabled="props.disabled" :options="cityOptions"
         @change="handleCityChange"></a-select>
@@ -23,9 +25,8 @@
         @change="handleValueChange"></a-select>
     </template>
     <template v-if="props.attribute.ExtControlType === 'numberfield'">
-      <a-input-number min="0" :max="props.attribute.Length" class="w-full" size="small"
-        :placeholder="(props.attribute.PromptMessage as string)" :disabled="props.disabled" v-model:value="localValue"
-        @change="handleValueChange"></a-input-number>
+      <a-input-number min="0" :precision="props.attribute.DigitalPrecision" class="w-full" size="small" :placeholder="(props.attribute.PromptMessage as string)"
+        :disabled="props.disabled" v-model:value="localValue" @change="handleValueChange"></a-input-number>
     </template>
     <template v-if="props.attribute.ExtControlType === 'inputcheckfield'">
       <a-input-search class="w-full" size="small" :disabled="props.disabled" v-model:value="localValue"
@@ -36,14 +37,15 @@
   <a-modal v-model:open="open" :width="600" @ok="confirm">
     <template #title>
       <div class="flex items-center">
-         {{t('searchButtonTitle')}}
-      <a-button type="link" size="small"
-          :icon="h('img', { src: getIcon('filter'), style: 'width: 14px; margin-left:4px' })" @click="openCustom"></a-button>
+        {{ t('searchButtonTitle') }}
+        <a-button type="link" size="small"
+          :icon="h('img', { src: getIcon('filter'), style: 'width: 14px; margin-left:4px' })"
+          @click="openCustom"></a-button>
       </div>
 
     </template>
-    <SearchResult ref="resultRef" v-model:selectedObject="selectedObject" :entity-config-name="props.moduleConfig.Name" :target-entity-name="props.moduleConfig.Name"
-     :key-word="localValue" @confirm="confirm" :for-merge="true"/>
+    <SearchResult ref="resultRef" v-model:selectedObject="selectedObject" :entity-config-name="props.moduleConfig.Name"
+      :target-entity-name="props.moduleConfig.Name" :key-word="localValue" @confirm="confirm" :for-merge="true" />
   </a-modal>
 </template>
 <script setup lang="ts">
@@ -68,9 +70,8 @@ const props = defineProps({
     default: null
   },
   defaultValue: {
-    type: String,
+    type: [String, null],
     required: true,
-    default: null
   },
   moduleConfig: {
     type: Object as PropType<ModuleConfig>,
@@ -85,7 +86,7 @@ const selectedObject = ref<SeletedObject>({
 });
 
 const resultRef = ref(null);
-const localValue = ref(props.defaultValue);
+const localValue = ref(props.defaultValue as string);
 const lovOptions = ref<LovItem[]>([]);
 const comboxOptions = ref<LovItem[]>([]);
 const provinceOptions = ref<Geography[]>([]);
@@ -143,10 +144,10 @@ const getProvinceOptions = async () => {
     provinceOptions.value = res;
     // 获取到省的列表后再根据传进来的市ID定位到当前省   然后根据省id再获取市列表
     if (!isVoid(props.defaultValue)) {
-      const proRes = await getParentGeoGraphy(props.defaultValue);
+      const proRes = await getParentGeoGraphy(props.defaultValue as string);
       if (proRes) {
         provinceValue.value = proRes.ID;
-        localValue.value = props.defaultValue;
+        localValue.value = props.defaultValue as string;
         getCityOptions();
       }
     }
@@ -196,18 +197,18 @@ const handleValueChange = () => {
   })
 }
 
-const search = (value: string) =>{
-  if(!isVoid(value)){
+const search = (value: string) => {
+  if (!isVoid(value)) {
     localValue.value = value;
     open.value = !open.value;
   }
-  else{
+  else {
     message.error(t('typeKeywords'));
   }
 }
 
-const confirm = () =>{
-  if(isVoid(selectedObject.value.Code)){
+const confirm = () => {
+  if (isVoid(selectedObject.value.Code)) {
     message.error(t('noneSelectionTips'));
     return;
   }
@@ -221,7 +222,7 @@ const confirm = () =>{
 
 
 const openCustom = () => {
-  if(resultRef.value){
+  if (resultRef.value) {
     (resultRef.value as any).openCustomEvent();
   }
 }

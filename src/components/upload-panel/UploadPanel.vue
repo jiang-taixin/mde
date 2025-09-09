@@ -43,7 +43,7 @@
         {{ t('upload.deleteTitle',{name:props.moduleConfig.DisplayName}) }}
       </div>
     </template>
-    <DeletePanel @closeCallback="closeDeletePanel" :impact-entities="impactEntities" :session-id="sessionID"></DeletePanel>
+    <DeletePanel @closeCallback="closeDeletePanel"  :impact-entities="impactEntities" :session-id="sessionID"></DeletePanel>
   </a-modal>
   <!--预览弹窗-->
   <a-modal v-model:open="openReview" :width="500" :footer="null" :destroy-on-close="true">
@@ -59,12 +59,13 @@
 <script setup lang="ts">
 import { ref, h } from 'vue';
 import { getIcon } from '@/utils/icon-transfer';
-import type { UploadChangeParam, UploadProps } from 'ant-design-vue';
+import { message, type UploadChangeParam, type UploadProps } from 'ant-design-vue';
 import { isVoid } from '../../utils/datacheck';
 import { ImportType } from '@/models/moduleConfigModel';
 import DeletePanel from '../delete-panel/DeletePanel.vue';
 import PreviewPanel from '../preview-panel/PreviewPanel.vue';
 import { ValidationType, type ImpactEntity, type Summary } from '@/models/uploadModel';
+import { importFile } from '@/services/upload-file-service';
 const { t } = useI18n();
 const contentContainer = ref<HTMLDivElement|null>(null);
 const fileList = ref<UploadProps['fileList']>([]);
@@ -111,7 +112,7 @@ const previewSummary = ref<Summary>({
   Update: 0
 });
 const previewValidationType = ref<ValidationType>(ValidationType.All);
-const emit = defineEmits(['closeCallback']);
+const emit = defineEmits(['closeCallback','successCallback']);
 
 onMounted(() =>{
   const importType = props.moduleConfig.ImportTypeEnum;
@@ -223,8 +224,15 @@ const beforeUpload: UploadProps['beforeUpload'] = file => {
   return false;
 };
 
-const importData = () => {
-  emit('closeCallback');
+const importData = async () => {
+  const importRes = await importFile(props.moduleConfig.EntityName, sessionID.value);
+  if(importRes.IsSuccess){
+    message.success(t('success'));
+    emit('successCallback');
+  }
+  else{
+    message.error(importRes.Message);
+  }
 };
 
 const closeDeletePanel = () =>{

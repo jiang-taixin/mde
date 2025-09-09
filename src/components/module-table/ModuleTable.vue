@@ -164,7 +164,7 @@
         {{ t('upload.title') }}
       </div>
     </template>
-    <UploadPanel @closeCallback="closeUploadPanel" :module-config="moduleConfig"></UploadPanel>
+    <UploadPanel @closeCallback="closeUploadPanel" @successCallback="successUploadPanel" :module-config="moduleConfig"></UploadPanel>
   </a-modal>
   <!--删除弹窗-->
   <a-modal v-model:open="openDelete" :width="500" :footer="null" :destroy-on-close="true">
@@ -743,6 +743,10 @@ const openDetailPanel = () => {
 // 关闭上传面板
 const closeUploadPanel = () => {
   openUpload.value = false;
+}
+
+const successUploadPanel = () =>{
+  loadGridData();
 }
 // 关闭删除面板
 const closeDeletePanel = () => {

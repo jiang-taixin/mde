@@ -142,6 +142,9 @@ export default {
     merge:"合并"
   },
   validString:{
-    notNull:"This field is required",
+    notNull:"必填字段不能为空",
+    overLength:"长度不能超过最大长度{length}",
+    overMax:"必须小于最大值{count}",
+    inValidError:"输入的格式无效: 有效格式是 {format}",
   }
 };

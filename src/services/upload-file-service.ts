@@ -26,4 +26,10 @@ export async function proceedDeletion(sessionID:string):Promise<any> {
   return http.get(`/API/entity/ProceedDeletion?sessionID=${sessionID}`);
 }
 
+// 导入
+export async function importFile(entityName:string,sessionID:string):Promise<any> {
+
+  return http.get(`/API/excel/ProceedExcelOperation?EntityName=${entityName}&sessionID=${sessionID}`);
+}
+
 
