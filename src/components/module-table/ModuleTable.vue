@@ -199,7 +199,7 @@
           @click="openMergeCustomEvent"></a-button>
       </div>
     </template>
-    <MergePanel ref="mergeRef" @closeCallback="closeMergePanel" :module-config="moduleConfig" :record-list="selectedRows">
+    <MergePanel ref="mergeRef" @closeCallback="closeMergePanel" @successCallback="successMergePanel" :module-config="moduleConfig" :record-list="selectedRows">
     </MergePanel>
   </a-modal>
 </template>
@@ -727,6 +727,11 @@ const openMergeCustomEvent = () => {
 const closeMergePanel = () => {
   openMerge.value = false;
 }
+// 上传成功
+const successMergePanel = () =>{
+  openMerge.value = false;
+  loadGridData();
+}
 // 关闭权限面板
 const closeSecurityPanel = () => {
   openSecurity.value = false;
@@ -744,8 +749,9 @@ const openDetailPanel = () => {
 const closeUploadPanel = () => {
   openUpload.value = false;
 }
-
+// 上传成功
 const successUploadPanel = () =>{
+  openUpload.value = false;
   loadGridData();
 }
 // 关闭删除面板

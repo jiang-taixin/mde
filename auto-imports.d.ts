@@ -71,6 +71,7 @@ declare global {
   const hideLoading: typeof import('./src/utils/loading')['hideLoading']
   const http: typeof import('./src/http/index')['default']
   const i18n: typeof import('./src/language/index')['i18n']
+  const importFile: typeof import('./src/services/upload-file-service')['importFile']
   const inject: typeof import('vue')['inject']
   const insertRecords: typeof import('./src/services/choose-service')['insertRecords']
   const isElement: typeof import('./src/utils/datacheck')['isElement']

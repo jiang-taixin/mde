@@ -6,46 +6,49 @@
     </template>
     <template v-if="props.attribute.ExtControlType === 'provincecityfield'">
       <a-form-item-rest>
-        <a-select class="w-1/2" size="small" v-model:value="provinceValue"
-          :field-names="{ label: 'ChineseName', value: 'ID' }" :disabled="props.disabled" :options="provinceOptions"
-          @change="handleProvinceChange"></a-select>
+        <a-select class="w-1/2 max-w-48" size="small" v-model:value="provinceValue" :disabled="props.disabled"
+          :options="provinceOptions" @change="handleProvinceChange" show-search :filter-option="filterOption"
+          :loading="provinceLoading"></a-select>
       </a-form-item-rest>
-      <a-select class="w-1/2" size="small" v-model:value="localValue"
-        :field-names="{ label: 'ChineseName', value: 'ID' }" :disabled="props.disabled" :options="cityOptions"
-        @change="handleCityChange"></a-select>
+      <a-select class="w-1/2 max-w-48" size="small" v-model:value="localValue"
+        :disabled="props.disabled" :options="cityOptions"
+        @change="handleCityChange" show-search :filter-option="filterOption" :loading="cityLoading"></a-select>
     </template>
     <template v-if="props.attribute.ExtControlType === 'lovfield'">
       <a-select :allow-clear="true" class="w-full" size="small" v-model:value="localValue"
         :field-names="{ label: 'Name', value: 'ID' }" :disabled="props.disabled" :options="lovOptions"
-        @change="handleValueChange"></a-select>
+        @change="handleValueChange" :loading="loadingSelect"></a-select>
     </template>
     <template v-if="props.attribute.ExtControlType === 'boolvaluecombox'">
       <a-select :allow-clear="true" class="w-full" size="small" v-model:value="localValue"
         :field-names="{ label: 'Name', value: 'Value' }" :disabled="props.disabled" :options="comboxOptions"
-        @change="handleValueChange"></a-select>
+        @change="handleValueChange" :loading="loadingSelect"></a-select>
     </template>
     <template v-if="props.attribute.ExtControlType === 'numberfield'">
-      <a-input-number min="0" :precision="props.attribute.DigitalPrecision" class="w-full" size="small" :placeholder="(props.attribute.PromptMessage as string)"
-        :disabled="props.disabled" v-model:value="localValue" @change="handleValueChange"></a-input-number>
+      <a-input-number min="0" :precision="props.attribute.DigitalPrecision" class="w-full" size="small"
+        :placeholder="(props.attribute.PromptMessage as string)" :disabled="props.disabled" v-model:value="localValue"
+        @change="handleValueChange"></a-input-number>
     </template>
     <template v-if="props.attribute.ExtControlType === 'inputcheckfield'">
-      <a-input-search class="w-full" size="small" :disabled="props.disabled" v-model:value="localValue"
-        @change="handleValueChange" @search="search">
+      <a-input-search class="w-full" size="small" :disabled="props.disabled" v-model:value="inputWord"
+      @search="search" :loading="loading">
       </a-input-search>
     </template>
   </div>
-  <a-modal v-model:open="open" :width="600" @ok="confirm">
+  <a-modal v-model:open="open" :width="600" @ok="confirm" :destroy-on-close="true">
     <template #title>
       <div class="flex items-center">
         {{ t('searchButtonTitle') }}
+        <a-form-item-rest>
         <a-button type="link" size="small"
           :icon="h('img', { src: getIcon('filter'), style: 'width: 14px; margin-left:4px' })"
           @click="openCustom"></a-button>
+          </a-form-item-rest>
       </div>
 
     </template>
     <SearchResult ref="resultRef" v-model:selectedObject="selectedObject" :entity-config-name="props.moduleConfig.Name"
-      :target-entity-name="props.moduleConfig.Name" :key-word="localValue" @confirm="confirm" :for-merge="true" />
+      :target-entity-name="props.moduleConfig.Name" :key-word="inputWord" @confirm="confirm" :for-merge="true" />
   </a-modal>
 </template>
 <script setup lang="ts">
@@ -58,6 +61,11 @@ import { message } from 'ant-design-vue';
 import type { SeletedObject } from '../search-result/SearchResult.vue';
 const { t } = useI18n();
 const open = ref<boolean>(false);
+const loading = ref<boolean>(false);
+const cityLoading = ref<boolean>(false);
+const provinceLoading = ref<boolean>(false);
+const loadingSelect = ref<boolean>(false);
+
 const props = defineProps({
   disabled: {
     type: Boolean,
@@ -70,7 +78,7 @@ const props = defineProps({
     default: null
   },
   defaultValue: {
-    type: [String, null],
+    type: [String, null, Number],
     required: true,
   },
   moduleConfig: {
@@ -78,6 +86,10 @@ const props = defineProps({
     required: true,
     default: null
   },
+  typeValue:{
+    type:String,
+    required:false,
+  }
 });
 
 const selectedObject = ref<SeletedObject>({
@@ -89,15 +101,29 @@ const resultRef = ref(null);
 const localValue = ref(props.defaultValue as string);
 const lovOptions = ref<LovItem[]>([]);
 const comboxOptions = ref<LovItem[]>([]);
-const provinceOptions = ref<Geography[]>([]);
+const provinceOptions = ref<any>([]);
+const cityOptions = ref<any>([]);
 const provinceValue = ref<string>('');
-const cityOptions = ref<Geography[]>([]);
+const inputWord = ref<string>('');
+const skipMainStore = ref<boolean>(false);
 const emit = defineEmits<{
-  (e: 'updateValue', data: { attributeName: string; value: any }): void
+  (e: 'updateValue', data: { name: string; value: any }): void
 }>();
 watch(() => props.defaultValue, (newValue) => {
   localValue.value = newValue as any;
 }, { immediate: true });
+watch(() => props.defaultValue, () => {
+  if(skipMainStore.value){
+    skipMainStore.value = false;
+    return;
+  }
+  if (props.attribute.ExtControlType === 'inputcheckfield') {
+    getMainStore()
+  }
+  if (props.attribute.ExtControlType === 'provincecityfield') {
+    getProvinceOptions()
+  }
+});
 onMounted(() => {
   // 如果是下拉组件  获取元素据列表
   if (props.attribute.ExtControlType === 'lovfield') {
@@ -121,7 +147,9 @@ onMounted(() => {
 })
 
 const getLovOptions = async () => {
+  loadingSelect.value = true;
   const res = await getLovItems(props.attribute.TargetLovID);
+  loadingSelect.value = false;
   if (res) {
     lovOptions.value = res;
     // lov类型使用的是ID
@@ -130,7 +158,9 @@ const getLovOptions = async () => {
 }
 
 const getComboxOptions = async () => {
+  loadingSelect.value = true;
   const res = await getComboxItems(props.attribute.AttributeName);
+  loadingSelect.value = false;
   if (res) {
     comboxOptions.value = res;
     // bool类型的下拉使用的是Value
@@ -139,9 +169,15 @@ const getComboxOptions = async () => {
 }
 
 const getProvinceOptions = async () => {
+  provinceLoading.value = true;
   const res = await getGeoGraphyList(parentId);
-  if (res) {
-    provinceOptions.value = res;
+  provinceLoading.value = false;
+  provinceOptions.value = [];
+  if (res && Array.isArray(res)) {
+    res.forEach(item => {
+      const provinceData = { label: `${item.ChineseName}(${item.PYCode})`, value: item.ID };
+      provinceOptions.value.push(provinceData);
+    })
     // 获取到省的列表后再根据传进来的市ID定位到当前省   然后根据省id再获取市列表
     if (!isVoid(props.defaultValue)) {
       const proRes = await getParentGeoGraphy(props.defaultValue as string);
@@ -153,54 +189,78 @@ const getProvinceOptions = async () => {
     }
   }
 }
+const getCityOptions = async () => {
+  cityLoading.value = true;
+  cityOptions.value = [];
+  const cityRes = await getGeoGraphyList(provinceValue.value);
+  cityLoading.value = false;
+  if (cityRes) {
+    cityRes.forEach(item => {
+      const cityData = { label: `${item.ChineseName}(${item.PYCode})`, value: item.ID };
+      cityOptions.value.push(cityData);
+    })
+  }
+
+}
+
+
 const getMainStore = async () => {
   // 获取总店信息
-
   if (!isVoid(props.defaultValue)) {
+    loading.value = true;
     let searchCondition: SearchConditionValue = {} as SearchConditionValue;
+    let masterCondition: any = [];
+    if(props.typeValue && props.typeValue !== '1' && props.typeValue !== '3'){
+      masterCondition.push({
+        Name: 'DrugstoreTypeLovItemValue', Value: 3
+      });
+    }
     searchCondition = { AndOr: ANDOR.ANDOR, Conditions: [{ Name: 'ID', Value: props.defaultValue }] };
     const params: RequestGridParams = {
       PageIndex: 1,
       PageSize: -1,
       EntityConfigName: props.moduleConfig.Name,
-      SearchCondition: searchCondition
+      SearchCondition: searchCondition,
+      MasterCondition: masterCondition.length > 0?masterCondition:null
     }
     const storeRes = await getGridData(params);
+    loading.value = false;
     if (storeRes) {
-      localValue.value = JSON.parse(storeRes.JsonData)[0].Name;
+      inputWord.value = JSON.parse(storeRes.JsonData)[0].Name;
     }
   }
-
+  else{
+    inputWord.value = '';
+  }
 }
 const handleProvinceChange = () => {
   localValue.value = '';
+  updateValue();
   getCityOptions();
 }
 const handleCityChange = () => {
-  emit('updateValue', {
-    attributeName: props.attribute.AttributeName,
-    value: localValue.value
-  });
+  updateValue();
 }
 
-const getCityOptions = async () => {
-  const cityRes = await getGeoGraphyList(provinceValue.value);
-  if (cityRes) {
-    cityOptions.value = cityRes;
-  }
-}
-
-const handleValueChange = () => {
+const updateValue = () => {
   emit('updateValue', {
-    attributeName: props.attribute.AttributeName,
-    value: localValue.value
+    name: props.attribute.Name,
+    value: localValue.value === undefined ? '' : localValue.value
   })
 }
 
+const handleValueChange = () => {
+  updateValue();
+}
+
+const filterOption = (input: string, option: any) => {
+  return option.ChineseName.toLowerCase().includes(input.toLowerCase());
+};
+
 const search = (value: string) => {
   if (!isVoid(value)) {
-    localValue.value = value;
-    open.value = !open.value;
+    inputWord.value = value;
+    open.value = true;
   }
   else {
     message.error(t('typeKeywords'));
@@ -212,11 +272,10 @@ const confirm = () => {
     message.error(t('noneSelectionTips'));
     return;
   }
-  localValue.value = selectedObject.value.DisplayName;
-  emit('updateValue', {
-    attributeName: props.attribute.AttributeName,
-    value: selectedObject.value.Code
-  })
+  skipMainStore.value = true;
+  localValue.value = selectedObject.value.Code;
+  inputWord.value = selectedObject.value.DisplayName;
+  updateValue();
   open.value = false;
 }
 

@@ -139,7 +139,8 @@ export default {
   },
   merge:{
     title:"Merge Records of {name}",
-    merge:"Merge"
+    merge:"Merge",
+    success:"Merge Successfully!"
   },
   validString:{
     notNull:"This field is required",

@@ -20,10 +20,9 @@
               <!-- 第一条记录 -->
               <template #default="{ row }" v-if="column.Name === 'record1'" align="center">
                 <div class="w-full h-full flex items-center">
-                  <a-radio :checked="firstRecord[row.AttributeName].Checked"
-                    @change="() => clickRecordFirst(row.AttributeName)" />
-                  <CustomComponent :disabled="true" :default-value="firstRecord[row.AttributeName].Value"
-                    :attribute="validAttributeList.find(item => item.AttributeName === row.AttributeName)"
+                  <a-radio :checked="firstRecord[row.Name].Checked" @change="() => clickRecordFirst(row.Name)" />
+                  <CustomComponent :disabled="true" :default-value="firstRecord[row.Name].Value"
+                    :attribute="validAttributeList.find(item => item.Name === row.Name)"
                     :module-config="props.moduleConfig" />
                 </div>
               </template>
@@ -31,33 +30,32 @@
               <!-- 第二条记录 -->
               <template #default="{ row }" v-if="column.Name === 'record2'" align="center">
                 <div class="w-full h-full flex items-center">
-                  <a-radio :checked="secondRecord[row.AttributeName].Checked"
-                    @change="() => clickRecordSecond(row.AttributeName)" />
-                  <CustomComponent :disabled="true" :default-value="secondRecord[row.AttributeName].Value"
-                    :attribute="validAttributeList.find(item => item.AttributeName === row.AttributeName)"
+                  <a-radio :checked="secondRecord[row.Name].Checked" @change="() => clickRecordSecond(row.Name)" />
+                  <CustomComponent :disabled="true" :default-value="secondRecord[row.Name].Value"
+                    :attribute="validAttributeList.find(item => item.Name === row.Name)"
                     :module-config="props.moduleConfig" />
                 </div>
               </template>
 
               <!-- 合并结果（需要校验） -->
               <template #default="{ row }" v-if="column.Name === 'result'" align="center">
-                <a-form-item :name="[row.AttributeName, 'Value']" :rules="fieldRules(row)"
-                  :validate-trigger="['change', 'blur']" :validate-status="errors[row.AttributeName] ? 'error' : ''"
-                  help="" class="w-full p-0">
+                <a-form-item :name="[row.Name, 'Value']" :rules="fieldRules(row)" :validate-trigger="['change', 'blur']"
+                  :validate-status="errors[row.Name] ? 'error' : ''" help="" class="w-full p-0">
                   <div class="w-full flex items-center">
                     <!-- 输入组件 -->
                     <div class="flex-1">
-                      <CustomComponent :disabled="row.AttributeName === 'Code'"
-                        :default-value="resultRecord[row.AttributeName]?.Value"
-                        :attribute="validAttributeList.find(item => item.AttributeName === row.AttributeName)"
-                        :module-config="props.moduleConfig" @update-value="handleUpdateValue" />
+                      <CustomComponent :disabled="resultRecord[row.Name].Disable"
+                        :default-value="resultRecord[row.Name]?.Value"
+                        :attribute="validAttributeList.find(item => item.Name === row.Name)"
+                        :module-config="props.moduleConfig" @update-value="handleUpdateValue"
+                        :type-value="resultRecord[row.Name].TypeValue" />
                     </div>
                     <!-- 错误按钮 -->
-                    <div class="ml-2" v-if="errors[row.AttributeName]">
+                    <div class="ml-2" v-if="errors[row.Name]">
                       <a-popover placement="right" trigger="click">
                         <template #content>
                           <div style="max-width:260px; word-break:break-word;">
-                            {{ errors[row.AttributeName] }}
+                            {{ errors[row.Name] }}
                           </div>
                         </template>
                         <a-button type="text" danger size="small">!</a-button>
@@ -74,7 +72,7 @@
 
     <!-- 底部按钮 -->
     <div class="flex justify-end gap-2 w-full mt-3">
-      <a-button class="w-28" size="small" @click="merge">{{ t('merge.merge') }}</a-button>
+      <a-button class="w-28" size="small" @click="merge" :disabled="merging">{{ t('merge.merge') }}</a-button>
       <a-button class="w-28" size="small" @click="close">{{ t('close') }}</a-button>
     </div>
   </div>
@@ -87,17 +85,20 @@ import type { Attribute, ModuleConfig } from '@/models/moduleConfigModel'
 import { type CustomColumn } from '@/models/SecurityModel'
 import type { VxeTableInstance, VxeTablePropTypes } from 'vxe-table'
 import { useI18n } from 'vue-i18n'
+import { message } from 'ant-design-vue'
 
 interface RecordItem {
   Value: any
   Checked: boolean,
+  Disable?: boolean,
+  TypeValue?: string,
 }
 
-const { t } = useI18n()
-const emit = defineEmits(['closeCallback', 'mergeCallback'])
-const tableRef = ref<VxeTableInstance<any>>()
-const formRef = ref<any>()
-const columns = ref<CustomColumn[]>()
+const { t } = useI18n();
+const emit = defineEmits(['closeCallback', 'successCallback']);
+const tableRef = ref<VxeTableInstance<any>>();
+const formRef = ref<any>();
+const columns = ref<CustomColumn[]>();
 const props = defineProps({
   moduleConfig: {
     type: Object as PropType<ModuleConfig>,
@@ -111,36 +112,39 @@ const props = defineProps({
   }
 })
 
-const validAttributeList = ref<Attribute[]>([])
-const firstRecord = ref<Record<string, RecordItem>>({})
-const secondRecord = ref<Record<string, RecordItem>>({})
-const resultRecord = ref<Record<string, RecordItem>>({})
+const validAttributeList = ref<Attribute[]>([]);
+const firstRecord = ref<Record<string, RecordItem>>({});
+const secondRecord = ref<Record<string, RecordItem>>({});
+const resultRecord = ref<Record<string, RecordItem>>({});
+const LostDataID = ref<string>('');
+const SaveDataID = ref<string>('');
+const merging = ref<boolean>(false);
 
 // 保存错误
-const errors = reactive<Record<string, string>>({})
+const errors = reactive<Record<string, string>>({});
 
 // 单字段校验方法
 const validateField = async (fieldName: string) => {
   try {
-    await formRef.value?.validateFields([[fieldName, 'Value']])
-    if (errors[fieldName]) delete errors[fieldName]
+    await formRef.value?.validateFields([[fieldName, 'Value']]);
+    if (errors[fieldName]) delete errors[fieldName];
   } catch (e: any) {
     if (e?.errorFields && e.errorFields[0]) {
       const name = Array.isArray(e.errorFields[0].name)
         ? e.errorFields[0].name[0]
         : e.errorFields[0].name
       if (name) {
-        errors[name] = e.errorFields[0].errors?.[0] ?? '校验失败'
+        errors[name] = e.errorFields[0].errors?.[0] ?? '校验失败';
       }
     }
   }
 }
 
 const fieldRules = (row: any) => {
-  const attr = validAttributeList.value.find(a => a.AttributeName === row.AttributeName)
+  const attr = validAttributeList.value.find(a => a.Name === row.Name);
   const rules: any[] = []
   if (attr && !attr.IsNullable) {
-    rules.push({ required: true, message: t('validString.notNull') })
+    rules.push({ required: true, message: t('validString.notNull') });
   }
   if (attr && attr.RegExpression !== null) {
     rules.push({
@@ -151,22 +155,22 @@ const fieldRules = (row: any) => {
   if (attr?.Length && attr.ExtControlType === 'numberfield') {
     rules.push({
       validator: (_: any, value: any) => {
-        if (value == null) return Promise.resolve()
+        if (value == null) return Promise.resolve();
         if (Number(value) > attr.Length) {
-          return Promise.reject(new Error(t('validString.overMax', { count: attr.Length })))
+          return Promise.reject(new Error(t('validString.overMax', { count: attr.Length })));
         }
-        return Promise.resolve()
+        return Promise.resolve();
       }
     })
   }
   if (attr?.Length && attr.ExtControlType === 'textfield') {
     rules.push({
       validator: (_: any, value: any) => {
-        if (value == null) return Promise.resolve()
+        if (value == null) return Promise.resolve();
         if (String(value).length > attr.Length) {
-          return Promise.reject(new Error(t('validString.overLength', { length: attr.Length })))
+          return Promise.reject(new Error(t('validString.overLength', { length: attr.Length })));
         }
-        return Promise.resolve()
+        return Promise.resolve();
       }
     })
   }
@@ -174,30 +178,61 @@ const fieldRules = (row: any) => {
 }
 
 const getValidFieldNames = () => {
-  return validAttributeList.value.map(attr => attr.AttributeName).filter(name => name !== 'ID')
+  return validAttributeList.value.map(attr => attr.Name).filter(name => name !== 'ID');
 }
 
 onMounted(() => {
-  if (props.recordList.length < 2) return
-  columns.value = merge_columns
+  if (props.recordList.length < 2) return;
+  columns.value = merge_columns;
   MergeFields[props.moduleConfig.EntityName].Fields.forEach((item: string) => {
-    const attribute = props.moduleConfig.Attributes.find(a => a.AttributeName === item)
-    if (attribute) validAttributeList.value.push(attribute as Attribute)
+    // MergeFields里面配置的都是AttributeName    这里要按照AttributeName获取
+    const attribute = props.moduleConfig.Attributes.find(a => a.AttributeName === item);
+    if (attribute) validAttributeList.value.push(attribute as Attribute);
   })
   validAttributeList.value.forEach(attr => {
-    const fieldName = attr.AttributeName
-    if (fieldName === 'ID') return
+    // 这里实际使用的是 Name
+    const fieldName = attr.Name;
+    if (fieldName === 'ID') return;
     firstRecord.value[fieldName] = {
-      Value: props.recordList[0][fieldName] ?? null,
-      Checked: true
+      Value: props.recordList[0][fieldName],
+      Checked: true,
     }
     secondRecord.value[fieldName] = {
-      Value: props.recordList[1][fieldName] ?? null,
-      Checked: false
+      Value: props.recordList[1][fieldName],
+      Checked: false,
     }
     resultRecord.value[fieldName] = { ...firstRecord.value[fieldName] }
-  })
+  });
+  LostDataID.value = props.recordList[1].ID;
+  SaveDataID.value = props.recordList[0].ID;
+  resultRecord.value['Code'].Disable = true;
+  resultRecord.value['DrugstoreTypeLovItemID'].Disable = true;
+  changeParentStoreStatus(0);
 })
+
+const changeParentStoreStatus = (index: number) => {
+  if (props.moduleConfig.EntityName === 'Drugstore') {
+    resultRecord.value['ParentID'].TypeValue = undefined;
+    let parentDrugStore = resultRecord.value['ParentID'].Value;
+    if (parentDrugStore) {
+      let isSingleRootDrugstore = (index === 0 ? props.recordList[0]['DrugstoreTypeLovItemValue'] : props.recordList[1]['DrugstoreTypeLovItemValue']);
+      if (isSingleRootDrugstore === '1' || isSingleRootDrugstore === "3") {
+        resultRecord.value['IsKATerritory'].Value = '';
+      }
+      else {
+        resultRecord.value['ParentID'].TypeValue = isSingleRootDrugstore;
+      }
+      resultRecord.value['IsKATerritory'].Disable = true;
+      resultRecord.value['ParentID'].Disable = true;
+    }
+    else {
+      resultRecord.value['IsKATerritory'].Disable = false;
+      resultRecord.value['ParentID'].Disable = false;
+    }
+  }
+}
+
+
 
 const close = () => {
   emit('closeCallback')
@@ -206,69 +241,97 @@ const close = () => {
 const merge = async () => {
   try {
     Object.keys(errors).forEach(k => delete errors[k])
-    await formRef.value.validate()
-    emit('mergeCallback', resultRecord.value)
+    await formRef.value.validate();
   } catch (err: any) {
-    Object.keys(errors).forEach(k => delete errors[k])
+    Object.keys(errors).forEach(k => delete errors[k]);
     if (err?.errorFields && Array.isArray(err.errorFields)) {
       err.errorFields.forEach((field: any) => {
-        const name = Array.isArray(field.name) ? field.name[0] : field.name
-        if (name) errors[name] = field.errors?.[0] ?? String(field)
+        const name = Array.isArray(field.name) ? field.name[0] : field.name;
+        if (name) errors[name] = field.errors?.[0] ?? String(field);
       })
     }
   }
+  // 转换 resultRecord 为所需格式
+  const record = Object.entries(resultRecord.value).map(([name, item]) => ({
+    Name: validAttributeList.value.find(item => item.Name === name)?.AttributeName,
+    Value: item.Value
+  }));
+  // 确保包含 ID
+  if (!record.some(item => item.Name === 'ID')) {
+    record.unshift({ Name: 'ID', Value: SaveDataID.value });
+  }
+  const mergeParams = {
+    LostDataID: LostDataID.value,
+    EntityName: props.moduleConfig.EntityName,
+    SurvivedRecord: record
+  }
+  merging.value = true;
+  await doMerge(mergeParams).then(res => {
+    if (res.IsSuccess) {
+      message.success(t('merge.success'));
+      emit('successCallback');
+    }
+    else {
+      message.error(res.Message)
+    }
+  }).catch(() => {
+  }).finally(() => {
+    merging.value = false;
+  });
 }
 
-const clickRecordFirst = (attributeName: string) => {
-  if (firstRecord.value[attributeName].Checked) return
-  if (attributeName === 'Code') {
-    const fieldNames = getValidFieldNames()
+const clickRecordFirst = (name: string) => {
+  if (firstRecord.value[name].Checked) return;
+  if (name === 'Code') {
+    const fieldNames = getValidFieldNames();
     fieldNames.forEach(key => {
-      firstRecord.value[key].Checked = true
-      secondRecord.value[key].Checked = false
-      resultRecord.value[key].Value = firstRecord.value[key].Value
-      validateField(key)
+      firstRecord.value[key].Checked = true;
+      secondRecord.value[key].Checked = false;
+      resultRecord.value[key].Value = firstRecord.value[key].Value;
     })
   } else {
-    firstRecord.value[attributeName].Checked = true
-    secondRecord.value[attributeName].Checked = false
-    resultRecord.value[attributeName].Value = firstRecord.value[attributeName].Value
-    validateField(attributeName)
+    firstRecord.value[name].Checked = true;
+    secondRecord.value[name].Checked = false;
+    resultRecord.value[name].Value = firstRecord.value[name].Value;
   }
+  changeParentStoreStatus(0);
+  LostDataID.value = props.recordList[1].ID;
+  SaveDataID.value = props.recordList[0].ID;
 }
 
-const handleUpdateValue = (data: { attributeName: string; value: any }) => {
-  const { attributeName, value } = data
-  if (resultRecord.value[attributeName]) {
-    resultRecord.value[attributeName].Value = value
+const handleUpdateValue = (data: { name: string; value: any }) => {
+  const { name, value } = data;
+  if (resultRecord.value[name]) {
+    resultRecord.value[name].Value = value;
   } else {
-    resultRecord.value[attributeName] = { Value: value, Checked: false }
+    resultRecord.value[name] = { Value: value, Checked: false };
   }
   // 实时校验
-  validateField(attributeName)
+  validateField(name);
 }
 
-const clickRecordSecond = (attributeName: string) => {
-  if (secondRecord.value[attributeName].Checked) return
-  if (attributeName === 'Code') {
-    const fieldNames = getValidFieldNames()
+const clickRecordSecond = (name: string) => {
+  if (secondRecord.value[name].Checked) return;
+  if (name === 'Code') {
+    const fieldNames = getValidFieldNames();
     fieldNames.forEach(key => {
-      firstRecord.value[key].Checked = false
-      secondRecord.value[key].Checked = true
-      resultRecord.value[key].Value = secondRecord.value[key].Value
-      validateField(key)
+      firstRecord.value[key].Checked = false;
+      secondRecord.value[key].Checked = true;
+      resultRecord.value[key].Value = secondRecord.value[key].Value;
     })
   } else {
-    firstRecord.value[attributeName].Checked = false
-    secondRecord.value[attributeName].Checked = true
-    resultRecord.value[attributeName].Value = secondRecord.value[attributeName].Value
-    validateField(attributeName)
+    firstRecord.value[name].Checked = false;
+    secondRecord.value[name].Checked = true;
+    resultRecord.value[name].Value = secondRecord.value[name].Value;
   }
+  changeParentStoreStatus(1);
+  LostDataID.value = props.recordList[0].ID;
+  SaveDataID.value = props.recordList[1].ID;
 }
 
 const openCustomEvent = () => {
-  const $table = tableRef.value
-  if ($table) $table.openCustom()
+  const $table = tableRef.value;
+  if ($table) $table.openCustom();
 }
 
 const columnDragConfig = reactive<VxeTablePropTypes.ColumnDragConfig<any>>({
@@ -281,8 +344,8 @@ const columnDragConfig = reactive<VxeTablePropTypes.ColumnDragConfig<any>>({
 defineExpose({ openCustomEvent })
 
 const getRowClassName = ({ row }: { row: any }) => {
-  if (secondRecord.value[row.AttributeName].Value !== firstRecord.value[row.AttributeName].Value) {
-    return 'yellow-row'
+  if (secondRecord.value[row.Name].Value !== firstRecord.value[row.Name].Value) {
+    return 'yellow-row';
   }
 }
 </script>

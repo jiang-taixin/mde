@@ -2,6 +2,7 @@
   <a-config-provider :theme="{
     token: {
       colorPrimary: '#66BFFF',
+      fontSize:13
     },
   }" :locale="antdLocale">
     <a-layout class="h-full flex">
