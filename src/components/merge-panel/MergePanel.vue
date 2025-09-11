@@ -251,7 +251,7 @@ const merge = async () => {
       })
     }
   }
-  // 转换 resultRecord 为所需格式
+  // 转换 resultRecord 为所需格式 这里需要把resultRecord里面提取的Name再转变为AttributeName ...
   const record = Object.entries(resultRecord.value).map(([name, item]) => ({
     Name: validAttributeList.value.find(item => item.Name === name)?.AttributeName,
     Value: item.Value

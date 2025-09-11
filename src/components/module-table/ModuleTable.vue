@@ -638,7 +638,7 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
     // 上移
     case FeatureName.MoveUp:
       loading.value = true;
-      const upRes = await moveUpOrDown(row.ID, MoveDirection.Up, gridData);
+      const upRes = await moveUpOrDown(row.ID, MoveDirection.Up, gridData,props.moduleConfig.EntityName);
       loading.value = false;
       if (upRes) {
         gridData.JsonData = upRes;
@@ -647,7 +647,7 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
     // 下移
     case FeatureName.MoveDown:
       loading.value = true;
-      const downRes = await moveUpOrDown(row.ID, MoveDirection.Down, gridData);
+      const downRes = await moveUpOrDown(row.ID, MoveDirection.Down, gridData,props.moduleConfig.EntityName);
       loading.value = false;
       if (downRes) {
         gridData.JsonData = downRes;

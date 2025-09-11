@@ -1,5 +1,5 @@
 export function useMoveUpOrDown() {
-  const moveUpOrDown = async (rowId: string, direction: MoveDirection, data: any) => {
+  const moveUpOrDown = async (rowId: string, direction: MoveDirection, data: any,entityName:string) => {
     try {
       const newArray = [...data.JsonData];
       const index = newArray.findIndex(item => item.ID === rowId);
@@ -30,7 +30,7 @@ export function useMoveUpOrDown() {
         ];
       }
       if(isVoid(movedIDs)) return false;
-      const params = { CommandName: 'ChangeSequence', EntityName: "Module", Records: movedIDs };
+      const params = { CommandName: 'ChangeSequence', EntityName: entityName, Records: movedIDs };
       const res = await moveRecordUpDown(params);
       if (res.IsSuccess) {
         return newArray;

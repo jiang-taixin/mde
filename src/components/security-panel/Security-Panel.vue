@@ -113,10 +113,23 @@ const initColumns = () => {
       resourceType.value = ResourceType.Module;
       columns.value = module_security_columns;
       break;
+    case "Entity":
+      resourceType.value = ResourceType.Entity;
+      columns.value = filter_security_columns;
+      break;
+    case "Attribute":
+      resourceType.value = ResourceType.Attribute;
+      columns.value = filter_security_columns;
+      break;
     case "RowFilter":
       resourceType.value = ResourceType.RowFilter;
       columns.value = filter_security_columns;
       break;
+    case "RowFilterAttribute":
+      resourceType.value = ResourceType.RowFilterAttribute;
+      columns.value = filter_security_columns;
+      break;
+
     default:
 
       break;
@@ -197,7 +210,7 @@ const updateScope = (row: SecurityItem) => {
     }
   }
   NewRacList.value.forEach(item => {
-    if(item.PrincipalID === row.PrincipalID){
+    if (item.PrincipalID === row.PrincipalID) {
       item.Scope = row.Scope;
     }
   })
