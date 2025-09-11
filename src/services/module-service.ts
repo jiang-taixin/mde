@@ -26,8 +26,8 @@ export async function saveUserSetting(params:ModuleConfig):Promise<any> {
 export async function deleteRecords(EntityName:string,DataIDs:string[]):Promise<any> {
   return http.post(`/API/entity/TryDeleteRecords`,{EntityName,DataIDs});
 }
-// 上移下移
-export async function moveRecordUpDown(params:any):Promise<any> {
+// 执行实体命令   上移下移,设为主助理,移除版本,发布,激活都用这个接口
+export async function doEntityCommand(params:any):Promise<any> {
   return http.post(`/API/entity/DoEntityCommand`,params);
 }
 

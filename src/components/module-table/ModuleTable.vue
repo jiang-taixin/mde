@@ -686,7 +686,7 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
             EntityName: moduleConfig.value.EntityName,
             Records: [[{ Name: 'ID', Value: selectedRows.value[0].ID }]]
           }
-          const setRes = await moveRecordUpDown(params);
+          const setRes = await doEntityCommand(params);
           if (setRes.IsSuccess) {
             loadGridData();
           }
@@ -699,6 +699,34 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
     // 合并
     case FeatureName.Merge:
       openMerge.value = true;
+      break;
+    // 删除版本
+    case FeatureName.DeleteVersion:
+      Modal.confirm({
+        title: t('warning'),
+        content: t('deleteVersionTips'),
+        okText: t('confirm'),
+        cancelText: t('cancel'),
+        onOk: async () => {
+          let records: any[] = [];
+          selectedRows.value.forEach(item => {
+            records.push([{Name:'ID',Value:item.ID}]);
+          });
+          const params = {
+            CommandName:'DeleteVersionDirectly',
+            EntityName:moduleConfig.value.EntityName,
+            Records:records
+          }
+          const delVerRes = await doEntityCommand(params);
+          if (delVerRes.IsSuccess) {
+            message.success(t('success'));
+            loadGridData();
+          }
+          else {
+            message.error(delVerRes.ErrorMessage)
+          }
+        }
+      });
       break;
     default:
   }

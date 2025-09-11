@@ -31,7 +31,7 @@ export function useMoveUpOrDown() {
       }
       if(isVoid(movedIDs)) return false;
       const params = { CommandName: 'ChangeSequence', EntityName: entityName, Records: movedIDs };
-      const res = await moveRecordUpDown(params);
+      const res = await doEntityCommand(params);
       if (res.IsSuccess) {
         return newArray;
       }

@@ -12,6 +12,7 @@ export default {
   searchButtonTitle:"Search",
   typeKeywords:"Please Type Keywords",
   deleteTips:"Are you sure to delete these records?",
+  deleteVersionTips:"This operation will delete all the related data in this version and can't be restored. Are you sure to proceed?",
   setToPrimaryTips:"Are you sure to set the selected record as primary?",
   deleteListNull:"Please select the records need to delete",
   advancedSearchTips:"Advanced Search Filters",
