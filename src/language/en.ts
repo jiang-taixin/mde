@@ -43,7 +43,9 @@ export default {
   add:"Add",
   save:"Save",
   close:"Close",
-  detailTitle:"Detail -- {title}",
+  createTitle:"Create Detail of {title}",
+  updateTitle:"Detail of {title}",
+  copyAddTitle:"Copy To Add {title}",
   app: {
     title: "Pfizer China Master Data Enricher",
   },

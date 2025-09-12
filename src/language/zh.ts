@@ -43,7 +43,9 @@ export default {
   add:"添加",
   save:"保存",
   close:"关闭",
-  detailTitle:"详情 -- {title}",
+  createTitle:"创建 {title} 的详情",
+  updateTitle:"{title} 的详情",
+  copyAddTitle:"复制添加 {title}",
   app: {
     title: "辉瑞中国主数据管理系统",
   },

@@ -15,6 +15,12 @@ export enum ImportType{
   Full = 3,
   NotSupport = 4,
 }
+// 创建或编辑类型
+export enum CreateUpdateType{
+  Create = 1,
+  Update = 2,
+  CopyAdd = 3
+}
 
 // 按钮点击事件
 export enum FeatureName{

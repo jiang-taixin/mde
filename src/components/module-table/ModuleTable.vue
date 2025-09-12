@@ -146,15 +146,15 @@
     <SecurityPanel ref="securityRef" @closeCallback="closeSecurityPanel" :module-config="moduleConfig"
       :security-id="rowID"></SecurityPanel>
   </a-modal>
-  <!--编辑弹窗-->
-  <a-modal v-model:open="openDetail" :width="500" :footer="null" :destroy-on-close="true">
+  <!--创建或编辑弹窗-->
+  <a-modal v-model:open="openCreateUpdate" :width="500" :footer="null" :destroy-on-close="true">
     <template #title>
       <div class="flex items-center text-lg">
-        <img :src="getIcon('detail-icon')" class="w-4 h-4 mr-1" />
-        {{ t('detailTitle', { title: moduleConfig.DisplayName }) }}
+        {{ createUpdateTitle }}
       </div>
     </template>
-    <DetailPanel @closeCallback="closeEditPanel"></DetailPanel>
+    <CreateUpdatePanel @closeCallback="closeCreateUpdatePanel" @successCallBack="successCreateUpdate"
+    :create-update-type="createUpdateType"></CreateUpdatePanel>
   </a-modal>
   <!--上传弹窗-->
   <a-modal v-model:open="openUpload" :width="500" :footer="null" :destroy-on-close="true">
@@ -164,7 +164,7 @@
         {{ t('upload.title') }}
       </div>
     </template>
-    <UploadPanel @closeCallback="closeUploadPanel" @successCallback="successUploadPanel" :module-config="moduleConfig">
+    <UploadPanel @closeCallback="closeUploadPanel" @successCallback="successUpload" :module-config="moduleConfig">
     </UploadPanel>
   </a-modal>
   <!--删除弹窗-->
@@ -207,7 +207,7 @@
 </template>
 <script setup lang="ts">
 import { ref, h, type PropType } from 'vue';
-import { FeatureName, type Attribute, type ModuleConfig } from '@/models/moduleConfigModel';
+import { CreateUpdateType, FeatureName, type Attribute, type ModuleConfig } from '@/models/moduleConfigModel';
 import { getIcon } from '@/utils/icon-transfer';
 import { message, Modal } from 'ant-design-vue';
 import type { VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table/types/all';
@@ -253,7 +253,6 @@ const rowID = ref<string>('');
 const openSecurity = ref<boolean>(false);
 const securityRef = ref(null);
 const mergeRef = ref(null);
-const openDetail = ref<boolean>(false);
 const openUpload = ref<boolean>(false);
 const showAdvancedSearch = ref<boolean>(false);
 const props = defineProps({
@@ -297,6 +296,9 @@ const props = defineProps({
   }
 });
 const moduleConfig = ref<ModuleConfig>({} as ModuleConfig);
+const createUpdateTitle = ref<string>(t('createTitle',{title:moduleConfig.value.DisplayName}));
+const openCreateUpdate = ref<boolean>(false);
+const createUpdateType = ref<CreateUpdateType>(CreateUpdateType.Create);
 watch(() => props.parentID, (parentId) => {
   if (!isVoid(parentId)) {
     // 子表在主表被选中某行时才加载数据    parentID变化从首页开始加载
@@ -662,7 +664,9 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
       break;
     // 编辑
     case FeatureName.Detail:
-      openDetailPanel();
+      createUpdateTitle.value = t('updateTitle',{title:moduleConfig.value.DisplayName});
+      createUpdateType.value = CreateUpdateType.Update;
+      openCreateUpdatePanel();
       break;
     // 上传
     case FeatureName.Upload:
@@ -784,6 +788,16 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
         }
       });
       break;
+    case FeatureName.Add:
+      createUpdateTitle.value = t('createTitle',{title:moduleConfig.value.DisplayName});
+      createUpdateType.value = CreateUpdateType.Create;
+      openCreateUpdate.value = true;
+      break;
+    case FeatureName.CopyToAdd:
+      createUpdateTitle.value = t('copyAddTitle',{title:moduleConfig.value.DisplayName});
+      createUpdateType.value = CreateUpdateType.CopyAdd;
+      openCreateUpdate.value = true;
+      break;
     default:
   }
 }
@@ -820,13 +834,17 @@ const successMergePanel = () => {
 const closeSecurityPanel = () => {
   openSecurity.value = false;
 }
-// 关闭编辑面板
-const closeEditPanel = () => {
-  openDetail.value = false;
+// 关闭新增或编辑面板
+const closeCreateUpdatePanel = () => {
+  openCreateUpdate.value = false;
 }
-// 打开编辑面板
-const openDetailPanel = () => {
-  openDetail.value = true;
+// 打开新增或编辑面板
+const openCreateUpdatePanel = () => {
+  openCreateUpdate.value = true;
+}
+// 创建或编辑成功
+const successCreateUpdate = () => {
+  openCreateUpdate.value = true;
 }
 
 // 关闭上传面板
@@ -834,7 +852,7 @@ const closeUploadPanel = () => {
   openUpload.value = false;
 }
 // 上传成功
-const successUploadPanel = () => {
+const successUpload = () => {
   openUpload.value = false;
   loadGridData();
 }
@@ -861,7 +879,9 @@ provide('finishDelete', finishDelete);
 const cellDblclickEvent: VxeTableEvents.CellDblclick = ({ row, $event }) => {
   // 双击编辑数据   和点击详情同样的操作   可编辑条件是列表中包含详情按钮列
   if (canEditData()) {
-    openDetailPanel();
+    createUpdateTitle.value = t('updateTitle',{title:moduleConfig.value.DisplayName});
+    createUpdateType.value = CreateUpdateType.Update;
+    openCreateUpdatePanel();
   }
 }
 
