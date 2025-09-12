@@ -1,3 +1,5 @@
+import type { CommandData } from "@/models/gridDataModel";
+
 export function useMoveUpOrDown() {
   const moveUpOrDown = async (rowId: string, direction: MoveDirection, data: any,entityName:string) => {
     try {
@@ -7,7 +9,7 @@ export function useMoveUpOrDown() {
         // 未找到对应ID的元素
         return;
       }
-      let movedIDs: MoveResult | undefined;
+      let movedIDs: MoveResult | any;
       if (direction === MoveDirection.Up && index > 0) {
         // 上移操作
         const movedItem = newArray[index];
@@ -30,7 +32,7 @@ export function useMoveUpOrDown() {
         ];
       }
       if(isVoid(movedIDs)) return false;
-      const params = { CommandName: 'ChangeSequence', EntityName: entityName, Records: movedIDs };
+      const params:CommandData = { CommandName: 'ChangeSequence', EntityName: entityName, Records: movedIDs };
       const res = await doEntityCommand(params);
       if (res.IsSuccess) {
         return newArray;

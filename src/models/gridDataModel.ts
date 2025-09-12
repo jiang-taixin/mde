@@ -55,7 +55,12 @@ export interface RequestHistoryParams extends RequestGridParams{
   DataID:string
 }
 
-
+// 请求Command参数
+export interface CommandData{
+  CommandName:string,
+  EntityName:string,
+  Records:any[]
+}
 
 // 导出数据请求
 export interface ExportParams{

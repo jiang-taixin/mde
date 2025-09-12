@@ -1,4 +1,5 @@
 import http from "@/http";
+import type { CommandData } from "@/models/gridDataModel";
 import type { ModuleConfig } from "@/models/moduleConfigModel";
 import type { ModuleItem } from "@/models/moduleItemModel";
 import type { ResourceType, SecurityItem } from "@/models/SecurityModel";
@@ -27,7 +28,7 @@ export async function deleteRecords(EntityName:string,DataIDs:string[]):Promise<
   return http.post(`/API/entity/TryDeleteRecords`,{EntityName,DataIDs});
 }
 // 执行实体命令   上移下移,设为主助理,移除版本,发布,激活都用这个接口
-export async function doEntityCommand(params:any):Promise<any> {
+export async function doEntityCommand(params:CommandData):Promise<any> {
   return http.post(`/API/entity/DoEntityCommand`,params);
 }
 

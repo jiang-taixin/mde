@@ -183,7 +183,7 @@ declare global {
   export type { ChooseParams, InsertParams } from './src/models/chooseModel'
   import('./src/models/chooseModel')
   // @ts-ignore
-  export type { TableLevel, ANDOR, MoveDirection, ExportType, DownloadType, MoveResult, SearchConditionValue, RequestGridParams, RequestHistoryParams, ExportParams, DownloadParams, GridData } from './src/models/gridDataModel'
+  export type { TableLevel, ANDOR, MoveDirection, ExportType, DownloadType, MoveResult, SearchConditionValue, RequestGridParams, RequestHistoryParams, CommandData, ExportParams, DownloadParams, GridData } from './src/models/gridDataModel'
   import('./src/models/gridDataModel')
   // @ts-ignore
   export type { Geography, LovItem } from './src/models/metaDataModel'

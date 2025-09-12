@@ -164,7 +164,8 @@
         {{ t('upload.title') }}
       </div>
     </template>
-    <UploadPanel @closeCallback="closeUploadPanel" @successCallback="successUploadPanel" :module-config="moduleConfig"></UploadPanel>
+    <UploadPanel @closeCallback="closeUploadPanel" @successCallback="successUploadPanel" :module-config="moduleConfig">
+    </UploadPanel>
   </a-modal>
   <!--删除弹窗-->
   <a-modal v-model:open="openDelete" :width="500" :footer="null" :destroy-on-close="true">
@@ -199,7 +200,8 @@
           @click="openMergeCustomEvent"></a-button>
       </div>
     </template>
-    <MergePanel ref="mergeRef" @closeCallback="closeMergePanel" @successCallback="successMergePanel" :module-config="moduleConfig" :record-list="selectedRows">
+    <MergePanel ref="mergeRef" @closeCallback="closeMergePanel" @successCallback="successMergePanel"
+      :module-config="moduleConfig" :record-list="selectedRows">
     </MergePanel>
   </a-modal>
 </template>
@@ -213,10 +215,10 @@ import { debounce } from 'lodash';
 import type { ExportSelection } from '../export-panel/ExportPanel.vue';
 import type { DefaultOptionType, SelectValue } from 'ant-design-vue/es/select';
 import type { DownloadSelection } from '../download-panel/DownloadPabel.vue';
-import { DownloadType } from '@/models/gridDataModel';
+import { DownloadType, type CommandData } from '@/models/gridDataModel';
 const { exportFile } = useExportFile();
 const { moveUpOrDown } = useMoveUpOrDown();
-const {getConfigName} = useGetVersionConfigName();
+const { getConfigName } = useGetVersionConfigName();
 const { downloadFile } = useDownloadFile();
 const emits = defineEmits(['parentVersionChange']);
 const { t } = useI18n();
@@ -363,7 +365,7 @@ watch(selectedRows, () => {
       enable = false;
       if (selectedRows.value && selectedRows.value.length > 0) {
         selectedRows.value.forEach(item => {
-          enable = ((item.Status == "0") || (item.IsPublish == "0"));
+          enable = ((item.Status == "0") && (item.IsPublish == "0"));
           if (!enable) {
             return false;
           }
@@ -638,7 +640,7 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
     // 上移
     case FeatureName.MoveUp:
       loading.value = true;
-      const upRes = await moveUpOrDown(row.ID, MoveDirection.Up, gridData,props.moduleConfig.EntityName);
+      const upRes = await moveUpOrDown(row.ID, MoveDirection.Up, gridData, props.moduleConfig.EntityName);
       loading.value = false;
       if (upRes) {
         gridData.JsonData = upRes;
@@ -647,7 +649,7 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
     // 下移
     case FeatureName.MoveDown:
       loading.value = true;
-      const downRes = await moveUpOrDown(row.ID, MoveDirection.Down, gridData,props.moduleConfig.EntityName);
+      const downRes = await moveUpOrDown(row.ID, MoveDirection.Down, gridData, props.moduleConfig.EntityName);
       loading.value = false;
       if (downRes) {
         gridData.JsonData = downRes;
@@ -681,7 +683,7 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
         okText: t('confirm'),
         cancelText: t('cancel'),
         onOk: async () => {
-          const params = {
+          const params: CommandData = {
             CommandName: FeatureName.SetToPrimaryAssistant,
             EntityName: moduleConfig.value.EntityName,
             Records: [[{ Name: 'ID', Value: selectedRows.value[0].ID }]]
@@ -690,7 +692,7 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
           if (setRes.IsSuccess) {
             loadGridData();
           }
-          else{
+          else {
             message.error(setRes.ErrorMessage);
           }
         }
@@ -710,14 +712,68 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
         onOk: async () => {
           let records: any[] = [];
           selectedRows.value.forEach(item => {
-            records.push([{Name:'ID',Value:item.ID}]);
+            records.push([{ Name: 'ID', Value: item.ID }]);
           });
-          const params = {
-            CommandName:'DeleteVersionDirectly',
-            EntityName:moduleConfig.value.EntityName,
-            Records:records
+          const params: CommandData = {
+            CommandName: 'DeleteVersionDirectly',
+            EntityName: moduleConfig.value.EntityName,
+            Records: records,
           }
+          loading.value = true;
           const delVerRes = await doEntityCommand(params);
+          loading.value = false;
+          if (delVerRes.IsSuccess) {
+            message.success(t('success'));
+            loadGridData();
+          }
+          else {
+            message.error(delVerRes.ErrorMessage)
+          }
+        }
+      });
+      break;
+    // 发布
+    case FeatureName.Publish:
+      let records: any[] = [];
+      selectedRows.value.forEach(item => {
+        records.push([{ Name: 'ID', Value: item.ID }]);
+      });
+      const params: CommandData = {
+        CommandName: 'PublishVersion',
+        EntityName: moduleConfig.value.EntityName,
+        Records: records,
+      }
+      loading.value = true;
+      const delVerRes = await doEntityCommand(params);
+      loading.value = false;
+      if (delVerRes.IsSuccess) {
+        message.success(t('success'));
+        loadGridData();
+      }
+      else {
+        message.error(delVerRes.ErrorMessage)
+      }
+      break;
+    // 激活
+    case FeatureName.SetToActive:
+      Modal.confirm({
+        title: t('warning'),
+        content: t('activeTips'),
+        okText: t('confirm'),
+        cancelText: t('cancel'),
+        onOk: async () => {
+          let records: any[] = [];
+          selectedRows.value.forEach(item => {
+            records.push([{ Name: 'ID', Value: item.ID }]);
+          });
+          const params: CommandData = {
+            CommandName: 'SetActiveVersion',
+            EntityName: moduleConfig.value.EntityName,
+            Records: records,
+          }
+          loading.value = true;
+          const delVerRes = await doEntityCommand(params);
+          loading.value = false;
           if (delVerRes.IsSuccess) {
             message.success(t('success'));
             loadGridData();
@@ -756,7 +812,7 @@ const closeMergePanel = () => {
   openMerge.value = false;
 }
 // 上传成功
-const successMergePanel = () =>{
+const successMergePanel = () => {
   openMerge.value = false;
   loadGridData();
 }
@@ -778,7 +834,7 @@ const closeUploadPanel = () => {
   openUpload.value = false;
 }
 // 上传成功
-const successUploadPanel = () =>{
+const successUploadPanel = () => {
   openUpload.value = false;
   loadGridData();
 }
