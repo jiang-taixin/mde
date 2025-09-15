@@ -8,6 +8,7 @@ export {}
 declare global {
   const ANDOR: typeof import('./src/models/gridDataModel')['ANDOR']
   const CLEAR_KEY: typeof import('./src/constants/index')['CLEAR_KEY']
+  const CreateUpdateType: typeof import('./src/models/moduleConfigModel')['CreateUpdateType']
   const DownloadType: typeof import('./src/models/gridDataModel')['DownloadType']
   const EffectScope: typeof import('vue')['EffectScope']
   const ExportType: typeof import('./src/models/gridDataModel')['ExportType']
@@ -189,7 +190,7 @@ declare global {
   export type { Geography, LovItem } from './src/models/metaDataModel'
   import('./src/models/metaDataModel')
   // @ts-ignore
-  export type { ModulePageType, ImportType, FeatureName, Attribute, Feature, ModuleConfig } from './src/models/moduleConfigModel'
+  export type { ModulePageType, ImportType, CreateUpdateType, FeatureName, Attribute, Feature, ModuleConfig } from './src/models/moduleConfigModel'
   import('./src/models/moduleConfigModel')
   // @ts-ignore
   export type { ModuleType, ModuleTab, ModuleItem } from './src/models/moduleItemModel'

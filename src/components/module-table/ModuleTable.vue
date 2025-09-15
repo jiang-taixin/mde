@@ -15,7 +15,7 @@
           </template>
           <a-input-search v-model:value="searchWord" size="small" :placeholder="t('searchPlaceholder')"
             style="width: 200px" @search="onSearch"
-            v-if="moduleConfig.Features?.find(item => item.Name === FeatureName.FuzzySearch)" />
+            v-if="moduleConfig.Features?.find((item: { Name: any; }) => item.Name === FeatureName.FuzzySearch)" />
         </a-popover>
         <div ref="container" class="flex flex-row w-full overflow-hidden" @wheel="handleWheel">
           <!-- 按钮组 超出边界横向滚动-->
@@ -65,11 +65,23 @@
           :column-config="{ resizable: true, drag: true }" :column-drag-config="columnDragConfig"
           :checkbox-config="{ highlight: true }" :cell-config="{ height: 25 }" :custom-config="customConfig"
           :row-config="{ isHover: true, isCurrent: true, keyField: 'ID' }" :empty-text="t('empty')"
-          show-overflow="ellipsis" @cell-dblclick="cellDblclickEvent" @cell-click="cellClickEvent"
-          @checkbox-change="checkboxChange" @checkbox-all="checkAll" @column-resizable-change="columnResizeChange"
+          :aggregate-config="aggregateConfig" :spanMethod="spanMethod" show-overflow="ellipsis"
+          @cell-dblclick="cellDblclickEvent" @cell-click="cellClickEvent" @checkbox-change="checkboxChange"
+          @checkbox-all="checkAll" @column-resizable-change="columnResizeChange"
           @custom-visible-change="columnVisibleChange" @column-dragend="columnDragend">
           <!--选择列-->
           <vxe-column type="checkbox" width="30" fixed="left" field="check"></vxe-column>
+          <!--分组信息-->
+          <vxe-column field="name" title="Name" row-group-node width="120" :show-overflow="false">
+            <template #group-content="{ groupContent, childList, row }">
+              <div class="flex items-center">
+                <span class="font-bold text-primary-400">{{ groupContent }}</span>
+                <span class="font-bold text-primary-400">( {{ childList.length }} Items )</span>
+                <a-button type="text" size="small" class="text-primary-400" @click.stop="clickDetail(row)">[show
+                  detail]</a-button>
+              </div>
+            </template>
+          </vxe-column>
           <!--Attribute中的有效列-->
           <template v-for="column in moduleConfig.Attributes">
             <template v-if="!column.Hidden">
@@ -154,7 +166,7 @@
       </div>
     </template>
     <CreateUpdatePanel @closeCallback="closeCreateUpdatePanel" @successCallBack="successCreateUpdate"
-    :create-update-type="createUpdateType"></CreateUpdatePanel>
+      :create-update-type="createUpdateType"></CreateUpdatePanel>
   </a-modal>
   <!--上传弹窗-->
   <a-modal v-model:open="openUpload" :width="500" :footer="null" :destroy-on-close="true">
@@ -296,7 +308,7 @@ const props = defineProps({
   }
 });
 const moduleConfig = ref<ModuleConfig>({} as ModuleConfig);
-const createUpdateTitle = ref<string>(t('createTitle',{title:moduleConfig.value.DisplayName}));
+const createUpdateTitle = ref<string>(t('createTitle', { title: moduleConfig.value.DisplayName }));
 const openCreateUpdate = ref<boolean>(false);
 const createUpdateType = ref<CreateUpdateType>(CreateUpdateType.Create);
 watch(() => props.parentID, (parentId) => {
@@ -350,7 +362,7 @@ watch(selectedRows, () => {
       enable = false;
       if (selectedRows.value && selectedRows.value.length > 0) {
         selectedRows.value.forEach(item => {
-          enable = ((item.Status == "0") || (item.Status.toUpperCase() == "NO"));
+          enable = ((item.Status == "0") || (item?.Status?.toUpperCase() == "NO"));
           if (!enable) {
             return false;
           }
@@ -503,7 +515,9 @@ const loadGridData = async (isAdvancedSearch: boolean = false, searchParams: any
       if (gridData.JsonData.length !== 0) {
         tableRef.value?.setCheckboxRow(gridData.JsonData[0], true);
         nextTick(() => {
-          selectedRows.value = tableRef.value?.getCheckboxRecords() as any;
+          const allSelected = tableRef.value?.getCheckboxRecords() || [];
+          // 过滤掉分组聚合行
+          selectedRows.value = allSelected.filter(row => !tableRef.value?.isAggregateRecord(row));
         })
         if (props.tableLevel === TableLevel.MainTable && !props.fromModule) {
           props.rowClick!(gridData.JsonData[0].ID);
@@ -664,7 +678,7 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
       break;
     // 编辑
     case FeatureName.Detail:
-      createUpdateTitle.value = t('updateTitle',{title:moduleConfig.value.DisplayName});
+      createUpdateTitle.value = t('updateTitle', { title: moduleConfig.value.DisplayName });
       createUpdateType.value = CreateUpdateType.Update;
       openCreateUpdatePanel();
       break;
@@ -789,12 +803,12 @@ const handleClick = async (featureName: FeatureName, row?: any) => {
       });
       break;
     case FeatureName.Add:
-      createUpdateTitle.value = t('createTitle',{title:moduleConfig.value.DisplayName});
+      createUpdateTitle.value = t('createTitle', { title: moduleConfig.value.DisplayName });
       createUpdateType.value = CreateUpdateType.Create;
       openCreateUpdate.value = true;
       break;
     case FeatureName.CopyToAdd:
-      createUpdateTitle.value = t('copyAddTitle',{title:moduleConfig.value.DisplayName});
+      createUpdateTitle.value = t('copyAddTitle', { title: moduleConfig.value.DisplayName });
       createUpdateType.value = CreateUpdateType.CopyAdd;
       openCreateUpdate.value = true;
       break;
@@ -879,7 +893,7 @@ provide('finishDelete', finishDelete);
 const cellDblclickEvent: VxeTableEvents.CellDblclick = ({ row, $event }) => {
   // 双击编辑数据   和点击详情同样的操作   可编辑条件是列表中包含详情按钮列
   if (canEditData()) {
-    createUpdateTitle.value = t('updateTitle',{title:moduleConfig.value.DisplayName});
+    createUpdateTitle.value = t('updateTitle', { title: moduleConfig.value.DisplayName });
     createUpdateType.value = CreateUpdateType.Update;
     openCreateUpdatePanel();
   }
@@ -890,13 +904,40 @@ const cellClickEvent: VxeTableEvents.CellClick<any> = ({ row, $event }) => {
     props.rowClick!(row.ID);
   }
 }
+const aggregateConfig = reactive<VxeTablePropTypes.AggregateConfig<any>>({
+  groupFields: ['Code'],
+  expandAll: true,
+  trigger: "row",
+  contentMethod() {
+    return ``
+  },
+})
+const clickDetail = (row: any) => {
+  console.log(row);
+
+}
+const spanMethod: VxeTablePropTypes.SpanMethod<any> = ({ row, column }) => {
+  const $table = tableRef.value
+  if ($table && $table.isAggregateRecord(row)) {
+    if (column.field === 'name') {
+      const colCount = $table.getColumns().length;
+      return { rowspan: 1, colspan: colCount }
+    }
+    return { rowspan: 0, colspan: 0 }
+  }
+  return { rowspan: 1, colspan: 1 }
+}
 // 复选框变化
 const checkboxChange = () => {
-  selectedRows.value = tableRef.value?.getCheckboxRecords() as any;
+  const allSelected = tableRef.value?.getCheckboxRecords() || [];
+  // 过滤掉分组聚合行
+  selectedRows.value = allSelected.filter(row => !tableRef.value?.isAggregateRecord(row));
 }
 // 复选框全选
 const checkAll = () => {
-  selectedRows.value = tableRef.value?.getCheckboxRecords() as any;
+  const allSelected = tableRef.value?.getCheckboxRecords() || [];
+  // 过滤掉分组聚合行
+  selectedRows.value = allSelected.filter(row => !tableRef.value?.isAggregateRecord(row));
 }
 // 列宽变化
 const columnResizeChange = (params: { column: any }) => {
