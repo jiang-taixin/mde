@@ -65,29 +65,32 @@
           :column-config="{ resizable: true, drag: true }" :column-drag-config="columnDragConfig"
           :checkbox-config="{ highlight: true }" :cell-config="{ height: 25 }" :custom-config="customConfig"
           :row-config="{ isHover: true, isCurrent: true, keyField: 'ID' }" :empty-text="t('empty')"
-          :aggregate-config="aggregateConfig" :spanMethod="spanMethod" show-overflow="ellipsis"
-          @cell-dblclick="cellDblclickEvent" @cell-click="cellClickEvent" @checkbox-change="checkboxChange"
-          @checkbox-all="checkAll" @column-resizable-change="columnResizeChange"
+          :aggregate-config="group.needGroup ? aggregateConfig : undefined" :spanMethod="spanMethod"
+          show-overflow="ellipsis" @cell-dblclick="cellDblclickEvent" @cell-click="cellClickEvent"
+          @checkbox-change="checkboxChange" @checkbox-all="checkAll" @column-resizable-change="columnResizeChange"
           @custom-visible-change="columnVisibleChange" @column-dragend="columnDragend">
           <!--选择列-->
           <vxe-column type="checkbox" width="30" fixed="left" field="check"></vxe-column>
-          <!--分组信息-->
-          <vxe-column field="name" title="Name" row-group-node width="120" :show-overflow="false">
-            <template #group-content="{ groupContent, childList, row }">
-              <div class="flex items-center">
-                <span class="font-bold text-primary-400">{{ groupContent }}</span>
-                <span class="font-bold text-primary-400">( {{ childList.length }} Items )</span>
-                <a-button type="text" size="small" class="text-primary-400" @click.stop="clickDetail(row)">[show
-                  detail]</a-button>
-              </div>
-            </template>
-          </vxe-column>
           <!--Attribute中的有效列-->
           <template v-for="column in moduleConfig.Attributes">
             <template v-if="!column.Hidden">
               <vxe-column :field="column.Name" :title="column.DisplayName"
+                :row-group-node="column.Name === group.displayField"
                 :width="`${column.DisplayWidth > 0 ? column.DisplayWidth : 80}px`" show-header-overflow
                 :sortable="column.SortOrder !== null" :visible="column.DisplayByDefault">
+                <template #group-content="{ groupContent, childList, row }">
+                  <div class="flex items-center">
+                    <span class="font-bold text-primary-400 mr-2">{{ groupContent }}</span>
+                    <span class="font-bold text-primary-400 mr-2">( {{ childList.length }} {{ childList.length >
+                      1 ? 'Items' : 'Item' }} )</span>
+                    <template v-if="group.showDetail">
+                      <span class="font-bold text-primary-400 mr-2">
+                        {{ t('weightTotal', { weight: calculateTotal(childList) }) }} </span>
+                      <a-button type="text" size="small" class="text-primary-400" @click.stop="clickDetail(row)">[{{
+                        t('groupDetail') }}]</a-button>
+                    </template>
+                  </div>
+                </template>
               </vxe-column>
             </template>
           </template>
@@ -308,6 +311,11 @@ const props = defineProps({
   }
 });
 const moduleConfig = ref<ModuleConfig>({} as ModuleConfig);
+const group = reactive({
+  needGroup: false,
+  displayField: '',
+  showDetail: false
+})
 const createUpdateTitle = ref<string>(t('createTitle', { title: moduleConfig.value.DisplayName }));
 const openCreateUpdate = ref<boolean>(false);
 const createUpdateType = ref<CreateUpdateType>(CreateUpdateType.Create);
@@ -362,7 +370,7 @@ watch(selectedRows, () => {
       enable = false;
       if (selectedRows.value && selectedRows.value.length > 0) {
         selectedRows.value.forEach(item => {
-          enable = ((item.Status == "0") || (item?.Status?.toUpperCase() == "NO"));
+          enable = ((item.Status == "0") || (item.Status.toUpperCase() == "NO"));
           if (!enable) {
             return false;
           }
@@ -431,6 +439,16 @@ onMounted(async () => {
     setTimeout(calculateMaxScroll, 100);
   }, 50);
   moduleConfig.value = sortConfig(props.moduleConfig);
+  // 如果有分组条件 执行分组
+  if (!isVoid(moduleConfig.value.GroupingPhysicalViewAlias)) {
+    group.needGroup = true; // 是否显示分组
+    if (moduleConfig.value.Name === 'HospitalStrengthWeightConfig' || moduleConfig.value.Name === 'AccountStrengthWeightConfig') {
+      group.showDetail = true;
+    }
+    aggregateConfig.groupFields?.push(moduleConfig.value.GroupingPhysicalViewAlias as string); // 这个字段就是分组的字段
+    const attribute = moduleConfig.value.Attributes.find(item => item.Hidden === false);
+    group.displayField = attribute?.Name as string; // 这个是分组显示的位置
+  }
   pagination.pageSize = moduleConfig.value.PageSize;
   // 加载版本的列表    加载条件是按钮组里有版本的按钮
   if (needLoadVersionList()) {
@@ -459,7 +477,7 @@ const loadVersionList = async () => {
   const params: RequestGridParams = {
     PageIndex: 1,
     PageSize: -1,
-    EntityConfigName: getConfigName(moduleConfig.value.EntityName)
+    EntityConfigName: getConfigName(moduleConfig.value.Name)
   }
   loading.value = true;
   await getGridData(params).then((res) => {
@@ -518,6 +536,9 @@ const loadGridData = async (isAdvancedSearch: boolean = false, searchParams: any
           const allSelected = tableRef.value?.getCheckboxRecords() || [];
           // 过滤掉分组聚合行
           selectedRows.value = allSelected.filter(row => !tableRef.value?.isAggregateRecord(row));
+          if(group.needGroup){
+            tableRef.value?.setAllRowGroupExpand(true);
+          }
         })
         if (props.tableLevel === TableLevel.MainTable && !props.fromModule) {
           props.rowClick!(gridData.JsonData[0].ID);
@@ -904,29 +925,7 @@ const cellClickEvent: VxeTableEvents.CellClick<any> = ({ row, $event }) => {
     props.rowClick!(row.ID);
   }
 }
-const aggregateConfig = reactive<VxeTablePropTypes.AggregateConfig<any>>({
-  groupFields: ['Code'],
-  expandAll: true,
-  trigger: "row",
-  contentMethod() {
-    return ``
-  },
-})
-const clickDetail = (row: any) => {
-  console.log(row);
 
-}
-const spanMethod: VxeTablePropTypes.SpanMethod<any> = ({ row, column }) => {
-  const $table = tableRef.value
-  if ($table && $table.isAggregateRecord(row)) {
-    if (column.field === 'name') {
-      const colCount = $table.getColumns().length;
-      return { rowspan: 1, colspan: colCount }
-    }
-    return { rowspan: 0, colspan: 0 }
-  }
-  return { rowspan: 1, colspan: 1 }
-}
 // 复选框变化
 const checkboxChange = () => {
   const allSelected = tableRef.value?.getCheckboxRecords() || [];
@@ -1005,4 +1004,41 @@ const columnDragConfig = reactive<VxeTablePropTypes.ColumnDragConfig<any>>({
   showIcon: false,
   trigger: 'cell'
 })
+
+const aggregateConfig = reactive<VxeTablePropTypes.AggregateConfig<any>>({
+  groupFields: [],
+  expandAll: true,
+  padding: false,
+  trigger: "row",
+  contentMethod() {
+    return ``
+  },
+})
+const clickDetail = (row: any) => {
+  console.log(row);
+}
+const spanMethod: VxeTablePropTypes.SpanMethod<any> = ({ row, column }) => {
+  const $table = tableRef.value
+  if ($table && $table.isAggregateRecord(row)) {
+    if (column.field === group.displayField) {
+      const colCount = $table.getColumns().length;
+      return { rowspan: 1, colspan: colCount }
+    }
+    return { rowspan: 0, colspan: 0 }
+  }
+  return { rowspan: 1, colspan: 1 }
+}
+
+const calculateTotal = (childList: any[]) => {
+
+  if (childList.length === 0) return "0.000000";
+  const totalInInt = childList.reduce((sum, item) => {
+    const weightNum = parseFloat(item.Weight);
+    const validWeight = isNaN(weightNum) ? 0 : weightNum;
+    return sum + Math.round(validWeight * 1e6);
+  }, 0);
+  const total = totalInInt / 1e6;
+  return total.toFixed(6);
+};
+
 </script>

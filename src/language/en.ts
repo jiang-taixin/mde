@@ -46,6 +46,8 @@ export default {
   createTitle:"Create Detail of {title}",
   updateTitle:"Detail of {title}",
   copyAddTitle:"Copy To Add {title}",
+  groupDetail:"Show Detail",
+  weightTotal:"Total of weight: {weight}",
   app: {
     title: "Pfizer China Master Data Enricher",
   },

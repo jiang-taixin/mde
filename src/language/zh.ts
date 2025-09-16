@@ -46,6 +46,8 @@ export default {
   createTitle:"创建 {title} 的详情",
   updateTitle:"{title} 的详情",
   copyAddTitle:"复制添加 {title}",
+  groupDetail:"显示详情",
+  weightTotal:"权重总计: {weight}",
   app: {
     title: "辉瑞中国主数据管理系统",
   },

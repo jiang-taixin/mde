@@ -142,7 +142,7 @@ export interface ModuleConfig {
   Features:Feature[],
   ForeignKeyID:string,
   ForeignKeyPhysicalViewAlias:unknown,
-  GroupingPhysicalViewAlias:unknown,
+  GroupingPhysicalViewAlias:string|null,
   ID:string,
   ImportTypeEnum:ImportType,
   IsSystem:boolean,
