@@ -57,7 +57,11 @@ router.beforeEach(async (to, from, next) => {
     if (!userProfileStore.isAuthenticated) {
       const userData = await login(false);
       if (userData) {
-        // 登录成功保存用户信息并设置语言环境
+        // 假如角色列表是空的 没有权限
+        if(userData.Principals.length === 0){
+          next('/no-access');
+        }
+        // 登录成功并且有权限保存用户信息并设置语言环境
         userProfileStore.setUserProfile(userData);
         i18n.global.locale.value = userData.Language as Language;
         next();

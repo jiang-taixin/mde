@@ -106,9 +106,16 @@ const switchAccount = async () => {
   userProfileStore.setRememberMe(false);
   const res = await login(true);
   if(res){
-    userProfileStore.setUserProfile(res);
-    i18n.global.locale.value = res.Language as Language;
-    router.go(0);
+     // 假如角色列表是空的 没有权限
+    if(res.Principals.length === 0){
+      router.push('/no-access');
+    }
+    else{
+      userProfileStore.setUserProfile(res);
+      i18n.global.locale.value = res.Language as Language;
+      router.go(0);
+    }
+
   }
 }
 

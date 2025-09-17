@@ -64,7 +64,7 @@
           :min-height="props.hasSubModuleConfig ? '300px' : '400px'" size="mini" round :border="true"
           :column-config="{ resizable: true, drag: true }" :column-drag-config="columnDragConfig"
           :checkbox-config="{ highlight: true }" :cell-config="{ height: 25 }" :custom-config="customConfig"
-          :row-config="{ isHover: true, isCurrent: true, keyField: 'ID' }" :empty-text="t('empty')"
+          :row-config="{ isHover: true, isCurrent: true, keyField: '__rowKey' }" :empty-text="t('empty')"
           :aggregate-config="group.needGroup ? aggregateConfig : undefined" :spanMethod="spanMethod"
           show-overflow="ellipsis" @cell-dblclick="cellDblclickEvent" @cell-click="cellClickEvent"
           @checkbox-change="checkboxChange" @checkbox-all="checkAll" @column-resizable-change="columnResizeChange"
@@ -78,6 +78,7 @@
                 :row-group-node="column.Name === group.displayField"
                 :width="`${column.DisplayWidth > 0 ? column.DisplayWidth : 80}px`" show-header-overflow
                 :sortable="column.SortOrder !== null" :visible="column.DisplayByDefault">
+                <!--分组信息-->
                 <template #group-content="params">
                   <div class="flex items-center">
                     <span class="font-bold text-primary-400 mr-2">{{ (params as any).groupContent }}</span>
@@ -539,9 +540,11 @@ const loadGridData = async (isAdvancedSearch: boolean = false, searchParams: any
     MasterCondition: masterCondition.length > 0 ? masterCondition : null,
   }
   await getGridData(params).then((res) => {
-
     if (res) {
-      gridData.JsonData = JSON.parse(res.JsonData);
+      let rows = JSON.parse(res.JsonData);
+      // 为每行重新生成唯一key
+      rows = ensureUniqueKeys(rows, moduleConfig.value.Name);
+      gridData.JsonData = rows;
       pagination.total = res.TotalRecords;
       if (gridData.JsonData.length !== 0) {
         tableRef.value?.setCheckboxRow(gridData.JsonData[0], true);
