@@ -142,6 +142,7 @@ declare global {
   const toValue: typeof import('vue')['toValue']
   const triggerRef: typeof import('vue')['triggerRef']
   const unref: typeof import('vue')['unref']
+  const updateWeight: typeof import('./src/services/module-service')['updateWeight']
   const uploadFile: typeof import('./src/services/upload-file-service')['uploadFile']
   const useAttrs: typeof import('vue')['useAttrs']
   const useCssModule: typeof import('vue')['useCssModule']

@@ -47,7 +47,14 @@ export default {
   updateTitle:"Detail of {title}",
   copyAddTitle:"Copy To Add {title}",
   groupDetail:"Show Detail",
+  weightTitle:"Weight -- {title}",
   weightTotal:"Total of weight: {weight}",
+  average:"Average",
+  weight:{
+    accountWeightTitle:"Account Name",
+    hospitalWeightTitle:"Hospital Name",
+    chineseWeightName:"Strength ChineseName",
+  },
   app: {
     title: "Pfizer China Master Data Enricher",
   },

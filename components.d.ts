@@ -26,6 +26,7 @@ declare module 'vue' {
     AFormItemRest: typeof import('ant-design-vue/es')['FormItemRest']
     AInput: typeof import('ant-design-vue/es')['Input']
     AInputNumber: typeof import('ant-design-vue/es')['InputNumber']
+    AInputPassword: typeof import('ant-design-vue/es')['InputPassword']
     AInputSearch: typeof import('ant-design-vue/es')['InputSearch']
     ALayout: typeof import('ant-design-vue/es')['Layout']
     ALayoutContent: typeof import('ant-design-vue/es')['LayoutContent']
@@ -77,5 +78,6 @@ declare module 'vue' {
     SelectPrincial: typeof import('./src/components/select-principal/SelectPrincial.vue')['default']
     SiderComponent: typeof import('./src/components/sider/SiderComponent.vue')['default']
     UploadPanel: typeof import('./src/components/upload-panel/UploadPanel.vue')['default']
+    WeightPanel: typeof import('./src/components/weight-panel/WeightPanel.vue')['default']
   }
 }

@@ -2,7 +2,7 @@
   <div>
     <a-form ref="formRef" :model="resultRecord" layout="vertical">
       <div class="flex-1">
-        <vxe-table ref="tableRef" :data="validAttributeList.filter(item => item.Name !== props.moduleConfig.PrimaryKey)"
+        <vxe-table ref="tableRef" :data="validAttributeList.filter((item: { Name: string }) => item.Name !== props.moduleConfig.PrimaryKey)"
           height="400px" max-height="800px" size="mini" round :border="true"
           :column-config="{ resizable: true, drag: true }" :column-drag-config="columnDragConfig"
           :checkbox-config="{ highlight: true }" :cell-config="{ height: 25 }"
@@ -22,7 +22,7 @@
                 <div class="w-full h-full flex items-center">
                   <a-radio :checked="firstRecord[row.Name].Checked" @change="() => clickRecordFirst(row.Name)" />
                   <CustomComponent :disabled="true" :default-value="firstRecord[row.Name].Value"
-                    :attribute="validAttributeList.find(item => item.Name === row.Name)"
+                    :attribute="validAttributeList.find((item: { Name: any }) => item.Name === row.Name)"
                     :module-config="props.moduleConfig" />
                 </div>
               </template>
@@ -32,7 +32,7 @@
                 <div class="w-full h-full flex items-center">
                   <a-radio :checked="secondRecord[row.Name].Checked" @change="() => clickRecordSecond(row.Name)" />
                   <CustomComponent :disabled="true" :default-value="secondRecord[row.Name].Value"
-                    :attribute="validAttributeList.find(item => item.Name === row.Name)"
+                    :attribute="validAttributeList.find((item: { Name: any }) => item.Name === row.Name)"
                     :module-config="props.moduleConfig" />
                 </div>
               </template>
@@ -46,7 +46,7 @@
                     <div class="flex-1">
                       <CustomComponent :disabled="resultRecord[row.Name].Disable"
                         :default-value="resultRecord[row.Name]?.Value"
-                        :attribute="validAttributeList.find(item => item.Name === row.Name)"
+                        :attribute="validAttributeList.find((item: { Name: any }) => item.Name === row.Name)"
                         :module-config="props.moduleConfig" @update-value="handleUpdateValue"
                         :type-value="resultRecord[row.Name].TypeValue" />
                     </div>

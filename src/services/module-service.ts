@@ -46,3 +46,8 @@ export async function saveSecuritySets(params:any):Promise<any> {
 export async function doMerge(params:any):Promise<any> {
   return http.post("/API/entity/MergeRecords",  params);
 }
+
+// 设置权重
+export async function updateWeight(params:any):Promise<any> {
+  return http.post("/API/entity/UpdateRecords",  params);
+}

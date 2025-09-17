@@ -47,7 +47,14 @@ export default {
   updateTitle:"{title} 的详情",
   copyAddTitle:"复制添加 {title}",
   groupDetail:"显示详情",
+  weightTitle:"权重 -- {title}",
   weightTotal:"权重总计: {weight}",
+  average:"平均分配",
+  weight:{
+    accountWeightTitle:"客户名称",
+    hospitalWeightTitle:"医院名称",
+    chineseWeightName:"权重中文名称",
+  },
   app: {
     title: "辉瑞中国主数据管理系统",
   },

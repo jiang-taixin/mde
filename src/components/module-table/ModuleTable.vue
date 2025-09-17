@@ -78,15 +78,15 @@
                 :row-group-node="column.Name === group.displayField"
                 :width="`${column.DisplayWidth > 0 ? column.DisplayWidth : 80}px`" show-header-overflow
                 :sortable="column.SortOrder !== null" :visible="column.DisplayByDefault">
-                <template #group-content="{ groupContent, childList, row }">
+                <template #group-content="params">
                   <div class="flex items-center">
-                    <span class="font-bold text-primary-400 mr-2">{{ groupContent }}</span>
-                    <span class="font-bold text-primary-400 mr-2">( {{ childList.length }} {{ childList.length >
+                    <span class="font-bold text-primary-400 mr-2">{{ (params as any).groupContent }}</span>
+                    <span class="font-bold text-primary-400 mr-2">( {{ (params as any).childList.length }} {{ (params as any).childList.length >
                       1 ? 'Items' : 'Item' }} )</span>
                     <template v-if="group.showDetail">
                       <span class="font-bold text-primary-400 mr-2">
-                        {{ t('weightTotal', { weight: calculateTotal(childList) }) }} </span>
-                      <a-button type="text" size="small" class="text-primary-400" @click.stop="clickDetail(row)">[{{
+                        {{ t('weightTotal', { weight: calculateTotal((params as any).childList) }) }} </span>
+                      <a-button type="text" size="small" class="text-primary-400" @click.stop="clickDetail((params as any).childList)">[{{
                         t('groupDetail') }}]</a-button>
                     </template>
                   </div>
@@ -219,6 +219,17 @@
       :module-config="moduleConfig" :record-list="selectedRows">
     </MergePanel>
   </a-modal>
+  <!--权重弹窗-->
+  <a-modal v-model:open="openWeight" :width="600" :footer="null" :destroy-on-close="true">
+    <template #title>
+      <div class="flex items-center text-lg">
+        {{ t('weightTitle', { title: props.moduleConfig.DisplayName }) }}
+      </div>
+    </template>
+    <WeightPanel :module-config="moduleConfig" :child-list="groupChildList" @closeCallback="closeWeightPanel"
+     @successCallback="changeWeightSuccess">
+    </WeightPanel>
+  </a-modal>
 </template>
 <script setup lang="ts">
 import { ref, h, type PropType } from 'vue';
@@ -253,6 +264,8 @@ const sessionID = ref<string>('');
 const impactEntities = ref<ImpactEntity[]>([]);
 const openChoose = ref<boolean>(false);
 const openMerge = ref<boolean>(false);
+const openWeight = ref<boolean>(false);
+const groupChildList = ref<any[]>();
 const advancedParams = ref<any>();                 // 导出和下载时需要使用高级查询的条件   所以条件变化就要更新
 const versionList = ref<any[]>();
 const activeVersion = ref<any>();
@@ -891,6 +904,7 @@ const successUpload = () => {
   openUpload.value = false;
   loadGridData();
 }
+
 // 关闭删除面板
 const closeDeletePanel = () => {
   openDelete.value = false;
@@ -901,6 +915,16 @@ const closeChoosePanel = (operation: boolean) => {
   if (operation) {
     loadGridData();
   }
+}
+// 关闭权重面板
+const closeWeightPanel = () =>{
+  openWeight.value = false;
+}
+
+// 调整权重完成
+const changeWeightSuccess = () =>{
+  openWeight.value = false;
+  loadGridData();
 }
 
 // 执行process后真正删除
@@ -1014,8 +1038,9 @@ const aggregateConfig = reactive<VxeTablePropTypes.AggregateConfig<any>>({
     return ``
   },
 })
-const clickDetail = (row: any) => {
-  console.log(row);
+const clickDetail = (childList: any) => {
+  groupChildList.value = childList;
+  openWeight.value = true;
 }
 const spanMethod: VxeTablePropTypes.SpanMethod<any> = ({ row, column }) => {
   const $table = tableRef.value
