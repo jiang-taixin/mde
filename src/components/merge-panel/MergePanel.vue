@@ -21,7 +21,7 @@
               <template #default="{ row }" v-if="column.Name === 'record1'" align="center">
                 <div class="w-full h-full flex items-center">
                   <a-radio :checked="firstRecord[row.Name].Checked" @change="() => clickRecordFirst(row.Name)" />
-                  <CustomComponent :disabled="true" :default-value="firstRecord[row.Name].Value"
+                  <MergeComponent :disabled="true" :default-value="firstRecord[row.Name].Value"
                     :attribute="validAttributeList.find((item: { Name: any }) => item.Name === row.Name)"
                     :module-config="props.moduleConfig" />
                 </div>
@@ -31,7 +31,7 @@
               <template #default="{ row }" v-if="column.Name === 'record2'" align="center">
                 <div class="w-full h-full flex items-center">
                   <a-radio :checked="secondRecord[row.Name].Checked" @change="() => clickRecordSecond(row.Name)" />
-                  <CustomComponent :disabled="true" :default-value="secondRecord[row.Name].Value"
+                  <MergeComponent :disabled="true" :default-value="secondRecord[row.Name].Value"
                     :attribute="validAttributeList.find((item: { Name: any }) => item.Name === row.Name)"
                     :module-config="props.moduleConfig" />
                 </div>
@@ -44,7 +44,7 @@
                   <div class="w-full flex items-center">
                     <!-- 输入组件 -->
                     <div class="flex-1">
-                      <CustomComponent :disabled="resultRecord[row.Name].Disable"
+                      <MergeComponent :disabled="resultRecord[row.Name].Disable"
                         :default-value="resultRecord[row.Name]?.Value"
                         :attribute="validAttributeList.find((item: { Name: any }) => item.Name === row.Name)"
                         :module-config="props.moduleConfig" @update-value="handleUpdateValue"

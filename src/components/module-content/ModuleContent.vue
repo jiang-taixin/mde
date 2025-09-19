@@ -39,19 +39,6 @@
     <div class="flex-1 min-h-0" v-if="getModulePageType() === ModulePageType.ModulePage">
       <ModulePage />
     </div>
-    <!-- 内容  这个是医生申请页面 -->
-    <div class="flex-1 min-h-0" v-if="getModulePageType() === ModulePageType.ContactRequestList">
-      <HcpApply />
-    </div>
-    <!-- 内容  这个是医生申请报告页面 -->
-    <div class="flex-1 min-h-0" v-if="getModulePageType() === ModulePageType.ContactRequestReport">
-      <HcpApplyReport />
-    </div>
-    <!-- 内容  这个是face讲者申请页面 -->
-    <div class="flex-1 min-h-0" v-if="getModulePageType() === ModulePageType.FaceRequestList">
-      <FaceSpeakerApply />
-    </div>
-
   </div>
 </template>
 <script setup lang="ts">
@@ -109,16 +96,13 @@ const loadConfig = async () =>{
 
 // 页面URL与模块类型的映射
 const PAGE_URL_MAPPING: Record<string, ModulePageType> = {
-  'ModulePage.aspx': ModulePageType.ModulePage,
-  'ContactRequestList.aspx': ModulePageType.ContactRequestList,
-  'ContactRequestReport.aspx': ModulePageType.ContactRequestReport,
-  'FaceRequestList.aspx': ModulePageType.FaceRequestList};
+  'ModulePage.aspx': ModulePageType.ModulePage
+};
 // 获取模块类型
 const getModulePageType = (): ModulePageType => {
   const { Url } = props.moduleTab;
-    // 查找匹配的页面类型
-    const matchedType = Object.entries(PAGE_URL_MAPPING).find(([pageUrl]) =>Url.includes(pageUrl)
-  );
+  // 查找匹配的页面类型
+  const matchedType = Object.entries(PAGE_URL_MAPPING).find(([pageUrl]) =>Url.includes(pageUrl));
   return matchedType?.[1] ?? ModulePageType.Normal;
 };
 

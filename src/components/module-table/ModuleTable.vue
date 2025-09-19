@@ -92,6 +92,10 @@
                     </template>
                   </div>
                 </template>
+                <!--自定义显示内容   部分字段需要数据转换-->
+                <template #default="{row}">
+                  {{mappingContent(column.Name,row[column.Name])}}
+                </template>
               </vxe-column>
             </template>
           </template>
@@ -236,6 +240,7 @@
 import { ref, h, type PropType } from 'vue';
 import { CreateUpdateType, FeatureName, type Attribute, type ModuleConfig } from '@/models/moduleConfigModel';
 import { getIcon } from '@/utils/icon-transfer';
+import { mappingContent } from '@/utils/mappingContent';
 import { message, Modal } from 'ant-design-vue';
 import type { VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table/types/all';
 import { debounce } from 'lodash';
