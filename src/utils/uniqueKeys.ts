@@ -5,7 +5,7 @@ export function ensureUniqueKeys(rows: any[], entityConfigName = '') {
     });
     return rows;
   }
-  else if(entityConfigName === 'RsfeHospitalStrengthWeightOfflineConfig'){
+  else if(entityConfigName === 'AccountStrengthWeightConfig'||entityConfigName === 'RsfeHospitalStrengthWeightOfflineConfig'){
     rows.forEach((row) => {
       row.__rowKey = `${row.VersionCode}_${row.AccountCode}_${row.StrengthCode}_${row.PositionCode}`;
     });

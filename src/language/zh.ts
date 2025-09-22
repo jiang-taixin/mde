@@ -160,5 +160,15 @@ export default {
     overLength:"长度不能超过最大长度{length}",
     overMax:"必须小于最大值{count}",
     inValidError:"输入的格式无效: 有效格式是 {format}",
+  },
+  dropdown:{
+    status:{
+      active:"激活",
+      deleted:"删除"
+    },
+    yesOrNo:{
+      yes:"是",
+      no:"否",
+    }
   }
 };

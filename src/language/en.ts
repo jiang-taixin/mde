@@ -160,5 +160,15 @@ export default {
     overLength:"Must be less than max length:{length}",
     overMax:"Must be less than max value:{count}",
     inValidError:"Input fromat invalid: valid format is {format}",
+  },
+  dropdown:{
+    status:{
+      active:"Active",
+      deleted:"Deleted"
+    },
+    yesOrNo:{
+      yes:"Yes",
+      no:"No",
+    }
   }
 };
