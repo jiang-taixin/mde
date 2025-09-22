@@ -16,3 +16,8 @@ export async function setLanuguage(LanguageCode:string):Promise<any> {
 export async function setPrincipal(activePrincipalId:string):Promise<any> {
   return http.post(`/API/auth/SignAs`,{activePrincipalId});
 }
+
+// 获取权限组
+export async function getPrincipals():Promise<any> {
+  return http.get(`/API/auth/GetPrincipalbyUser`);
+}

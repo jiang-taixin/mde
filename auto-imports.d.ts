@@ -67,6 +67,7 @@ declare global {
   const getModuleConfig: typeof import('./src/services/module-service')['getModuleConfig']
   const getModulesList: typeof import('./src/services/module-service')['getModulesList']
   const getParentGeoGraphy: typeof import('./src/services/metaData-service')['getParentGeoGraphy']
+  const getPrincipals: typeof import('./src/services/login-service')['getPrincipals']
   const getRefEntityConfig: typeof import('./src/services/choose-service')['getRefEntityConfig']
   const getSecurityList: typeof import('./src/services/module-service')['getSecurityList']
   const getWeekNo: typeof import('./src/utils/datetime')['getWeekNo']

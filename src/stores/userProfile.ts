@@ -33,6 +33,11 @@ export const useUserProfileStore = defineStore("userProfile", {
     },
     setLanguage(lang:string){
       (this.userProfile as UserProfile).Language = lang as string;
+    },
+    setPrincipals(principals:Principal[]){
+      if(this.userProfile){
+        this.userProfile.Principals = principals;
+      }
     }
 
   },

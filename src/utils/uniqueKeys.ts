@@ -11,6 +11,12 @@ export function ensureUniqueKeys(rows: any[], entityConfigName = '') {
     });
     return rows;
   }
+  else if(entityConfigName === 'DoctorConfig'){
+    rows.forEach((row) => {
+      row.__rowKey = `${row.Code}_${row.HospitalCode}_${row.DepartmentCode}`;
+    });
+    return rows;
+  }
   else{
     rows.forEach((row) => {
       row.__rowKey = `${row.ID}`;
