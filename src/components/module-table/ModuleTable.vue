@@ -174,7 +174,7 @@
       </div>
     </template>
     <CreateUpdatePanel @closeCallback="closeCreateUpdatePanel" @successCallBack="successCreateUpdate"
-      :create-update-type="createUpdateType"></CreateUpdatePanel>
+      :create-update-type="createUpdateType" :module-config="moduleConfig"></CreateUpdatePanel>
   </a-modal>
   <!--上传弹窗-->
   <a-modal v-model:open="openUpload" :width="500" :footer="null" :destroy-on-close="true">

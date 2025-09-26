@@ -1,4 +1,5 @@
 import http from "@/http";
+import type { Entity } from "@/models/entityModel";
 import type { CommandData } from "@/models/gridDataModel";
 import type { ModuleConfig } from "@/models/moduleConfigModel";
 import type { ModuleItem } from "@/models/moduleItemModel";
@@ -12,6 +13,11 @@ export async function getModulesList(moduleId: string): Promise<[ModuleItem]> {
 // 获取模块配置(包括操作栏和表头信息)
 export async function getModuleConfig(entityConfigName: string, showLoading?:boolean): Promise<ModuleConfig> {
   return http.get("/API/application/GetEntityByUser", { params:{entityConfigName} ,loading:showLoading});
+}
+
+// 获取实体
+export async function getEntity(entityName: string, filterDataId:string): Promise<Entity> {
+  return http.get("/API/application/GetEntity", { params:{entityName, filterDataId}});
 }
 
 // 重置配置
@@ -51,3 +57,6 @@ export async function doMerge(params:any):Promise<any> {
 export async function updateWeight(params:any):Promise<any> {
   return http.post("/API/entity/UpdateRecords",  params);
 }
+
+
+

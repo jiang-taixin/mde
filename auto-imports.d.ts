@@ -24,6 +24,7 @@ declare global {
   const PermissionFlagType: typeof import('./src/models/SecurityModel')['PermissionFlagType']
   const PrincipalScope: typeof import('./src/models/SecurityModel')['PrincipalScope']
   const PrincipalType: typeof import('./src/models/userProfileModel')['PrincipalType']
+  const RenderFields: typeof import('./src/constants/renderFields')['RenderFields']
   const ResourceType: typeof import('./src/models/SecurityModel')['ResourceType']
   const SecurityPrincipalType: typeof import('./src/models/SecurityModel')['SecurityPrincipalType']
   const TableLevel: typeof import('./src/models/gridDataModel')['TableLevel']
@@ -58,6 +59,7 @@ declare global {
   const getDateMessage: typeof import('./src/utils/datetime')['getDateMessage']
   const getDeletionImpactEntityData: typeof import('./src/services/upload-file-service')['getDeletionImpactEntityData']
   const getEnglishDate: typeof import('./src/utils/datetime')['getEnglishDate']
+  const getEntity: typeof import('./src/services/module-service')['getEntity']
   const getExcelValidationPreview: typeof import('./src/services/upload-file-service')['getExcelValidationPreview']
   const getGeoGraphyList: typeof import('./src/services/metaData-service')['getGeoGraphyList']
   const getGridData: typeof import('./src/services/gridData-service')['getGridData']
@@ -183,6 +185,9 @@ declare global {
   // @ts-ignore
   export type { ChooseParams, InsertParams } from './src/models/chooseModel'
   import('./src/models/chooseModel')
+  // @ts-ignore
+  export type { EntityAttribute, Entity } from './src/models/entityModel'
+  import('./src/models/entityModel')
   // @ts-ignore
   export type { TableLevel, ANDOR, MoveDirection, ExportType, DownloadType, MoveResult, SearchConditionValue, RequestGridParams, RequestHistoryParams, CommandData, ExportParams, DownloadParams, GridData } from './src/models/gridDataModel'
   import('./src/models/gridDataModel')
